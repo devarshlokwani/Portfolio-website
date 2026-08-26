@@ -1,0 +1,70 @@
+{
+  "categories": [
+    {
+      "name": "Languages",
+      "items": [
+        { "id": "javascript", "label": "JavaScript", "set": "si", "icon": "SiJavascript", "color": "#F7DF1E" },
+        { "id": "typescript", "label": "TypeScript", "set": "si", "icon": "SiTypescript", "color": "#3178C6" },
+        { "id": "python", "label": "Python", "set": "si", "icon": "SiPython", "color": "#3776AB" },
+        { "id": "sql", "label": "SQL", "set": "tb", "icon": "TbSql", "color": "#4479A1" },
+        { "id": "html5", "label": "HTML5", "set": "si", "icon": "SiHtml5", "color": "#E34F26" },
+        { "id": "css3", "label": "CSS3", "set": "si", "icon": "SiCss", "color": "#1572B6" }
+      ]
+    },
+    {
+      "name": "Frameworks & Libraries",
+      "items": [
+        { "id": "react", "label": "React", "set": "si", "icon": "SiReact", "color": "#61DAFB" },
+        { "id": "react-native", "label": "React Native", "set": "si", "icon": "SiReact", "color": "#61DAFB" },
+        { "id": "nodejs", "label": "Node.js", "set": "si", "icon": "SiNodedotjs", "color": "#5FA04E" },
+        { "id": "express", "label": "Express.js", "set": "si", "icon": "SiExpress", "color": "#ffffff" },
+        { "id": "rest-apis", "label": "REST APIs", "set": "tb", "icon": "TbApi", "color": "#FF5A3C" },
+        { "id": "tailwind", "label": "Tailwind CSS", "set": "si", "icon": "SiTailwindcss", "color": "#38BDF8" },
+        { "id": "gsap", "label": "GSAP", "set": "si", "icon": "SiGreensock", "color": "#88CE02" },
+        { "id": "pandas", "label": "Pandas", "set": "si", "icon": "SiPandas", "color": "#150458" },
+        { "id": "numpy", "label": "NumPy", "set": "si", "icon": "SiNumpy", "color": "#4DABCF" }
+      ]
+    },
+    {
+      "name": "Databases",
+      "items": [
+        { "id": "mysql", "label": "MySQL", "set": "si", "icon": "SiMysql", "color": "#4479A1" },
+        { "id": "mongodb", "label": "MongoDB", "set": "si", "icon": "SiMongodb", "color": "#47A248" },
+        { "id": "ms-access", "label": "MS Access", "set": "tb", "icon": "TbDatabase", "color": "#A4373A" }
+      ]
+    },
+    {
+      "name": "Cloud & DevOps",
+      "items": [
+        { "id": "aws", "label": "AWS", "set": "fa6", "icon": "FaAws", "color": "#FF9900" },
+        { "id": "git", "label": "Git", "set": "si", "icon": "SiGit", "color": "#F05032" },
+        { "id": "github", "label": "GitHub", "set": "si", "icon": "SiGithub", "color": "#ffffff" },
+        { "id": "vercel", "label": "Vercel", "set": "si", "icon": "SiVercel", "color": "#ffffff" },
+        { "id": "render", "label": "Render", "set": "si", "icon": "SiRender", "color": "#46E3B7" },
+        { "id": "vite", "label": "Vite", "set": "si", "icon": "SiVite", "color": "#646CFF" },
+        { "id": "npm", "label": "npm", "set": "si", "icon": "SiNpm", "color": "#CB3837" }
+      ]
+    },
+    {
+      "name": "Design & UX",
+      "items": [
+        { "id": "figma", "label": "Figma", "set": "si", "icon": "SiFigma", "color": "#F24E1E" }
+      ]
+    },
+    {
+      "name": "Data & AI",
+      "items": [
+        { "id": "data-analysis", "label": "Data Analysis", "set": "tb", "icon": "TbChartHistogram", "color": "#FF5A3C" },
+        { "id": "ml", "label": "KNN & ML", "set": "tb", "icon": "TbRobot", "color": "#FF5A3C" },
+        { "id": "genai", "label": "GenAI & Prompting", "set": "si", "icon": "SiAnthropic", "color": "#D97757" }
+      ]
+    },
+    {
+      "name": "Tools",
+      "items": [
+        { "id": "vscode", "label": "VS Code", "set": "tb", "icon": "TbBrandVscode", "color": "#007ACC" },
+        { "id": "jupyter", "label": "Jupyter", "set": "si", "icon": "SiJupyter", "color": "#F37626" }
+      ]
+    }
+  ]
+}

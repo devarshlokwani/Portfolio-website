@@ -1,0 +1,44 @@
+[
+  {
+    "role": "Software Engineer",
+    "company": "Robotic Marketer",
+    "period": "Feb 2026 — Jul 2026",
+    "location": "Sydney, NSW",
+    "points": [
+      "Owned the Contacts module of a fully interconnected CRM for an AI marketing platform, delivered by a 6-person Agile team, contributing across the stack from backend APIs to the React front end.",
+      "Shipped full CRUD, bulk actions, and soft delete/restore end to end, plus CSV import/export pipelines with live preview, improving data-management workflows for B2B, B2C, eCommerce, and Education clients.",
+      "Designed Contacts to auto-link with Accounts and Opportunities so lead conversion creates linked records in a single step, with every action logged to a shared activity timeline for full audit traceability.",
+      "Built persona-driven contact classification and buying-group tracking to power Account-Based Marketing, collaborating through code reviews and version control in a fast-paced delivery environment."
+    ]
+  },
+  {
+    "role": "Store Team Member (Sole Operator)",
+    "company": "7-Eleven",
+    "period": "Apr 2025 — Present",
+    "location": "Sydney, NSW",
+    "points": [
+      "Operate the store independently during solo shifts, demonstrating autonomy, accountability, and problem-solving under pressure in a high-traffic environment.",
+      "Manage end-to-end operations, POS transactions, customer service, inventory, cash handling, and compliance checklists, applying standardised procedures in a time-critical setting."
+    ]
+  },
+  {
+    "role": "Team Member & Crew Trainer",
+    "company": "KFC Australia",
+    "period": "Nov 2023 — Present",
+    "location": "Sydney, NSW",
+    "points": [
+      "Selected as Crew Trainer to onboard and upskill new team members, producing training notes, walking trainees through workflows, and answering operational questions.",
+      "Recognised consistently by customers and supervisors for reliability and performance under pressure during peak service periods."
+    ]
+  },
+  {
+    "role": "Digital Marketing Intern",
+    "company": "Renaissance Educare",
+    "period": "Apr 2023 — Jun 2023",
+    "location": "India",
+    "points": [
+      "Managed social media platforms and analytics dashboards, increasing audience engagement by 40% over 6 months through data-informed content strategy.",
+      "Conducted competitor analysis and executed email marketing workflows with measurable conversion outcomes; awarded Intern of the Month for initiative."
+    ]
+  }
+]

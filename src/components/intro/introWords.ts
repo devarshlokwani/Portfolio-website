@@ -1,0 +1,1 @@
+export const INTRO_WORDS = ['THINK', 'DESIGN', 'BUILD', 'SHIP', 'DEVARSH LOKWANI']

@@ -1,0 +1,52 @@
+[
+  {
+    "slug": "foundr",
+    "title": "Foundr",
+    "tagline": "Full-stack finance tracker for solo founders",
+    "description": "A live, deployed finance-tracking web app that turns manual records into clear metrics — burn rate, runway, ROI, and margins. Decoupled architecture: a static TypeScript/Lit landing frontend on Vercel and an independent Node.js/Express waitlist API on Render, backed by MongoDB Atlas.",
+    "stack": ["TypeScript", "Node.js", "Express", "MongoDB", "Lit", "Vite"],
+    "links": { "live": "#", "github": "#" },
+    "featured": true,
+    "device": "browser"
+  },
+  {
+    "slug": "sigma-dogcare",
+    "title": "Sigma DogCare",
+    "tagline": "UX research + React Native dog-care app",
+    "description": "User research and stakeholder interviews defined requirements for a dual-interface mobile app. Built a functional React Native prototype covering authentication, booking management, real-time tracking, and payment flows.",
+    "stack": ["React Native", "Figma", "UX Research"],
+    "links": { "github": "#" },
+    "featured": false,
+    "device": "mobile"
+  },
+  {
+    "slug": "pokedex",
+    "title": "Pokédex",
+    "tagline": "Relational database system",
+    "description": "Architected a multi-table relational database and wrote complex SQL queries managing inter-table relationships and aggregate reporting, replicated across MySQL Workbench and MongoDB.",
+    "stack": ["MySQL", "MongoDB", "SQL"],
+    "links": { "github": "#" },
+    "featured": false,
+    "device": "desktop"
+  },
+  {
+    "slug": "large-scale-data-analysis",
+    "title": "Large-Scale Data Analysis",
+    "tagline": "KNN classification & regression in Python",
+    "description": "Analysed real-world datasets in Jupyter Notebooks using KNN classification and regression, using Pandas, NumPy, and Matplotlib for wrangling, statistical analysis, and visualisation.",
+    "stack": ["Python", "Pandas", "NumPy", "Jupyter"],
+    "links": { "github": "#" },
+    "featured": false,
+    "device": "desktop"
+  },
+  {
+    "slug": "veritree",
+    "title": "Veritree",
+    "tagline": "AI business analysis & stakeholder modelling",
+    "description": "Full Business Model Canvas analysis of an AI-powered enterprise, including stakeholder mapping and adoption analysis using the UTAUT framework and EU AI Act risk classification.",
+    "stack": ["Business Analysis", "UTAUT", "AI Governance"],
+    "links": {},
+    "featured": false,
+    "device": "desktop"
+  }
+]
