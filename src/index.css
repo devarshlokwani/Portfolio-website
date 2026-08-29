@@ -57,6 +57,28 @@ body {
   min-height: 100svh;
 }
 
+/* React Bits "Warp Text" hero name — text is rasterized to a canvas texture
+   and redrawn each frame by a WebGL fragment shader that fbm-warps it and
+   splits the RGB channels near the pointer for a chromatic-aberration bend
+   (see WarpText.tsx). Width/height are deliberately left to each usage's
+   Tailwind classes (that's what sizes the text, via the auto-fit-to-
+   container canvas logic) — setting them here too would collide with those
+   utility classes at equal specificity and lose on source order. */
+.warp-text {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.warp-text canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 /* Custom cursor — CustomCursor adds this class to <html> once it sees a real
    mouse-typed pointer event, and removes it on touch input. Everything under
    it loses the native cursor so our arrow glyph reads as the pointer

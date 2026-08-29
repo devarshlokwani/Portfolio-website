@@ -8,14 +8,18 @@ export interface SkillItem {
   set: IconSet
   icon: string
   color: string
+  category: string
 }
+
+export type SkillNodeState = 'default' | 'active' | 'dimmed'
 
 interface SkillNodeProps {
   item: SkillItem
+  state?: SkillNodeState
 }
 
 export const SkillNode = forwardRef<HTMLDivElement, SkillNodeProps>(function SkillNode(
-  { item },
+  { item, state = 'default' },
   ref,
 ) {
   const Icon = resolveIcon(item.set, item.icon)
@@ -26,12 +30,26 @@ export const SkillNode = forwardRef<HTMLDivElement, SkillNodeProps>(function Ski
       className="absolute left-1/2 top-1/2 flex flex-col items-center gap-1.5 will-change-transform"
     >
       <div
-        className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-lg md:h-14 md:w-14"
-        style={{ color: item.color }}
+        className={`flex h-11 w-11 items-center justify-center rounded-full border bg-surface shadow-lg transition-all duration-500 ease-out md:h-14 md:w-14 ${
+          state === 'dimmed' ? 'border-border grayscale' : 'border-border'
+        } ${state === 'active' ? 'scale-[1.15]' : 'scale-100'}`}
+        style={{
+          color: item.color,
+          opacity: state === 'dimmed' ? 0.25 : 1,
+          boxShadow: state === 'active' ? `0 0 22px 3px ${item.color}99, 0 0 0 1px ${item.color}` : undefined,
+        }}
       >
         {Icon && <Icon className="h-5 w-5 md:h-6 md:w-6" />}
       </div>
-      <span className="whitespace-nowrap font-mono text-[10px] text-fg-muted">{item.label}</span>
+      <span
+        className="whitespace-nowrap font-mono text-[10px] transition-opacity duration-500"
+        style={{
+          color: state === 'active' ? item.color : 'var(--color-fg-muted)',
+          opacity: state === 'dimmed' ? 0.25 : 1,
+        }}
+      >
+        {item.label}
+      </span>
     </div>
   )
 })

@@ -18,19 +18,15 @@
         { "id": "react-native", "label": "React Native", "set": "si", "icon": "SiReact", "color": "#61DAFB" },
         { "id": "nodejs", "label": "Node.js", "set": "si", "icon": "SiNodedotjs", "color": "#5FA04E" },
         { "id": "express", "label": "Express.js", "set": "si", "icon": "SiExpress", "color": "#ffffff" },
-        { "id": "rest-apis", "label": "REST APIs", "set": "tb", "icon": "TbApi", "color": "#FF5A3C" },
         { "id": "tailwind", "label": "Tailwind CSS", "set": "si", "icon": "SiTailwindcss", "color": "#38BDF8" },
-        { "id": "gsap", "label": "GSAP", "set": "si", "icon": "SiGreensock", "color": "#88CE02" },
-        { "id": "pandas", "label": "Pandas", "set": "si", "icon": "SiPandas", "color": "#150458" },
-        { "id": "numpy", "label": "NumPy", "set": "si", "icon": "SiNumpy", "color": "#4DABCF" }
+        { "id": "gsap", "label": "GSAP", "set": "si", "icon": "SiGreensock", "color": "#88CE02" }
       ]
     },
     {
       "name": "Databases",
       "items": [
         { "id": "mysql", "label": "MySQL", "set": "si", "icon": "SiMysql", "color": "#4479A1" },
-        { "id": "mongodb", "label": "MongoDB", "set": "si", "icon": "SiMongodb", "color": "#47A248" },
-        { "id": "ms-access", "label": "MS Access", "set": "tb", "icon": "TbDatabase", "color": "#A4373A" }
+        { "id": "mongodb", "label": "MongoDB", "set": "si", "icon": "SiMongodb", "color": "#47A248" }
       ]
     },
     {
@@ -41,12 +37,11 @@
         { "id": "github", "label": "GitHub", "set": "si", "icon": "SiGithub", "color": "#ffffff" },
         { "id": "vercel", "label": "Vercel", "set": "si", "icon": "SiVercel", "color": "#ffffff" },
         { "id": "render", "label": "Render", "set": "si", "icon": "SiRender", "color": "#46E3B7" },
-        { "id": "vite", "label": "Vite", "set": "si", "icon": "SiVite", "color": "#646CFF" },
-        { "id": "npm", "label": "npm", "set": "si", "icon": "SiNpm", "color": "#CB3837" }
+        { "id": "vite", "label": "Vite", "set": "si", "icon": "SiVite", "color": "#646CFF" }
       ]
     },
     {
-      "name": "Design & UX",
+      "name": "Design",
       "items": [
         { "id": "figma", "label": "Figma", "set": "si", "icon": "SiFigma", "color": "#F24E1E" }
       ]
@@ -55,14 +50,10 @@
       "name": "Data & AI",
       "items": [
         { "id": "data-analysis", "label": "Data Analysis", "set": "tb", "icon": "TbChartHistogram", "color": "#FF5A3C" },
-        { "id": "ml", "label": "KNN & ML", "set": "tb", "icon": "TbRobot", "color": "#FF5A3C" },
-        { "id": "genai", "label": "GenAI & Prompting", "set": "si", "icon": "SiAnthropic", "color": "#D97757" }
-      ]
-    },
-    {
-      "name": "Tools",
-      "items": [
-        { "id": "vscode", "label": "VS Code", "set": "tb", "icon": "TbBrandVscode", "color": "#007ACC" },
+        { "id": "ml", "label": "Machine Learning", "set": "tb", "icon": "TbRobot", "color": "#FF5A3C" },
+        { "id": "genai", "label": "GenAI & Prompting", "set": "si", "icon": "SiAnthropic", "color": "#D97757" },
+        { "id": "pandas", "label": "Pandas", "set": "si", "icon": "SiPandas", "color": "#150458" },
+        { "id": "numpy", "label": "NumPy", "set": "si", "icon": "SiNumpy", "color": "#4DABCF" },
         { "id": "jupyter", "label": "Jupyter", "set": "si", "icon": "SiJupyter", "color": "#F37626" }
       ]
     }

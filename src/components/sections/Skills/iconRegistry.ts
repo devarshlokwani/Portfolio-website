@@ -13,7 +13,6 @@ import {
   SiMongodb,
   SiMysql,
   SiNodedotjs,
-  SiNpm,
   SiNumpy,
   SiPandas,
   SiPython,
@@ -24,7 +23,7 @@ import {
   SiVercel,
   SiVite,
 } from 'react-icons/si'
-import { TbApi, TbBrandVscode, TbChartHistogram, TbDatabase, TbRobot, TbSql } from 'react-icons/tb'
+import { TbChartHistogram, TbRobot, TbSql } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 
 // Explicit named imports (rather than `import *`) so bundlers can tree-shake
@@ -49,16 +48,12 @@ const ICONS: Record<string, IconType> = {
   SiVercel,
   SiRender,
   SiVite,
-  SiNpm,
   SiFigma,
   SiAnthropic,
   SiJupyter,
   TbSql,
-  TbDatabase,
-  TbApi,
   TbChartHistogram,
   TbRobot,
-  TbBrandVscode,
   FaAws,
 }
 

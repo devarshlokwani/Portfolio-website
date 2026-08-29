@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Section } from '@/components/ui/Section'
 import { SkillsGlobeCSS } from '@/components/sections/Skills/SkillsGlobeCSS'
@@ -6,10 +6,18 @@ import type { SkillItem } from '@/components/sections/Skills/SkillNode'
 import skillsData from '@/data/skills.json'
 
 export function Skills() {
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+
   const { items, categories } = useMemo(() => {
-    const flat: SkillItem[] = skillsData.categories.flatMap((c) => c.items as SkillItem[])
+    const flat: SkillItem[] = skillsData.categories.flatMap((c) =>
+      c.items.map((item) => ({ ...item, category: c.name }) as SkillItem),
+    )
     return { items: flat, categories: skillsData.categories.map((c) => c.name) }
   }, [])
+
+  const toggleCategory = (name: string) => {
+    setActiveCategory((prev) => (prev === name ? null : name))
+  }
 
   return (
     <Section id="skills" label="03 — Skills">
@@ -19,22 +27,33 @@ export function Skills() {
             A toolkit built for shipping
           </h2>
           <p className="mt-6 max-w-md text-fg-muted">
-            Drag the sphere to look around. Every icon here is something I've used to ship
-            production code — from the language and framework layer down to the cloud and tooling
-            that gets it live.
+            Drag the sphere to look around, or tap a category to spotlight just those skills.
+            Every icon here is something I've used to ship production code.
           </p>
           <ul className="mt-8 flex flex-wrap gap-2">
-            {categories.map((name) => (
-              <li
-                key={name}
-                className="rounded-full border border-border px-3 py-1 font-mono text-xs text-fg-muted"
-              >
-                {name}
-              </li>
-            ))}
+            {categories.map((name) => {
+              const isActive = activeCategory === name
+              return (
+                <li key={name}>
+                  <button
+                    type="button"
+                    data-cursor-hover
+                    onClick={() => toggleCategory(name)}
+                    aria-pressed={isActive}
+                    className={`rounded-full border px-3 py-1 font-mono text-xs transition-colors duration-300 ${
+                      isActive
+                        ? 'border-accent bg-accent text-accent-fg'
+                        : 'border-border text-fg-muted hover:border-accent hover:text-accent'
+                    }`}
+                  >
+                    {name}
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </div>
-        <SkillsGlobeCSS items={items} />
+        <SkillsGlobeCSS items={items} activeCategory={activeCategory} />
       </div>
     </Section>
   )
