@@ -59,7 +59,8 @@ export function Contact() {
               <li key={s.label}>
                 <a
                   href={s.href}
-                  className="font-mono text-sm text-fg-muted transition-colors hover:text-accent"
+                  data-cursor-hover
+                  className="link-underline font-mono text-sm text-fg-muted transition-colors hover:text-accent"
                 >
                   {s.label} ↗
                 </a>

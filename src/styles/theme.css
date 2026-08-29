@@ -25,6 +25,7 @@
   --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-accent: 'Instrument Serif', 'Georgia', serif;
 }
 
 :root[data-theme='light'] {

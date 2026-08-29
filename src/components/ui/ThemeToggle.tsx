@@ -1,4 +1,7 @@
+import { useRef } from 'react'
+
 import { useTheme } from '@/hooks/useTheme'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 function SunIcon() {
   return (
@@ -23,13 +26,46 @@ function MoonIcon() {
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const reducedMotion = useReducedMotion()
+
+  const handleClick = () => {
+    const btn = btnRef.current
+    const supportsViewTransition = typeof document.startViewTransition === 'function'
+
+    if (!supportsViewTransition || reducedMotion || !btn) {
+      toggleTheme()
+      return
+    }
+
+    const { left, top, width, height } = btn.getBoundingClientRect()
+    const x = left + width / 2
+    const y = top + height / 2
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    )
+
+    const transition = document.startViewTransition(() => {
+      toggleTheme()
+    })
+
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`] },
+        { duration: 650, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
+      )
+    })
+  }
 
   return (
     <button
+      ref={btnRef}
       type="button"
-      onClick={toggleTheme}
+      onClick={handleClick}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       aria-pressed={isDark}
+      data-cursor-hover
       className="relative flex h-8 w-14 items-center rounded-full border border-border bg-surface px-1 transition-colors"
     >
       <span

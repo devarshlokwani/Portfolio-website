@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap');
 @import 'tailwindcss';
 @import './styles/theme.css';
 
@@ -17,6 +17,7 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-mono: var(--font-mono);
+  --font-accent: var(--font-accent);
 }
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -54,4 +55,110 @@ body {
 
 #root {
   min-height: 100svh;
+}
+
+/* Custom cursor — CustomCursor adds this class to <html> once it sees a real
+   mouse-typed pointer event, and removes it on touch input. Everything under
+   it loses the native cursor so our arrow glyph reads as the pointer
+   instead. */
+.custom-cursor-active,
+.custom-cursor-active * {
+  cursor: none !important;
+}
+
+.cursor-anchor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* fg fill + bg outline (rather than mix-blend-mode) keeps the arrow legible
+   over any content in either theme, including solid-fg UI like the active
+   nav pill, without the double-blend artifacts a difference blend produced
+   there. */
+.cursor-arrow {
+  display: block;
+  width: 28px;
+  height: 28px;
+  transform-origin: 4px 4px;
+  filter: drop-shadow(0 3px 8px rgb(0 0 0 / 0.28));
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.2s ease;
+}
+
+/* Solid kite silhouette (no default-cursor flag notch) split into two
+   facets by a diagonal seam, one dimmed, for a smooth beveled look. The
+   outline path only traces the outer perimeter, not the internal seam, so
+   the facet split reads as soft shading rather than a hard line. */
+.cursor-arrow-outline {
+  fill: none;
+  stroke: var(--color-bg);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.cursor-arrow-facet-a,
+.cursor-arrow-facet-b {
+  fill: var(--color-fg);
+  transition: fill 0.2s ease;
+}
+
+.cursor-arrow-facet-b {
+  fill-opacity: 0.65;
+}
+
+.cursor--hover .cursor-arrow {
+  transform: scale(1.18) rotate(-6deg);
+}
+
+.cursor--hover .cursor-arrow-facet-a,
+.cursor--hover .cursor-arrow-facet-b {
+  fill: var(--color-accent);
+}
+
+.cursor--down .cursor-arrow {
+  transform: scale(0.82);
+}
+
+/* Theme toggle circular reveal — the toggle drives a clip-path grow on the
+   new-theme snapshot via the View Transitions API; the browser's default
+   crossfade is turned off so only that clip-path animation shows. Browsers
+   without support just fall back to the plain color transition below. */
+html,
+body {
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* Animated underline sweep for inline text links. */
+.link-underline {
+  position: relative;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-underline:hover {
+  background-size: 100% 1px;
 }

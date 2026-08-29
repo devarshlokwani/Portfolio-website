@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { gsap } from '@/lib/gsap'
@@ -15,6 +15,58 @@ const LINKS = [
 export function Nav() {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  const listRef = useRef<HTMLDivElement>(null)
+  const pillRef = useRef<HTMLDivElement>(null)
+  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([])
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
+  const pillPrimed = useRef(false)
+
+  // Scroll-spy: highlight whichever section's link is currently centered in view.
+  useEffect(() => {
+    const sections = LINKS.map((l) => document.querySelector<HTMLElement>(l.href))
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          const idx = sections.findIndex((s) => s === entry.target)
+          if (idx !== -1) setActiveIndex(idx)
+        }
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+    )
+
+    sections.forEach((s) => s && observer.observe(s))
+    return () => observer.disconnect()
+  }, [])
+
+  // Slide the pill under the hovered link, falling back to the active section.
+  useEffect(() => {
+    const index = hoverIndex ?? activeIndex
+    const pill = pillRef.current
+    const list = listRef.current
+    const target = index !== null ? linkRefs.current[index] : null
+    if (!pill || !list) return
+
+    if (!target) {
+      gsap.to(pill, { opacity: 0, duration: 0.3, ease: 'power2.out' })
+      return
+    }
+
+    const listBox = list.getBoundingClientRect()
+    const targetBox = target.getBoundingClientRect()
+
+    gsap.to(pill, {
+      x: targetBox.left - listBox.left,
+      width: targetBox.width,
+      opacity: 1,
+      duration: pillPrimed.current ? 0.5 : 0,
+      ease: 'power3.out',
+    })
+    pillPrimed.current = true
+  }, [activeIndex, hoverIndex])
 
   const toggleMenu = () => {
     const next = !open
@@ -41,18 +93,35 @@ export function Nav() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-end gap-8 px-6 py-5 md:px-10 md:py-6">
-      <nav className="hidden items-center gap-7 md:flex">
-        {LINKS.map((link) => (
+    <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-end gap-4 px-6 py-5 md:px-10 md:py-6">
+      <nav
+        ref={listRef}
+        onMouseLeave={() => setHoverIndex(null)}
+        className="relative hidden items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex"
+      >
+        <div
+          ref={pillRef}
+          style={{ width: 0 }}
+          className="pointer-events-none absolute inset-y-1 left-0 rounded-full bg-fg opacity-0"
+        />
+        {LINKS.map((link, i) => (
           <a
             key={link.href}
+            ref={(el) => {
+              linkRefs.current[i] = el
+            }}
             href={link.href}
-            className="font-mono text-xs uppercase tracking-wide text-fg-muted transition-colors hover:text-fg"
+            data-cursor-hover
+            onMouseEnter={() => setHoverIndex(i)}
+            className={`relative z-10 rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wide transition-colors duration-300 ${
+              (hoverIndex ?? activeIndex) === i ? 'text-bg' : 'text-fg-muted hover:text-fg'
+            }`}
           >
             {link.label}
           </a>
         ))}
       </nav>
+
       <ThemeToggle />
 
       <button

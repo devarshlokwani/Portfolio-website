@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 
 import { AppProviders } from '@/app/providers'
 import { CornerMark } from '@/components/ui/CornerMark'
+import { CustomCursor } from '@/components/ui/CustomCursor'
 import { Nav } from '@/components/ui/Nav'
 import { Footer } from '@/components/ui/Footer'
 import { IntroLoader } from '@/components/intro/IntroLoader'
@@ -23,6 +24,7 @@ const SignTheWall = lazy(() =>
 function App() {
   return (
     <AppProviders>
+      <CustomCursor />
       <IntroLoader />
       <CornerMark />
       <Nav />
