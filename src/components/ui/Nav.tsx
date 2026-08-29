@@ -107,7 +107,10 @@ export function Nav() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-end gap-4 px-6 py-5 md:px-10 md:py-6">
-      <nav className="hidden items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex">
+      {/* DL lives in the separate fixed CornerMark component on the far
+          left; this nav is centered independently of that, and the theme
+          toggle + hamburger stay in normal flow pushed to the right. */}
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex">
         {LINKS.map((link, i) => (
           <NavLink
             key={link.href}

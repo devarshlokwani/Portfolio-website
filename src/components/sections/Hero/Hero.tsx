@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { TbBriefcase2, TbMapPin } from 'react-icons/tb'
 
+import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
+import { SocialIcons } from '@/components/sections/Hero/SocialIcons'
 import { WarpText } from '@/components/sections/Hero/WarpText'
+import { BorderGlow } from '@/components/ui/BorderGlow'
 import { useIntro } from '@/hooks/useIntro'
 import { gsap } from '@/lib/gsap'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -42,7 +45,9 @@ export function Hero() {
       id="hero"
       className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-6 pt-32 text-center md:px-10 md:pt-36"
     >
-      <p className="font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
+      <FoundrLink />
+
+      <p className="mt-6 font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
         Sydney, NSW · Graduate Software Engineer
       </p>
 
@@ -57,9 +62,13 @@ export function Hero() {
         </div>
       </h1>
 
+      <div className="mt-6">
+        <SocialIcons />
+      </div>
+
       <div
         ref={metaRef}
-        className="mt-10 flex max-w-2xl flex-col items-center gap-2 opacity-0 md:mt-14"
+        className="mt-8 flex max-w-2xl flex-col items-center gap-2 opacity-0 md:mt-10"
       >
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
           I design and build products that
@@ -75,13 +84,15 @@ export function Hero() {
           >
             View Projects
           </a>
-          <a
-            href="#contact"
-            data-cursor-hover
-            className="rounded-full border border-border px-6 py-3 text-sm font-medium text-fg transition-colors hover:border-accent hover:text-accent"
-          >
-            Get in Touch
-          </a>
+          <BorderGlow className="hover:!border-transparent">
+            <a
+              href="#contact"
+              data-cursor-hover
+              className="rounded-full px-6 py-3 text-sm font-medium text-fg"
+            >
+              Get in Touch
+            </a>
+          </BorderGlow>
         </div>
       </div>
 

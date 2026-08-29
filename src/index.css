@@ -184,3 +184,228 @@ body {
 .link-underline:hover {
   background-size: 100% 1px;
 }
+
+/* Foundr pill's border — a conic gradient in Foundr's own greens, masked
+   down to a thin ring around the pill and continuously rotated, so it reads
+   as a light chasing around the border rather than a static outline. Same
+   idea as an animated rainbow-border pill, just green instead of rainbow. */
+@property --foundr-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.foundr-pill {
+  position: relative;
+}
+
+.foundr-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--foundr-angle),
+    transparent 0%,
+    transparent 30%,
+    #052e21 38%,
+    #10b981 52%,
+    #6ee7b7 70%,
+    #34d399 88%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: foundr-border-spin 3.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes foundr-border-spin {
+  to {
+    --foundr-angle: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foundr-pill::before {
+    animation: none;
+  }
+}
+
+/* Ported from React Bits' Border Glow (reactbits.dev) — pointer position
+   (set as --edge-proximity / --cursor-angle by BorderGlow.tsx) drives a
+   conic-gradient-masked glow that tracks the cursor around the border,
+   fading in the closer it gets to the edge. Adapted from the source's
+   card-sized defaults down to pill-button scale. */
+.border-glow-card {
+  --edge-proximity: 0;
+  --cursor-angle: 45deg;
+  --edge-sensitivity: 30;
+  --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+  --border-radius: 9999px;
+  --glow-padding: 18px;
+  --cone-spread: 25;
+
+  position: relative;
+  display: inline-grid;
+  border-radius: var(--border-radius);
+  isolation: isolate;
+  transform: translate3d(0, 0, 0.01px);
+  border: 1px solid var(--color-border);
+  background: var(--card-bg, transparent);
+  overflow: visible;
+  transition: border-color 0.3s ease;
+}
+
+.border-glow-card::before,
+.border-glow-card > .edge-light {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity 0.25s ease-out;
+  z-index: -1;
+}
+
+.border-glow-card:not(:hover)::before,
+.border-glow-card:not(:hover) > .edge-light {
+  opacity: 0;
+  transition: opacity 0.75s ease-in-out;
+}
+
+.border-glow-card::before {
+  border: 1px solid transparent;
+  background:
+    var(--gradient-one) border-box,
+    var(--gradient-two) border-box,
+    var(--gradient-three) border-box,
+    var(--gradient-four) border-box,
+    var(--gradient-five) border-box,
+    var(--gradient-six) border-box,
+    var(--gradient-seven) border-box,
+    var(--gradient-base) border-box;
+  opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+  /* The border-box gradient layers above paint across the WHOLE element,
+     not just its edge — the source relied on an opaque --card-bg sitting on
+     a padding-box layer on top to visually hide the interior portion, which
+     only works when the card actually has a solid background. On a
+     transparent pill that hid nothing, so the fill read as a solid interior
+     flood. Ring-confine it properly instead (full box minus content-box,
+     same trick as .foundr-pill::before), then intersect that ring with the
+     angular cone mask so the glow only shows on the ring segment nearest
+     the cursor. */
+  -webkit-mask:
+    conic-gradient(
+      from var(--cursor-angle) at center,
+      black calc(var(--cone-spread) * 1%),
+      transparent calc((var(--cone-spread) + 15) * 1%),
+      transparent calc((100 - var(--cone-spread) - 15) * 1%),
+      black calc((100 - var(--cone-spread)) * 1%)
+    ),
+    linear-gradient(#fff 0 0),
+    linear-gradient(#fff 0 0) content-box;
+  /* mask-composite folds bottom-up (content-box, then the full rect, then
+     the conic layer), one explicit operator per layer so the list isn't
+     silently repeat-padded into the wrong pairing: exclude the content-box
+     from the full rect first (full XOR content-box = the ring), then
+     intersect that ring with the conic cone. The third value is unused
+     (bottommost layer has nothing below it to combine with) but still
+     supplied so the 2-value list doesn't get cycled into a different,
+     wrong pairing. */
+  mask-composite: intersect, exclude, add;
+}
+
+/* The source's third layer (a soft mesh-gradient wash filling the card's
+   interior near the edges) is dropped entirely here — on a small pill that
+   "near the edges" radius covers almost the whole button, reading as a
+   solid color fill instead of a glow. Border ring + outer shadow glow only. */
+
+.border-glow-card > .edge-light {
+  inset: calc(var(--glow-padding) * -1);
+  pointer-events: none;
+  z-index: 1;
+  mask-image: conic-gradient(
+    from var(--cursor-angle) at center,
+    black 2.5%,
+    transparent 10%,
+    transparent 90%,
+    black 97.5%
+  );
+  opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+  mix-blend-mode: plus-lighter;
+}
+
+.border-glow-card > .edge-light::before {
+  content: '';
+  position: absolute;
+  inset: var(--glow-padding);
+  border-radius: inherit;
+  /* The source's blur radii (up to 50px) were sized for a big card, where a
+     glow that large only bleeds out past the card's own edges. On a small
+     ~40px pill, blur that size reaches all the way back across the button's
+     own face from every direction, flooding it solid rather than reading as
+     a glow. Scaled down roughly 3-4x throughout, inset and outward alike. */
+  box-shadow:
+    inset 0 0 0 1px var(--glow-color),
+    inset 0 0 1px 0 var(--glow-color-60),
+    inset 0 0 2px 0 var(--glow-color-50),
+    inset 0 0 3px 0 var(--glow-color-40),
+    0 0 1px 0 var(--glow-color-60),
+    0 0 2px 0 var(--glow-color-50),
+    0 0 4px 0 var(--glow-color-40),
+    0 0 8px 0 var(--glow-color-30),
+    0 0 12px 1px var(--glow-color-20),
+    0 0 20px 1px var(--glow-color-10);
+}
+
+.border-glow-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  border-radius: inherit;
+}
+
+/* Social icon buttons — a light, quick wiggle on hover (not a spin or a
+   bounce, just a nervous little shake) while the icon's own color and a
+   matching glow fade in, driven per-button via --social-glow. */
+.social-icon-btn {
+  --social-glow: var(--color-fg);
+}
+
+.social-icon-btn:hover .social-icon-btn__icon,
+.social-icon-btn:focus-visible .social-icon-btn__icon {
+  animation: social-icon-shake 0.4s ease-in-out;
+  color: var(--social-glow);
+  filter: drop-shadow(0 0 6px var(--social-glow));
+}
+
+@keyframes social-icon-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-12deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  60% {
+    transform: rotate(-6deg);
+  }
+  80% {
+    transform: rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-icon-btn:hover .social-icon-btn__icon,
+  .social-icon-btn:focus-visible .social-icon-btn__icon {
+    animation: none;
+  }
+}
