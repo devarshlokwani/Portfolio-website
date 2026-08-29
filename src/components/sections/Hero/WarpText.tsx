@@ -110,6 +110,13 @@ void main() {
 }
 `
 
+export interface GlyphTransition {
+  /** character index within `text` (single-line only) */
+  index: number
+  /** 0 = old glyph still fully in place, 1 = fully replaced by the incoming one */
+  progress: number
+}
+
 interface WarpTextProps {
   text: string
   color?: string
@@ -126,6 +133,10 @@ interface WarpTextProps {
   letterSpacing?: string | number
   lineHeight?: number
   className?: string
+  /** Accessible name, in case `text` is mid-animation (e.g. a scramble reveal) and doesn't match the final word. Defaults to `text`. */
+  ariaLabel?: string
+  /** Characters mid-"reload": each one's old glyph slides out to the left while a fresh copy slides in from the right, clipped to that character's own cell — a kinetic idle tic, not a content change (`text` stays the settled word throughout). */
+  glyphTransitions?: GlyphTransition[] | null
 }
 
 interface TextCanvasProps {
@@ -136,6 +147,7 @@ interface TextCanvasProps {
   fontFamily: string
   letterSpacing: string | number
   lineHeight: number
+  glyphTransitions?: GlyphTransition[] | null
 }
 
 const getFontValue = (value: string | number) => (typeof value === 'number' ? `${value}px` : value)
@@ -152,13 +164,44 @@ const drawLine = (
   x: number,
   y: number,
   letterSpacing: number,
+  fontSizePx: number,
+  glyphTransitions?: GlyphTransition[] | null,
 ) => {
   const chars = Array.from(line)
   let cursor = x - measureLine(ctx, line, letterSpacing) / 2
 
   chars.forEach((char, index) => {
-    ctx.fillText(char, cursor, y)
-    cursor += ctx.measureText(char).width + (index === chars.length - 1 ? 0 : letterSpacing)
+    const charWidth = ctx.measureText(char).width
+    const transition = glyphTransitions?.find((t) => t.index === index)
+
+    if (transition) {
+      const p = Math.min(Math.max(transition.progress, 0), 1)
+      const slide = charWidth
+      const alpha = ctx.globalAlpha
+      // clip to this character's own cell (plus half the surrounding gap) so
+      // the sliding glyph wipes out/in within its own slot instead of
+      // smearing across the neighboring letter
+      const pad = letterSpacing / 2
+      ctx.save()
+      ctx.beginPath()
+      ctx.rect(cursor - pad, y - fontSizePx * 1.2, charWidth + pad * 2, fontSizePx * 2.4)
+      ctx.clip()
+
+      // outgoing glyph slides left and fades out
+      ctx.globalAlpha = alpha * (1 - p)
+      ctx.fillText(char, cursor - p * slide, y)
+
+      // incoming glyph (same character) slides in from the right and fades in
+      ctx.globalAlpha = alpha * p
+      ctx.fillText(char, cursor + (1 - p) * slide, y)
+
+      ctx.globalAlpha = alpha
+      ctx.restore()
+    } else {
+      ctx.fillText(char, cursor, y)
+    }
+
+    cursor += charWidth + (index === chars.length - 1 ? 0 : letterSpacing)
   })
 }
 
@@ -236,7 +279,17 @@ const buildTextCanvas = ({
   }
 
   const startY = height / 2 - (lineHeight * (lines.length - 1)) / 2
-  lines.forEach((line, index) => drawLine(ctx, line, width / 2, startY + index * lineHeight, letterSpacing))
+  lines.forEach((line, index) =>
+    drawLine(
+      ctx,
+      line,
+      width / 2,
+      startY + index * lineHeight,
+      letterSpacing,
+      fontSizePx,
+      index === 0 ? props.glyphTransitions : null,
+    ),
+  )
 
   return canvas
 }
@@ -265,6 +318,8 @@ export function WarpText({
   letterSpacing = '-0.06em',
   lineHeight = 0.9,
   className = '',
+  ariaLabel,
+  glyphTransitions = null,
 }: WarpTextProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const propsRef = useRef({
@@ -282,6 +337,7 @@ export function WarpText({
     pointerStrength,
     refraction,
     ripple,
+    glyphTransitions,
   })
   const contextRef = useRef<{ program: Program; rasterize: () => void } | null>(null)
 
@@ -301,6 +357,7 @@ export function WarpText({
       pointerStrength,
       refraction,
       ripple,
+      glyphTransitions,
     }
 
     if (contextRef.current) {
@@ -329,6 +386,7 @@ export function WarpText({
     pointerStrength,
     refraction,
     ripple,
+    glyphTransitions,
   ])
 
   useEffect(() => {
@@ -562,5 +620,7 @@ export function WarpText({
     }
   }, [])
 
-  return <div ref={containerRef} className={`warp-text ${className}`.trim()} role="img" aria-label={text} />
+  return (
+    <div ref={containerRef} className={`warp-text ${className}`.trim()} role="img" aria-label={ariaLabel ?? text} />
+  )
 }

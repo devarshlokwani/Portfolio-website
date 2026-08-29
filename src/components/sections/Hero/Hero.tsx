@@ -1,13 +1,15 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TbBriefcase2, TbMapPin } from 'react-icons/tb'
 
 import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
 import { SocialIcons } from '@/components/sections/Hero/SocialIcons'
 import { WarpText } from '@/components/sections/Hero/WarpText'
 import { BorderGlow } from '@/components/ui/BorderGlow'
+import { useGlyphReload } from '@/hooks/useGlyphReload'
 import { useIntro } from '@/hooks/useIntro'
 import { gsap } from '@/lib/gsap'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useScrambleReveal } from '@/hooks/useScrambleReveal'
 import { useTheme } from '@/hooks/useTheme'
 
 // Mirrors --color-fg / --color-fg-muted in theme.css — WarpText rasterizes
@@ -24,6 +26,31 @@ export function Hero() {
   const nameRef = useRef<HTMLDivElement>(null)
   const metaRef = useRef<HTMLDivElement>(null)
   const { fg, muted } = NAME_COLORS[theme]
+
+  const [devarshRevealed, setDevarshRevealed] = useState(false)
+  const [lokwaniRevealed, setLokwaniRevealed] = useState(false)
+
+  const revealTrigger = introComplete && !reducedMotion
+  const devarshReveal = useScrambleReveal('DEVARSH', {
+    trigger: revealTrigger,
+    duration: 0.7,
+    onDone: () => setDevarshRevealed(true),
+  })
+  const lokwaniReveal = useScrambleReveal('LOKWANI', {
+    trigger: revealTrigger,
+    duration: 0.7,
+    delay: 0.12,
+    onDone: () => setLokwaniRevealed(true),
+  })
+
+  // Once each word has settled from its initial reveal, keep it "alive" with
+  // occasional character reloads — the same glyph(s) slide out one side and
+  // a fresh copy slides in from the other, like a magazine swap.
+  const devarshTransitions = useGlyphReload('DEVARSH', { enabled: devarshRevealed && !reducedMotion })
+  const lokwaniTransitions = useGlyphReload('LOKWANI', { enabled: lokwaniRevealed && !reducedMotion })
+
+  const devarshText = devarshRevealed ? 'DEVARSH' : devarshReveal
+  const lokwaniText = lokwaniRevealed ? 'LOKWANI' : lokwaniReveal
 
   useEffect(() => {
     if (!introComplete) return
@@ -53,10 +80,18 @@ export function Hero() {
 
       <h1 className="mt-4 flex w-full flex-col items-center uppercase text-fg">
         <div ref={nameRef} className="flex w-full flex-col items-center opacity-0">
-          <WarpText text="DEVARSH" color={fg} className="h-[16vw] max-h-[230px] w-[92vw] max-w-[1400px]" />
           <WarpText
-            text="LOKWANI"
+            text={devarshText}
+            ariaLabel="DEVARSH"
+            color={fg}
+            glyphTransitions={devarshRevealed ? devarshTransitions : null}
+            className="h-[16vw] max-h-[230px] w-[92vw] max-w-[1400px]"
+          />
+          <WarpText
+            text={lokwaniText}
+            ariaLabel="LOKWANI"
             color={muted}
+            glyphTransitions={lokwaniRevealed ? lokwaniTransitions : null}
             className="h-[16vw] max-h-[230px] w-[92vw] max-w-[1400px]"
           />
         </div>

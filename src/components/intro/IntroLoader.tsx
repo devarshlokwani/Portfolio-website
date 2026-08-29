@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react'
 
 import { ScrambleText } from '@/components/intro/ScrambleText'
-import { INTRO_WORDS } from '@/components/intro/introWords'
+import { buildIntroWordClassNames, INTRO_WORDS } from '@/components/intro/introWords'
 import { useIntro } from '@/hooks/useIntro'
 import { gsap } from '@/lib/gsap'
 
 export function IntroLoader() {
   const { introComplete, skipped, completeIntro } = useIntro()
   const [wordsDone, setWordsDone] = useState(false)
+  const [wordClassNames] = useState(buildIntroWordClassNames)
   const overlayRef = useRef<HTMLDivElement>(null)
   const panelTopRef = useRef<HTMLDivElement>(null)
   const panelBottomRef = useRef<HTMLDivElement>(null)
@@ -32,6 +33,7 @@ export function IntroLoader() {
           onDone={handleWordsDone}
           skip={skipped}
           className="font-display text-[12vw] font-semibold uppercase leading-none tracking-tight text-fg md:text-[6vw]"
+          wordClassNames={wordClassNames}
         />
       </div>
     </div>

@@ -26,6 +26,7 @@
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --font-accent: 'Instrument Serif', 'Georgia', serif;
+  --font-signature: 'Caveat', 'Segoe Script', cursive;
 }
 
 :root[data-theme='light'] {

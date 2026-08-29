@@ -30,10 +30,10 @@ export function CornerMark() {
       onClick={(e) => {
         if (smoothScrollToHash(lenisRef.current, '#hero', 0)) e.preventDefault()
       }}
-      className="fixed left-5 top-5 z-50 flex h-8 items-center overflow-hidden font-mono text-sm tracking-wide text-fg md:left-8 md:top-8"
+      className="fixed left-5 top-5 z-50 flex h-8 items-center overflow-hidden font-signature text-xl tracking-normal text-fg md:left-8 md:top-8"
       aria-label="Devarsh Lokwani — back to top"
     >
-      <span className="relative block h-full w-40">
+      <span className="relative block h-full w-[11.5rem]">
         <span ref={shortRef} className="absolute inset-0 flex items-center whitespace-nowrap opacity-100">
           {SHORT}
         </span>
