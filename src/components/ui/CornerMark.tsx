@@ -1,11 +1,14 @@
 import { useRef } from 'react'
 
+import { useLenisInstance } from '@/hooks/useLenisInstance'
 import { gsap } from '@/lib/gsap'
+import { smoothScrollToHash } from '@/lib/smoothScroll'
 
 const SHORT = 'DL'
 const LONG = 'Devarsh Lokwani'
 
 export function CornerMark() {
+  const lenisRef = useLenisInstance()
   const shortRef = useRef<HTMLSpanElement>(null)
   const longRef = useRef<HTMLSpanElement>(null)
 
@@ -24,6 +27,9 @@ export function CornerMark() {
       href="#hero"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
+      onClick={(e) => {
+        if (smoothScrollToHash(lenisRef.current, '#hero', 0)) e.preventDefault()
+      }}
       className="fixed left-5 top-5 z-50 flex h-8 items-center overflow-hidden font-mono text-sm tracking-wide text-fg md:left-8 md:top-8"
       aria-label="Devarsh Lokwani — back to top"
     >

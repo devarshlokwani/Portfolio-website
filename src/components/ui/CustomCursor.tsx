@@ -43,11 +43,19 @@ export function CustomCursor() {
       gsap.to(root, { opacity: 1, duration: 0.2 })
     }
 
+    // Instant, not a fade: leaving the window means the real OS cursor is
+    // immediately visible out there, so any lingering fade on ours reads as
+    // lag. Only `root`'s opacity tween is killed here — `cursor`'s x/y are
+    // owned by the quickTo functions above, and externally killing their
+    // tweens breaks quickTo's internal reference to them permanently (every
+    // future moveX/moveY call becomes a no-op), which is what was freezing
+    // the arrow in place while the native cursor showed through underneath.
     const disable = () => {
       if (!mouseActive) return
       mouseActive = false
       document.documentElement.classList.remove('custom-cursor-active')
-      gsap.to(root, { opacity: 0, duration: 0.2 })
+      gsap.killTweensOf(root)
+      gsap.set(root, { opacity: 0 })
     }
 
     const onMove = (e: PointerEvent) => {
@@ -82,10 +90,10 @@ export function CustomCursor() {
         root.classList.remove('cursor--hover')
       }
     }
-    const onLeaveWindow = () => gsap.to(root, { opacity: 0, duration: 0.2 })
-    const onEnterWindow = () => {
-      if (mouseActive) gsap.to(root, { opacity: 1, duration: 0.2 })
-    }
+    // No separate mouseenter handler needed: onMove's !mouseActive branch
+    // already re-primes position instantly (via gsap.set, not an eased
+    // tween) the moment a real pointermove arrives after re-entering.
+    const onLeaveWindow = () => disable()
 
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerdown', onDown)
@@ -93,7 +101,6 @@ export function CustomCursor() {
     document.addEventListener('pointerover', onOver)
     document.addEventListener('pointerout', onOut)
     document.addEventListener('mouseleave', onLeaveWindow)
-    document.addEventListener('mouseenter', onEnterWindow)
 
     return () => {
       document.documentElement.classList.remove('custom-cursor-active')
@@ -103,7 +110,6 @@ export function CustomCursor() {
       document.removeEventListener('pointerover', onOver)
       document.removeEventListener('pointerout', onOut)
       document.removeEventListener('mouseleave', onLeaveWindow)
-      document.removeEventListener('mouseenter', onEnterWindow)
     }
   }, [reducedMotion])
 

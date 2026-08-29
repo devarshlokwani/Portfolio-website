@@ -67,10 +67,6 @@ export function Hero() {
         <p className="font-accent text-4xl italic leading-[1.05] text-fg md:text-6xl">
           ship, and actually work.
         </p>
-        <p className="mt-4 max-w-xl text-fg-muted md:text-lg">
-          Currently studying Artificial Intelligence at Macquarie University and shipping
-          full-stack features in production — from database schema to the pixel that ships.
-        </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
           <a
             href="#projects"

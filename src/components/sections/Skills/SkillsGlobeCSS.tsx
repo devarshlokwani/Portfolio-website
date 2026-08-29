@@ -1,7 +1,12 @@
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 
 import { SkillNode, type SkillItem, type SkillNodeState } from '@/components/sections/Skills/SkillNode'
-import { fibonacciSphere, rotatePoint } from '@/components/sections/Skills/sphere'
+import {
+  fibonacciSphere,
+  rotatePoint,
+  slerpOnSphere,
+  type Point3D,
+} from '@/components/sections/Skills/sphere'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap } from '@/lib/gsap'
 
@@ -11,6 +16,89 @@ const FRICTION = 0.94
 const DRAG_SENSITIVITY = 0.006
 const MAX_PITCH = 1.15
 const RING_TILTS = [0, 55, 110] // deg — evenly-spaced great circles around the yaw axis
+const VIEWBOX = RADIUS * 1.1 // half-extent of the SVG's coordinate space, in the same units as projected node positions
+const ARC_STEPS = 10 // sample points per connection's great-circle arc
+
+interface Connection {
+  a: number
+  b: number
+  /** Set only when both endpoints share a category — that's what lets a
+   *  category filter keep this one flying while others go dark. */
+  category: string | null
+  cycleTicks: number
+  flightTicks: number
+  phaseOffset: number
+  /** Per-connection brightness multiplier — without this every star peaks
+   *  at the same opacity, which reads as mechanical. A few noticeably
+   *  brighter ones and a few dimmer ones among mostly-average stars sells
+   *  the "random shooting star" feel much better than uniform glow. */
+  brightness: number
+}
+
+function makeConnection(a: number, b: number, category: string | null): Connection {
+  return {
+    a,
+    b,
+    category,
+    cycleTicks: 280 + Math.random() * 340, // one flight roughly every 4.5–10s at 60fps
+    flightTicks: 50 + Math.random() * 30, // each flight lasts roughly 0.8–1.3s
+    phaseOffset: Math.random() * 900,
+    brightness: 0.5 + Math.random() * Math.random() * 1.3, // squared distribution: mostly modest, occasionally a standout
+  }
+}
+
+/** A sparse, mostly-same-category-biased set of node pairs to send shooting
+ *  stars along — a couple of links per category (so filtering to any one
+ *  category reliably has something to show) plus a handful of cross-category
+ *  links for the default view's texture. Deliberately kept small: this is
+ *  meant to read as occasional, subtle flickers of connection, not a busy
+ *  web of constant lines. */
+function buildConnections(items: SkillItem[]): Connection[] {
+  const byCategory = new Map<string, number[]>()
+  items.forEach((item, i) => {
+    const list = byCategory.get(item.category)
+    if (list) list.push(i)
+    else byCategory.set(item.category, [i])
+  })
+
+  const seen = new Set<string>()
+  const connections: Connection[] = []
+
+  const tryAdd = (a: number, b: number, category: string | null) => {
+    if (a === b) return false
+    const key = a < b ? `${a}-${b}` : `${b}-${a}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    connections.push(makeConnection(a, b, category))
+    return true
+  }
+
+  byCategory.forEach((indices, category) => {
+    if (indices.length < 2) return
+    const linksToMake = Math.min(1, indices.length - 1)
+    for (let n = 0; n < linksToMake; n++) {
+      let guard = 0
+      let added = false
+      while (!added && guard < 12) {
+        guard++
+        const a = indices[Math.floor(Math.random() * indices.length)]
+        const b = indices[Math.floor(Math.random() * indices.length)]
+        added = tryAdd(a, b, category)
+      }
+    }
+  })
+
+  const extras = Math.min(4, Math.round(items.length * 0.15))
+  let guard = 0
+  while (connections.length < byCategory.size + extras && guard < extras * 25) {
+    guard++
+    const a = Math.floor(Math.random() * items.length)
+    const b = Math.floor(Math.random() * items.length)
+    tryAdd(a, b, items[a]?.category === items[b]?.category ? items[a]?.category : null)
+  }
+
+  return connections
+}
 
 interface SkillsGlobeCSSProps {
   items: SkillItem[]
@@ -21,9 +109,25 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
   const containerRef = useRef<HTMLDivElement>(null)
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([])
   const ringRefs = useRef<(HTMLDivElement | null)[]>([])
+  const starRefs = useRef<(SVGPathElement | null)[]>([])
   const reducedMotion = useReducedMotion()
 
   const basePoints = useMemo(() => fibonacciSphere(items.length, RADIUS), [items.length])
+  const connections = useMemo(() => buildConnections(items), [items])
+  const arcSamples = useMemo(
+    () =>
+      connections.map((conn) => {
+        const a = basePoints[conn.a]
+        const b = basePoints[conn.b]
+        if (!a || !b) return []
+        const samples: Point3D[] = []
+        for (let s = 0; s <= ARC_STEPS; s++) {
+          samples.push(slerpOnSphere(a, b, s / ARC_STEPS, RADIUS))
+        }
+        return samples
+      }),
+    [connections, basePoints],
+  )
 
   const nodeStates = useMemo<SkillNodeState[]>(
     () =>
@@ -38,6 +142,7 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
   const momentum = useRef({ yaw: 0, pitch: 0 })
   const dragging = useRef(false)
   const lastPointer = useRef({ x: 0, y: 0 })
+  const flowTick = useRef(0)
 
   const render = useCallback(() => {
     const { yaw, pitch } = rotation.current
@@ -61,7 +166,40 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
       const tilt = RING_TILTS[i] ?? 0
       ring.style.transform = `rotateX(${pitch * -45}deg) rotateY(${(yaw * 180) / Math.PI}deg) rotateZ(${tilt}deg)`
     })
-  }, [basePoints])
+
+    if (!reducedMotion) flowTick.current += 1
+
+    connections.forEach((conn, i) => {
+      const star = starRefs.current[i]
+      if (!star) return
+
+      const categoryOk = !activeCategory || conn.category === activeCategory
+      const localPhase = (flowTick.current + conn.phaseOffset) % conn.cycleTicks
+
+      if (!categoryOk || localPhase >= conn.flightTicks) {
+        star.style.opacity = '0'
+        return
+      }
+
+      const samples = arcSamples[i]
+      if (!samples?.length) return
+
+      const rotated = samples.map((p) => rotatePoint(p, yaw, pitch))
+      star.setAttribute(
+        'd',
+        `M ${rotated.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L ')}`,
+      )
+
+      const t = localPhase / conn.flightTicks
+      const envelope = Math.sin(t * Math.PI) // smooth fade in, peak, fade out
+      const length = star.getTotalLength()
+      const dashLen = 16
+
+      star.setAttribute('stroke-dasharray', `${dashLen} ${Math.max(length - dashLen, 1)}`)
+      star.setAttribute('stroke-dashoffset', String(-(t * length)))
+      star.style.opacity = String(envelope * 0.4 * conn.brightness)
+    })
+  }, [basePoints, connections, arcSamples, activeCategory, reducedMotion])
 
   useLayoutEffect(() => {
     render() // paint correct positions before the first tick, avoiding a (0,0) flash
@@ -164,6 +302,33 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
           />
         ))}
       </div>
+
+      {/* Occasional shooting-star pulses along great-circle arcs between
+          skills — each connection is invisible almost all the time, briefly
+          fading in as a small comet travels its arc, then fading out again.
+          A category filter keeps only same-category connections firing. */}
+      <svg
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox={`${-VIEWBOX} ${-VIEWBOX} ${VIEWBOX * 2} ${VIEWBOX * 2}`}
+      >
+        {connections.map((conn, i) => (
+          <path
+            key={`${conn.a}-${conn.b}-${i}`}
+            ref={(el) => {
+              starRefs.current[i] = el
+            }}
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth={0.8}
+            strokeLinecap="round"
+            opacity={0}
+            style={{
+              filter: `drop-shadow(0 0 ${(1 + conn.brightness * 1.6).toFixed(1)}px var(--color-accent))`,
+            }}
+          />
+        ))}
+      </svg>
 
       {items.map((item, i) => (
         <SkillNode

@@ -1,27 +1,35 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { NavLink } from '@/components/ui/NavLink'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { useLenisInstance } from '@/hooks/useLenisInstance'
 import { gsap } from '@/lib/gsap'
+import { smoothScrollToHash } from '@/lib/smoothScroll'
 
 const LINKS = [
   { href: '#about', label: 'About' },
   { href: '#experience', label: 'Experience' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
-  { href: '#wall', label: 'Wall' },
   { href: '#contact', label: 'Contact' },
 ]
 
 export function Nav() {
+  const lenisRef = useLenisInstance()
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const listRef = useRef<HTMLDivElement>(null)
-  const pillRef = useRef<HTMLDivElement>(null)
-  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
-  const pillPrimed = useRef(false)
+
+  // A nav-triggered smooth scroll passes through every section between here
+  // and the target, and each one crossing the scroll-spy's center threshold
+  // along the way would otherwise flip activeIndex (and fire that link's
+  // fill animation) for the split-second it's in view — a flicker cascade
+  // down the whole nav. Suppressed for the duration of that one scroll; the
+  // click itself sets the destination's index immediately instead.
+  const suppressSpyRef = useRef(false)
+  const suppressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Scroll-spy: highlight whichever section's link is currently centered in view.
   useEffect(() => {
@@ -29,6 +37,7 @@ export function Nav() {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (suppressSpyRef.current) return
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
           const idx = sections.findIndex((s) => s === entry.target)
@@ -42,31 +51,35 @@ export function Nav() {
     return () => observer.disconnect()
   }, [])
 
-  // Slide the pill under the hovered link, falling back to the active section.
   useEffect(() => {
-    const index = hoverIndex ?? activeIndex
-    const pill = pillRef.current
-    const list = listRef.current
-    const target = index !== null ? linkRefs.current[index] : null
-    if (!pill || !list) return
+    return () => {
+      if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current)
+    }
+  }, [])
 
-    if (!target) {
-      gsap.to(pill, { opacity: 0, duration: 0.3, ease: 'power2.out' })
-      return
+  const navigateTo = (index: number, href: string) => {
+    setActiveIndex(index)
+    suppressSpyRef.current = true
+    if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current)
+
+    const resumeSpy = () => {
+      suppressSpyRef.current = false
+      if (suppressTimeoutRef.current) {
+        clearTimeout(suppressTimeoutRef.current)
+        suppressTimeoutRef.current = null
+      }
     }
 
-    const listBox = list.getBoundingClientRect()
-    const targetBox = target.getBoundingClientRect()
-
-    gsap.to(pill, {
-      x: targetBox.left - listBox.left,
-      width: targetBox.width,
-      opacity: 1,
-      duration: pillPrimed.current ? 0.5 : 0,
-      ease: 'power3.out',
-    })
-    pillPrimed.current = true
-  }, [activeIndex, hoverIndex])
+    const handled = smoothScrollToHash(lenisRef.current, href, undefined, resumeSpy)
+    if (!handled) {
+      resumeSpy()
+      return
+    }
+    // Safety net in case Lenis's onComplete doesn't fire for some edge case
+    // (e.g. the target is already at the current scroll position) — the
+    // scroll-spy should never stay suppressed indefinitely.
+    suppressTimeoutRef.current = setTimeout(resumeSpy, 1600)
+  }
 
   const toggleMenu = () => {
     const next = !open
@@ -94,31 +107,17 @@ export function Nav() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-end gap-4 px-6 py-5 md:px-10 md:py-6">
-      <nav
-        ref={listRef}
-        onMouseLeave={() => setHoverIndex(null)}
-        className="relative hidden items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex"
-      >
-        <div
-          ref={pillRef}
-          style={{ width: 0 }}
-          className="pointer-events-none absolute inset-y-1 left-0 rounded-full bg-fg opacity-0"
-        />
+      <nav className="hidden items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex">
         {LINKS.map((link, i) => (
-          <a
+          <NavLink
             key={link.href}
-            ref={(el) => {
-              linkRefs.current[i] = el
-            }}
             href={link.href}
-            data-cursor-hover
-            onMouseEnter={() => setHoverIndex(i)}
-            className={`relative z-10 rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wide transition-colors duration-300 ${
-              (hoverIndex ?? activeIndex) === i ? 'text-bg' : 'text-fg-muted hover:text-fg'
-            }`}
-          >
-            {link.label}
-          </a>
+            label={link.label}
+            filled={activeIndex === i || hoverIndex === i}
+            onHoverStart={() => setHoverIndex(i)}
+            onHoverEnd={() => setHoverIndex((prev) => (prev === i ? null : prev))}
+            onNavigate={() => navigateTo(i, link.href)}
+          />
         ))}
       </nav>
 
@@ -146,11 +145,18 @@ export function Nav() {
         style={{ clipPath: 'inset(0 0 100% 0)' }}
         className="fixed inset-0 top-0 z-30 flex flex-col items-start justify-center gap-6 bg-bg px-8 md:hidden"
       >
-        {LINKS.map((link) => (
+        {LINKS.map((link, i) => (
           <a
             key={link.href}
             href={link.href}
-            onClick={toggleMenu}
+            onClick={(e) => {
+              navigateTo(i, link.href)
+              toggleMenu()
+              // the anchor jump still needs suppressing even though the menu
+              // is about to be covering the viewport anyway, so the browser
+              // doesn't fight Lenis's scroll with its own instant one
+              e.preventDefault()
+            }}
             className="mobile-nav-link font-display text-4xl font-semibold text-fg"
           >
             {link.label}

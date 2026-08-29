@@ -16,9 +16,11 @@ export function useLenis(enabled: boolean) {
     if (!enabled) return
 
     const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t: number) => 1 - Math.pow(1 - t, 4),
+      duration: 0.75,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
       smoothWheel: true,
+      wheelMultiplier: 0.85,
+      touchMultiplier: 1,
     })
     lenisRef.current = lenis
 
