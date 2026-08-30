@@ -1,32 +1,38 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
+
 import { AppProviders } from '@/app/providers'
+import { HeroTransitionProvider } from '@/app/HeroTransitionProvider'
+import { RouteTransitionProvider } from '@/app/RouteTransitionProvider'
 import { CornerMark } from '@/components/ui/CornerMark'
 import { CustomCursor } from '@/components/ui/CustomCursor'
 import { Nav } from '@/components/ui/Nav'
 import { Footer } from '@/components/ui/Footer'
 import { IntroLoader } from '@/components/intro/IntroLoader'
-import { Hero } from '@/components/sections/Hero/Hero'
-import { About } from '@/components/sections/About/About'
-import { Experience } from '@/components/sections/Experience/Experience'
-import { Skills } from '@/components/sections/Skills/Skills'
-import { Projects } from '@/components/sections/Projects/Projects'
-import { Contact } from '@/components/sections/Contact/Contact'
+import { HomePage } from '@/pages/HomePage'
+import { ExperiencePage } from '@/pages/ExperiencePage'
+import { PrivacyPolicy } from '@/pages/PrivacyPolicy'
+import { TermsAndConditions } from '@/pages/TermsAndConditions'
 
 function App() {
   return (
     <AppProviders>
-      <CustomCursor />
-      <IntroLoader />
-      <CornerMark />
-      <Nav />
-      <main>
-        <Hero />
-        <About />
-        <Experience />
-        <Skills />
-        <Projects />
-        <Contact />
-      </main>
-      <Footer />
+      <HeroTransitionProvider>
+        <RouteTransitionProvider>
+          <CustomCursor />
+          <IntroLoader />
+          <CornerMark />
+          <Nav />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/experience" element={<ExperiencePage />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
+            {/* any unknown path (typos, old bookmarks, etc.) lands on Home instead of rendering blank */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Footer />
+        </RouteTransitionProvider>
+      </HeroTransitionProvider>
     </AppProviders>
   )
 }

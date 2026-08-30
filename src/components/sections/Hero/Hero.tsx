@@ -1,34 +1,31 @@
-import { useEffect, useRef, useState } from 'react'
-import { TbBriefcase2, TbMapPin } from 'react-icons/tb'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
-import { SocialIcons } from '@/components/sections/Hero/SocialIcons'
-import { WarpText } from '@/components/sections/Hero/WarpText'
-import { BorderGlow } from '@/components/ui/BorderGlow'
+import { useHeroTransitionRegistry } from '@/app/HeroTransitionProvider'
+import { HERO_NAME_CLASS, HERO_NAME_STYLE } from '@/components/sections/Hero/heroNameStyle'
+import { HeroChrome } from '@/components/sections/Hero/HeroChrome'
+import { ReloadText } from '@/components/sections/Hero/ReloadText'
 import { useGlyphReload } from '@/hooks/useGlyphReload'
 import { useIntro } from '@/hooks/useIntro'
 import { gsap } from '@/lib/gsap'
+import { SCRAMBLE_CHARS } from '@/lib/scrambleChars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrambleReveal } from '@/hooks/useScrambleReveal'
-import { useTheme } from '@/hooks/useTheme'
-
-// Mirrors --color-fg / --color-fg-muted in theme.css — WarpText rasterizes
-// onto a canvas, so it needs resolved color values rather than CSS vars.
-const NAME_COLORS = {
-  dark: { fg: '#f4f3ef', muted: '#a3a1ab' },
-  light: { fg: '#17161a', muted: '#55525c' },
-} as const
 
 export function Hero() {
   const { introComplete } = useIntro()
   const reducedMotion = useReducedMotion()
-  const { theme } = useTheme()
+  const { registerHandler } = useHeroTransitionRegistry()
   const nameRef = useRef<HTMLDivElement>(null)
   const metaRef = useRef<HTMLDivElement>(null)
-  const { fg, muted } = NAME_COLORS[theme]
 
   const [devarshRevealed, setDevarshRevealed] = useState(false)
   const [lokwaniRevealed, setLokwaniRevealed] = useState(false)
+  // idle: normal hero, the recurring glyph-reload tic is live. exiting: a
+  // route change is underway — both words are scrambling toward their exit
+  // text (see playHeroExit).
+  const [heroPhase, setHeroPhase] = useState<'idle' | 'exiting'>('idle')
+  const [devarshExitText, setDevarshExitText] = useState('DEVARSH')
+  const [lokwaniExitText, setLokwaniExitText] = useState('LOKWANI')
 
   const revealTrigger = introComplete && !reducedMotion
   const devarshReveal = useScrambleReveal('DEVARSH', {
@@ -45,12 +42,59 @@ export function Hero() {
 
   // Once each word has settled from its initial reveal, keep it "alive" with
   // occasional character reloads — the same glyph(s) slide out one side and
-  // a fresh copy slides in from the other, like a magazine swap.
-  const devarshTransitions = useGlyphReload('DEVARSH', { enabled: devarshRevealed && !reducedMotion })
-  const lokwaniTransitions = useGlyphReload('LOKWANI', { enabled: lokwaniRevealed && !reducedMotion })
+  // a fresh copy slides in from the other, like a magazine swap. Disabled
+  // once a route-exit is underway so it can't fight the scramble below.
+  const devarshTransitions = useGlyphReload('DEVARSH', {
+    enabled: devarshRevealed && !reducedMotion && heroPhase === 'idle',
+  })
+  const lokwaniTransitions = useGlyphReload('LOKWANI', {
+    enabled: lokwaniRevealed && !reducedMotion && heroPhase === 'idle',
+  })
 
-  const devarshText = devarshRevealed ? 'DEVARSH' : devarshReveal
-  const lokwaniText = lokwaniRevealed ? 'LOKWANI' : lokwaniReveal
+  const devarshText = heroPhase === 'exiting' ? devarshExitText : devarshRevealed ? 'DEVARSH' : devarshReveal
+  const lokwaniText = heroPhase === 'exiting' ? lokwaniExitText : lokwaniRevealed ? 'LOKWANI' : lokwaniReveal
+
+  // Route exit: the same scramble-text "glitch" effect already used for the
+  // intro reveal (and the idle tic's own char cycling), run once more —
+  // DEVARSH scrambles into MY WORK, LOKWANI scrambles away to nothing. The
+  // rest of the hero (FoundrLink, tagline, socials, meta, bottom bar) stays
+  // put — only the name changes.
+  const playHeroExit = useCallback((onComplete: () => void) => {
+    setHeroPhase('exiting')
+
+    const devarshEl = document.createElement('span')
+    devarshEl.textContent = 'DEVARSH'
+    const lokwaniEl = document.createElement('span')
+    lokwaniEl.textContent = 'LOKWANI'
+
+    let wordsRemaining = 2
+    const onWordDone = () => {
+      wordsRemaining -= 1
+      if (wordsRemaining > 0) return
+      gsap.delayedCall(0.35, onComplete)
+    }
+
+    gsap.to(devarshEl, {
+      duration: 0.7,
+      scrambleText: { text: 'MY WORK', chars: SCRAMBLE_CHARS, speed: 0.4, revealDelay: 0.1 },
+      ease: 'none',
+      onUpdate: () => setDevarshExitText(devarshEl.textContent || 'DEVARSH'),
+      onComplete: onWordDone,
+    })
+    gsap.to(lokwaniEl, {
+      duration: 0.6,
+      delay: 0.1,
+      scrambleText: { text: '', chars: SCRAMBLE_CHARS, speed: 0.4, revealDelay: 0.1 },
+      ease: 'none',
+      onUpdate: () => setLokwaniExitText(lokwaniEl.textContent || ''),
+      onComplete: onWordDone,
+    })
+  }, [])
+
+  useEffect(() => {
+    registerHandler(playHeroExit)
+    return () => registerHandler(null)
+  }, [registerHandler, playHeroExit])
 
   useEffect(() => {
     if (!introComplete) return
@@ -68,89 +112,26 @@ export function Hero() {
   }, [introComplete, reducedMotion])
 
   return (
-    <section
-      id="hero"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-6 pt-32 text-center md:px-10 md:pt-36"
-    >
-      <FoundrLink />
-
-      <p className="mt-6 font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
-        Sydney, NSW · Graduate Software Engineer
-      </p>
-
-      <h1 className="mt-4 flex w-full flex-col items-center uppercase text-fg">
-        <div ref={nameRef} className="flex w-full flex-col items-center opacity-0">
-          <WarpText
+    <HeroChrome
+      nameRef={nameRef}
+      metaRef={metaRef}
+      animateIn
+      name={
+        <>
+          <ReloadText
             text={devarshText}
-            ariaLabel="DEVARSH"
-            color={fg}
-            glyphTransitions={devarshRevealed ? devarshTransitions : null}
-            className="h-[16vw] max-h-[230px] w-[92vw] max-w-[1400px]"
+            transitions={heroPhase === 'idle' ? devarshTransitions : []}
+            className={`${HERO_NAME_CLASS} text-fg`}
+            style={HERO_NAME_STYLE}
           />
-          <WarpText
+          <ReloadText
             text={lokwaniText}
-            ariaLabel="LOKWANI"
-            color={muted}
-            glyphTransitions={lokwaniRevealed ? lokwaniTransitions : null}
-            className="h-[16vw] max-h-[230px] w-[92vw] max-w-[1400px]"
+            transitions={heroPhase === 'idle' ? lokwaniTransitions : []}
+            className={`${HERO_NAME_CLASS} text-fg-muted`}
+            style={HERO_NAME_STYLE}
           />
-        </div>
-      </h1>
-
-      <div className="mt-6">
-        <SocialIcons />
-      </div>
-
-      <div
-        ref={metaRef}
-        className="mt-8 flex max-w-2xl flex-col items-center gap-2 opacity-0 md:mt-10"
-      >
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
-          I design and build products that
-        </p>
-        <p className="font-accent text-4xl italic leading-[1.05] text-fg md:text-6xl">
-          ship, and actually work.
-        </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="#projects"
-            data-cursor-hover
-            className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5"
-          >
-            View Projects
-          </a>
-          <BorderGlow className="hover:!border-transparent">
-            <a
-              href="#contact"
-              data-cursor-hover
-              className="rounded-full px-6 py-3 text-sm font-medium text-fg"
-            >
-              Get in Touch
-            </a>
-          </BorderGlow>
-        </div>
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-6 bottom-10 hidden items-center justify-between md:flex md:inset-x-10">
-        <div className="flex items-center gap-2.5">
-          <TbMapPin className="h-5 w-5 text-accent" />
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-wide text-fg">
-              Based in Sydney,
-            </p>
-            <p className="font-mono text-xs uppercase tracking-wide text-fg-subtle">Australia</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5">
-          <div className="text-right">
-            <p className="font-mono text-xs font-semibold uppercase tracking-wide text-fg">
-              Full Stack Dev,
-            </p>
-            <p className="font-mono text-xs uppercase tracking-wide text-fg-subtle">& Builder</p>
-          </div>
-          <TbBriefcase2 className="h-5 w-5 text-accent" />
-        </div>
-      </div>
-    </section>
+        </>
+      }
+    />
   )
 }

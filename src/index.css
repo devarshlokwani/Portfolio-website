@@ -58,20 +58,6 @@ body {
   min-height: 100svh;
 }
 
-/* React Bits "Warp Text" hero name — text is rasterized to a canvas texture
-   and redrawn each frame by a WebGL fragment shader that fbm-warps it and
-   splits the RGB channels near the pointer for a chromatic-aberration bend
-   (see WarpText.tsx). Width/height are deliberately left to each usage's
-   Tailwind classes (that's what sizes the text, via the auto-fit-to-
-   container canvas logic) — setting them here too would collide with those
-   utility classes at equal specificity and lose on source order. */
-.warp-text {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  isolation: isolate;
-}
-
 .warp-text canvas {
   position: absolute;
   inset: 0;
@@ -407,6 +393,37 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .social-icon-btn:hover .social-icon-btn__icon,
   .social-icon-btn:focus-visible .social-icon-btn__icon {
+    animation: none;
+  }
+}
+
+/* Footer's plain icon-only links — enlarge and tint to the brand color on
+   hover, driven per-link via --icon-glow (same convention as the social
+   icon buttons above, minus their wiggle — this row is quieter/smaller). */
+.footer-icon-link {
+  --icon-glow: var(--color-fg);
+}
+
+.footer-icon-link:hover .footer-icon-link__icon,
+.footer-icon-link:focus-visible .footer-icon-link__icon {
+  color: var(--icon-glow);
+}
+
+/* Continuous slow spin for the "OPEN TO EXPLORE" circular badge on project
+   screenshots — a lazy rotation, not a spinner, so it reads as ambient
+   rather than a loading state. */
+.explore-badge-spin {
+  animation: explore-badge-spin 9s linear infinite;
+}
+
+@keyframes explore-badge-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-badge-spin {
     animation: none;
   }
 }

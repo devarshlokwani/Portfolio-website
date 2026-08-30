@@ -1,21 +1,29 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
+import { useRouteTransition } from '@/app/RouteTransitionProvider'
 import { NavLink } from '@/components/ui/NavLink'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useLenisInstance } from '@/hooks/useLenisInstance'
 import { gsap } from '@/lib/gsap'
 import { smoothScrollToHash } from '@/lib/smoothScroll'
 
-const LINKS = [
-  { href: '#about', label: 'About' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#skills', label: 'Skills' },
-  { href: '#projects', label: 'Projects' },
-  { href: '#contact', label: 'Contact' },
+type LinkConfig =
+  | { kind: 'hash'; href: string; label: string }
+  | { kind: 'route'; to: string; label: string }
+
+const LINKS: LinkConfig[] = [
+  { kind: 'hash', href: '#about', label: 'About' },
+  { kind: 'hash', href: '#skills', label: 'Skills' },
+  { kind: 'hash', href: '#projects', label: 'Projects' },
+  { kind: 'hash', href: '#contact', label: 'Contact' },
+  { kind: 'route', to: '/experience', label: 'Work' },
 ]
 
 export function Nav() {
   const lenisRef = useLenisInstance()
+  const { goTo } = useRouteTransition()
+  const location = useLocation()
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -31,9 +39,17 @@ export function Nav() {
   const suppressSpyRef = useRef(false)
   const suppressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Scroll-spy: highlight whichever section's link is currently centered in view.
+  // Scroll-spy only applies on the home route, where the hash-linked
+  // sections actually live in the DOM. On any other route the nav's active
+  // link is just whichever one points at the current route.
   useEffect(() => {
-    const sections = LINKS.map((l) => document.querySelector<HTMLElement>(l.href))
+    if (location.pathname !== '/') {
+      const routeIndex = LINKS.findIndex((l) => l.kind === 'route' && l.to === location.pathname)
+      setActiveIndex(routeIndex === -1 ? null : routeIndex)
+      return undefined
+    }
+
+    const sections = LINKS.map((l) => (l.kind === 'hash' ? document.querySelector<HTMLElement>(l.href) : null))
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -49,7 +65,7 @@ export function Nav() {
 
     sections.forEach((s) => s && observer.observe(s))
     return () => observer.disconnect()
-  }, [])
+  }, [location.pathname])
 
   useEffect(() => {
     return () => {
@@ -57,8 +73,19 @@ export function Nav() {
     }
   }, [])
 
-  const navigateTo = (index: number, href: string) => {
+  const navigateTo = (index: number, link: LinkConfig) => {
     setActiveIndex(index)
+
+    if (link.kind === 'route') {
+      goTo(link.to)
+      return
+    }
+
+    if (location.pathname !== '/') {
+      goTo('/', { hash: link.href })
+      return
+    }
+
     suppressSpyRef.current = true
     if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current)
 
@@ -70,7 +97,7 @@ export function Nav() {
       }
     }
 
-    const handled = smoothScrollToHash(lenisRef.current, href, undefined, resumeSpy)
+    const handled = smoothScrollToHash(lenisRef.current, link.href, undefined, resumeSpy)
     if (!handled) {
       resumeSpy()
       return
@@ -113,13 +140,13 @@ export function Nav() {
       <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex">
         {LINKS.map((link, i) => (
           <NavLink
-            key={link.href}
-            href={link.href}
+            key={link.label}
+            href={link.kind === 'hash' ? link.href : link.to}
             label={link.label}
             filled={activeIndex === i || hoverIndex === i}
             onHoverStart={() => setHoverIndex(i)}
             onHoverEnd={() => setHoverIndex((prev) => (prev === i ? null : prev))}
-            onNavigate={() => navigateTo(i, link.href)}
+            onNavigate={() => navigateTo(i, link)}
           />
         ))}
       </nav>
@@ -150,14 +177,15 @@ export function Nav() {
       >
         {LINKS.map((link, i) => (
           <a
-            key={link.href}
-            href={link.href}
+            key={link.label}
+            href={link.kind === 'hash' ? link.href : link.to}
             onClick={(e) => {
-              navigateTo(i, link.href)
+              navigateTo(i, link)
               toggleMenu()
               // the anchor jump still needs suppressing even though the menu
               // is about to be covering the viewport anyway, so the browser
-              // doesn't fight Lenis's scroll with its own instant one
+              // doesn't fight Lenis's scroll (or the router) with its own
+              // instant one
               e.preventDefault()
             }}
             className="mobile-nav-link font-display text-4xl font-semibold text-fg"

@@ -8,7 +8,7 @@ interface PathSample extends PathPoint {
 }
 
 export interface FlightPath {
-  /** SVG path `d` string through the same points */
+  /** SVG path `d` string through the same points (a fine polyline once jittered — see buildFlightPath) */
   d: string
   totalLength: number
   samples: PathSample[]
@@ -28,6 +28,29 @@ function cubicPoint(p0: PathPoint, c1: PathPoint, c2: PathPoint, p1: PathPoint, 
   }
 }
 
+// A handful of stacked sine waves at different frequencies/phases — a cheap,
+// fully deterministic stand-in for hand-tremor noise, so the same arc length
+// always wobbles the same way (no per-render flicker) without pulling in a
+// noise library.
+function handWobble(length: number, amplitude: number) {
+  if (amplitude <= 0) return 0
+  return (
+    Math.sin(length * 0.018) * amplitude * 0.55 +
+    Math.sin(length * 0.05 + 1.7) * amplitude * 0.3 +
+    Math.sin(length * 0.12 + 4.2) * amplitude * 0.15
+  )
+}
+
+function polylineD(samples: PathSample[]) {
+  return samples.map((s, i) => `${i === 0 ? 'M' : 'L'} ${s.x.toFixed(1)} ${s.y.toFixed(1)}`).join(' ')
+}
+
+interface BuildFlightPathOptions {
+  stepsPerSegment?: number
+  /** perpendicular hand-wobble amplitude in px — 0 for a perfectly smooth curve */
+  jitterAmplitude?: number
+}
+
 /**
  * Builds a smooth, gently wandering path through `points` (horizontal
  * tangent at every point, via the classic "control point = 1/3 of the way
@@ -35,11 +58,16 @@ function cubicPoint(p0: PathPoint, c1: PathPoint, c2: PathPoint, p1: PathPoint, 
  * a curve-fitting library), plus a finely-sampled arc-length table so a
  * plane can be positioned/rotated by scroll progress without touching the
  * DOM (no `getPointAtLength` calls on every scroll tick).
+ *
+ * With `jitterAmplitude` set, a deterministic hand-wobble is added
+ * perpendicular to the curve at every sample — the line (and anything
+ * tracking it, like the plane) reads as drawn rather than plotted.
  */
-export function buildFlightPath(points: PathPoint[], stepsPerSegment = 32): FlightPath {
-  const samples: PathSample[] = [{ x: points[0].x, y: points[0].y, length: 0 }]
+export function buildFlightPath(points: PathPoint[], options: BuildFlightPathOptions = {}): FlightPath {
+  const { stepsPerSegment = 32, jitterAmplitude = 0 } = options
+
+  const raw: PathSample[] = [{ x: points[0].x, y: points[0].y, length: 0 }]
   const pointLengths: number[] = [0]
-  let d = `M ${points[0].x} ${points[0].y}`
   let cumulative = 0
 
   for (let i = 0; i < points.length - 1; i++) {
@@ -48,20 +76,36 @@ export function buildFlightPath(points: PathPoint[], stepsPerSegment = 32): Flig
     const half = (p1.x - p0.x) / 2
     const c1 = { x: p0.x + half, y: p0.y }
     const c2 = { x: p1.x - half, y: p1.y }
-    d += ` C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p1.x} ${p1.y}`
 
     let prev = p0
     for (let s = 1; s <= stepsPerSegment; s++) {
       const t = s / stepsPerSegment
       const pt = cubicPoint(p0, c1, c2, p1, t)
       cumulative += Math.hypot(pt.x - prev.x, pt.y - prev.y)
-      samples.push({ x: pt.x, y: pt.y, length: cumulative })
+      raw.push({ x: pt.x, y: pt.y, length: cumulative })
       prev = pt
     }
     pointLengths.push(cumulative)
   }
 
-  return { d, totalLength: cumulative, samples, pointLengths }
+  if (jitterAmplitude <= 0) {
+    return { d: polylineD(raw), totalLength: cumulative, samples: raw, pointLengths }
+  }
+
+  const jittered: PathSample[] = raw.map((pt, i) => {
+    const prevPt = raw[Math.max(0, i - 1)]
+    const nextPt = raw[Math.min(raw.length - 1, i + 1)]
+    const tx = nextPt.x - prevPt.x
+    const ty = nextPt.y - prevPt.y
+    const tLen = Math.hypot(tx, ty) || 1
+    // perpendicular (normal) to the local tangent
+    const nx = -ty / tLen
+    const ny = tx / tLen
+    const offset = handWobble(pt.length, jitterAmplitude)
+    return { x: pt.x + nx * offset, y: pt.y + ny * offset, length: pt.length }
+  })
+
+  return { d: polylineD(jittered), totalLength: cumulative, samples: jittered, pointLengths }
 }
 
 /** Interpolated position + direction of travel (degrees) at a given arc length along the sampled path. */

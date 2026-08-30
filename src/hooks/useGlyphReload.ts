@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 
 import { gsap } from '@/lib/gsap'
-import type { GlyphTransition } from '@/components/sections/Hero/WarpText'
+
+export interface GlyphTransition {
+  /** character index within the reloaded string */
+  index: number
+  /** 0 = old glyph still fully in place, 1 = fully replaced by the fresh copy */
+  progress: number
+}
 
 interface GlyphReloadOptions {
   enabled: boolean
@@ -26,7 +32,7 @@ const GROUP_DURATION_SCALE = [1, 0.85, 0.7]
  * one between picks) so a multi-letter event reads as one deliberate
  * pattern rather than a random cluster. Purely a kinetic idle tic — the
  * text content itself never changes, only the transient slide progress fed
- * to WarpText's `glyphTransitions` prop.
+ * to `ReloadText`'s `transitions` prop.
  */
 export function useGlyphReload(
   target: string,

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 
 import { FlightCard } from '@/components/sections/Experience/FlightCard'
 import { buildFlightPath, sampleFlightPath, type PathPoint } from '@/components/sections/Experience/flightPathMath'
@@ -16,6 +16,8 @@ interface Job {
 
 interface FlightPathProps {
   jobs: Job[]
+  /** rendered locked at the top of the pinned view, above the paper canvas */
+  heading: ReactNode
 }
 
 interface Checkpoint {
@@ -49,24 +51,30 @@ function buildGeometry(viewportWidth: number, laneHeight: number, count: number)
   }
   points.push({ x: totalWidth, y: midY })
 
-  const { d, totalLength, samples, pointLengths } = buildFlightPath(points)
-  const checkpoints: Checkpoint[] = points
-    .slice(1, -1)
-    .map((p, i) => ({ x: p.x, y: p.y, arcLength: pointLengths[i + 1] }))
+  const { d, totalLength, samples, pointLengths } = buildFlightPath(points, { jitterAmplitude: 5 })
+  // read checkpoint x/y back off the jittered samples so the marker sits
+  // exactly on the hand-wobbled line, not the original clean control point
+  const checkpoints: Checkpoint[] = points.slice(1, -1).map((_p, i) => {
+    const arcLength = pointLengths[i + 1]
+    const { x, y } = sampleFlightPath(samples, arcLength)
+    return { x, y, arcLength }
+  })
 
   return { totalWidth, laneHeight, d, totalLength, samples, checkpoints }
 }
 
 /**
- * Pins the section and turns further scroll into horizontal travel — a
- * paper plane glides along a wandering (not straight) path, leaving a
- * dotted trail behind it (an accent-colored dashed copy of the path,
- * clipped to a rect whose width tracks the plane's x — so the dots only
- * ever exist behind where the plane has already been), and a widget card
- * fades in as the plane nears each checkpoint and back out as it leaves.
+ * Pins the section with `heading` locked at the top and turns further
+ * scroll into horizontal travel in the paper canvas below it — a paper
+ * plane glides along a wandering (not straight) path, leaving a dotted
+ * trail behind it (clipped to a rect whose width tracks the plane's x, so
+ * the dots only ever exist behind where it's already been), and a widget
+ * card fades in as the plane nears each checkpoint and back out as it
+ * leaves.
  */
-export function FlightPath({ jobs }: FlightPathProps) {
+export function FlightPath({ jobs, heading }: FlightPathProps) {
   const pinRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const planeRef = useRef<HTMLDivElement>(null)
   const clipRectRef = useRef<SVGRectElement>(null)
@@ -76,11 +84,11 @@ export function FlightPath({ jobs }: FlightPathProps) {
   const [geometry, setGeometry] = useState<Geometry | null>(null)
 
   useLayoutEffect(() => {
-    const pinEl = pinRef.current
-    if (!pinEl) return undefined
+    const canvasEl = canvasRef.current
+    if (!canvasEl) return undefined
 
     const compute = () => {
-      const laneHeight = pinEl.clientHeight || window.innerHeight
+      const laneHeight = canvasEl.clientHeight || window.innerHeight
       setGeometry(buildGeometry(window.innerWidth, laneHeight, jobs.length))
     }
     compute()
@@ -163,79 +171,137 @@ export function FlightPath({ jobs }: FlightPathProps) {
     return () => ctx.revert()
   }, [geometry])
 
-  if (!geometry) {
-    return <div ref={pinRef} className="h-screen w-full" />
-  }
-
   return (
-    <div ref={pinRef} className="relative h-screen w-full overflow-hidden">
-      <div ref={trackRef} className="relative h-full" style={{ width: geometry.totalWidth }}>
-        <svg
-          className="absolute left-0 top-0"
-          width={geometry.totalWidth}
-          height={geometry.laneHeight}
-          aria-hidden="true"
-        >
-          <defs>
-            <clipPath id="flight-trail-clip">
-              <rect ref={clipRectRef} x={0} y={0} width={0} height={geometry.laneHeight} />
-            </clipPath>
-          </defs>
-          <path
-            d={geometry.d}
-            fill="none"
-            stroke="var(--color-accent)"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeDasharray="2 11"
-            opacity={0.8}
-            clipPath="url(#flight-trail-clip)"
-          />
-          {geometry.checkpoints.map((cp, i) => (
-            <circle
-              key={jobs[i].company}
-              cx={cp.x}
-              cy={cp.y}
-              r={5}
-              fill="var(--color-bg)"
-              stroke="var(--color-accent)"
-              strokeWidth={2}
-            />
-          ))}
-        </svg>
+    <div ref={pinRef} className="relative flex h-screen w-full flex-col overflow-hidden">
+      <div className="shrink-0 pt-28 md:pt-32">{heading}</div>
 
-        <div ref={planeRef} className="absolute left-0 top-0 h-6 w-14 will-change-transform">
-          <PaperPlaneIcon className="h-full w-full drop-shadow-[0_4px_10px_rgba(255,90,60,0.4)]" />
-        </div>
+      <div ref={canvasRef} className="relative flex-1 overflow-hidden">
+        {geometry && (
+          <div ref={trackRef} className="relative h-full" style={{ width: geometry.totalWidth }}>
+            <svg
+              className="absolute left-0 top-0"
+              width={geometry.totalWidth}
+              height={geometry.laneHeight}
+              aria-hidden="true"
+            >
+              <defs>
+                <clipPath id="flight-trail-clip">
+                  <rect ref={clipRectRef} x={0} y={0} width={0} height={geometry.laneHeight} />
+                </clipPath>
+                {/* A gentle, static paper-grain texture: turbulence noise
+                    used as a bump map, multiplied over the flat paper
+                    color — a fixed, moderate crease level rather than an
+                    animated crumple. */}
+                <filter id="paper-grain" x="-5%" y="-15%" width="110%" height="130%">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.004 0.007" numOctaves={4} seed={7} result="noise" />
+                  <feDiffuseLighting in="noise" surfaceScale={4} diffuseConstant={1.05} lightingColor="#fff8ec" result="light">
+                    <feDistantLight azimuth={235} elevation={55} />
+                  </feDiffuseLighting>
+                  <feComposite in="light" in2="SourceGraphic" operator="in" result="clippedLight" />
+                  <feBlend in="clippedLight" in2="SourceGraphic" mode="multiply" />
+                </filter>
 
-        {geometry.checkpoints.map((cp, i) => (
-          <div
-            key={jobs[i].company}
-            ref={(el) => {
-              markerRefs.current[i] = el
-            }}
-            aria-hidden="true"
-            className="absolute h-2.5 w-2.5 rounded-full bg-accent"
-            style={{ left: cp.x, top: cp.y, transform: 'translate(-50%, -50%)' }}
-          />
-        ))}
+                {/* Light edge roughening for the trail — the path already
+                    has a hand-wobble baked into its geometry, this filter
+                    adds fine surface irregularity on top so it reads as a
+                    scribbled crayon line rather than a clean stroke. */}
+                <filter id="trail-sketch" x="-10%" y="-60%" width="120%" height="220%">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.04 0.09" numOctaves={2} seed={11} result="wobble" />
+                  <feDisplacementMap in="SourceGraphic" in2="wobble" scale={1.6} xChannelSelector="R" yChannelSelector="G" />
+                </filter>
+              </defs>
 
-        {geometry.checkpoints.map((cp, i) => (
-          <div
-            key={jobs[i].company}
-            ref={(el) => {
-              cardRefs.current[i] = el
-            }}
-            className="absolute opacity-0 transition-opacity duration-150 ease-out"
-            style={{
-              left: cp.x,
-              ...(i % 2 === 0 ? { bottom: geometry.laneHeight * 0.06 } : { top: geometry.laneHeight * 0.08 }),
-              transform: 'translateX(-50%)',
-            }}
-          >
-            <FlightCard {...jobs[i]} />
+              <rect
+                x={0}
+                y={0}
+                width={geometry.totalWidth}
+                height={geometry.laneHeight}
+                rx={20}
+                fill="#f4ecd8"
+                filter="url(#paper-grain)"
+              />
+
+              {/* soft peach glow underneath, then the main crayon-orange dashes, then a thin dark fleck on top — a layered waxy trail rather than one flat dashed line */}
+              <g filter="url(#trail-sketch)">
+                <path
+                  d={geometry.d}
+                  fill="none"
+                  stroke="#ffcda0"
+                  strokeWidth={5.5}
+                  strokeLinecap="round"
+                  strokeDasharray="1 13"
+                  opacity={0.55}
+                  clipPath="url(#flight-trail-clip)"
+                />
+                <path
+                  d={geometry.d}
+                  fill="none"
+                  stroke="var(--color-accent)"
+                  strokeWidth={2.4}
+                  strokeLinecap="round"
+                  strokeDasharray="2 11"
+                  opacity={0.9}
+                  clipPath="url(#flight-trail-clip)"
+                />
+                <path
+                  d={geometry.d}
+                  fill="none"
+                  stroke="#8a3f18"
+                  strokeWidth={1}
+                  strokeLinecap="round"
+                  strokeDasharray="1.5 12.5"
+                  opacity={0.4}
+                  clipPath="url(#flight-trail-clip)"
+                />
+
+                {geometry.checkpoints.map((cp, i) => (
+                  <circle
+                    key={jobs[i].company}
+                    cx={cp.x}
+                    cy={cp.y}
+                    r={5}
+                    fill="#f4ecd8"
+                    stroke="var(--color-accent)"
+                    strokeWidth={2}
+                  />
+                ))}
+              </g>
+            </svg>
+
+            <div ref={planeRef} className="absolute left-0 top-0 h-6 w-14 will-change-transform">
+              <PaperPlaneIcon className="h-full w-full drop-shadow-[0_4px_10px_rgba(255,90,60,0.4)]" />
+            </div>
+
+            {geometry.checkpoints.map((cp, i) => (
+              <div
+                key={jobs[i].company}
+                ref={(el) => {
+                  markerRefs.current[i] = el
+                }}
+                aria-hidden="true"
+                className="absolute h-2.5 w-2.5 rounded-full bg-accent"
+                style={{ left: cp.x, top: cp.y, transform: 'translate(-50%, -50%)' }}
+              />
+            ))}
+
+            {geometry.checkpoints.map((cp, i) => (
+              <div
+                key={jobs[i].company}
+                ref={(el) => {
+                  cardRefs.current[i] = el
+                }}
+                className="absolute opacity-0 transition-opacity duration-150 ease-out"
+                style={{
+                  left: cp.x,
+                  ...(i % 2 === 0 ? { bottom: geometry.laneHeight * 0.06 } : { top: geometry.laneHeight * 0.08 }),
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                <FlightCard {...jobs[i]} rotation={i % 2 === 0 ? -2.5 : 2} />
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   )
