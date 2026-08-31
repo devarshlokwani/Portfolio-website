@@ -95,7 +95,8 @@ body {
   filter: drop-shadow(0 3px 8px rgb(0 0 0 / 0.28));
   transition:
     transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 0.2s ease;
+    filter 0.2s ease,
+    opacity 0.2s ease;
 }
 
 /* Solid kite silhouette (no default-cursor flag notch) split into two
@@ -131,6 +132,92 @@ body {
 
 .cursor--down .cursor-arrow {
   transform: scale(0.94);
+}
+
+/* Icon-swap cursor: hovering an element carrying data-cursor-icon="X"
+   fades the default arrow out and this badge in, positioned centered on
+   the same tracked point (the arrow's own transform-origin is its top-left
+   corner, not centered, so this needs its own centering offset). Currently
+   only the "foundr" variant exists. */
+.cursor-icon-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 96px;
+  width: 96px;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The dark greyscale ring behind the brand mark, slightly larger so its
+   band shows all the way around, with "VIEW MORE" curving along it —
+   spins slowly so the repeated label reads clearly as it passes rather
+   than sitting static and half-legible. */
+.cursor-icon-badge__ring {
+  position: absolute;
+  inset: 0;
+  animation: cursor-icon-ring-spin 9s linear infinite;
+  filter: drop-shadow(0 8px 20px rgb(0 0 0 / 0.35));
+}
+
+.cursor-icon-badge__ring-bg {
+  fill: #161616;
+}
+
+.cursor-icon-badge__ring-text {
+  fill: #f4f3ef;
+  font-family: var(--font-mono);
+  font-size: 6.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.cursor-icon-badge__ring-dot {
+  fill: #f4f3ef;
+}
+
+.cursor-icon-badge__mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  height: 52px;
+  width: 52px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #2c4a3d;
+  color: #fff;
+  font-family: var(--font-accent);
+  font-size: 20px;
+  font-weight: 700;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.35);
+}
+
+@keyframes cursor-icon-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-icon-badge__ring {
+    animation: none;
+  }
+}
+
+.cursor--icon-foundr .cursor-arrow {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.cursor--icon-foundr .cursor-icon-badge--foundr {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* Theme toggle circular reveal — the toggle drives a clip-path grow on the

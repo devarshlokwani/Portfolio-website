@@ -44,7 +44,6 @@ export function Projects() {
             key={project.slug}
             project={{ index: i + 1, ...project }}
             screens={project.slug === 'foundr' ? <FoundrScreens /> : null}
-            defaultOpen={projects.length === 1}
           />
         ))}
       </div>

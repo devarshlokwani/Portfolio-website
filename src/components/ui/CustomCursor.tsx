@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 
 import { gsap } from '@/lib/gsap'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -23,6 +23,7 @@ export function CustomCursor() {
   const rootRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
+  const ringTextPathId = useId()
 
   useEffect(() => {
     const root = rootRef.current
@@ -80,14 +81,24 @@ export function CustomCursor() {
 
     const onOver = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return
-      if ((e.target as Element)?.closest?.(INTERACTIVE_SELECTOR)) {
+      const target = e.target as Element
+      if (target?.closest?.(INTERACTIVE_SELECTOR)) {
         root.classList.add('cursor--hover')
+      }
+      const iconTarget = target?.closest?.<HTMLElement>('[data-cursor-icon]')
+      if (iconTarget) {
+        root.classList.add(`cursor--icon-${iconTarget.dataset.cursorIcon}`)
       }
     }
     const onOut = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return
-      if ((e.target as Element)?.closest?.(INTERACTIVE_SELECTOR)) {
+      const target = e.target as Element
+      if (target?.closest?.(INTERACTIVE_SELECTOR)) {
         root.classList.remove('cursor--hover')
+      }
+      const iconTarget = target?.closest?.<HTMLElement>('[data-cursor-icon]')
+      if (iconTarget) {
+        root.classList.remove(`cursor--icon-${iconTarget.dataset.cursorIcon}`)
       }
     }
     // No separate mouseenter handler needed: onMove's !mouseActive branch
@@ -121,6 +132,43 @@ export function CustomCursor() {
           <path className="cursor-arrow-facet-a" d="M4 3 L4 19 L9.5 14.5 Z" />
           <path className="cursor-arrow-facet-b" d="M4 3 L9.5 14.5 L17 14.5 Z" />
         </svg>
+        {/* Swapped in over the Foundr screenshot showcase (see
+            data-cursor-icon="foundr" in FoundrScreens.tsx) in place of the
+            arrow: a dark greyscale ring — slightly larger than, and
+            centered behind, the green "F" disc — with "VIEW MORE" curving
+            around the band between them. */}
+        <div className="cursor-icon-badge cursor-icon-badge--foundr">
+          <svg className="cursor-icon-badge__ring" viewBox="0 0 96 96">
+            <circle className="cursor-icon-badge__ring-bg" cx="48" cy="48" r="47" />
+            <defs>
+              {/* Short arcs centered exactly on the top and bottom points
+                  (not full semicircles — a semicircle left "VIEW MORE"
+                  centered via startOffset but still stretching most of the
+                  way around to the sides, reading as a left/right split
+                  rather than top/bottom) — traced in opposite directions so
+                  each label's "up" faces outward and reads upright, rather
+                  than the bottom copy coming out upside down. */}
+              <path id={`${ringTextPathId}-top`} d="M 19.7,24.2 A 37,37 0 0 1 76.3,24.2" />
+              <path id={`${ringTextPathId}-bottom`} d="M 76.3,71.8 A 37,37 0 0 1 19.7,71.8" />
+            </defs>
+            <text className="cursor-icon-badge__ring-text" textAnchor="middle">
+              <textPath href={`#${ringTextPathId}-top`} startOffset="50%">
+                VIEW MORE
+              </textPath>
+            </text>
+            <text className="cursor-icon-badge__ring-text" textAnchor="middle">
+              <textPath href={`#${ringTextPathId}-bottom`} startOffset="50%">
+                VIEW MORE
+              </textPath>
+            </text>
+            {/* Separator dots at 3 and 9 o'clock — equal distance from both
+                labels, in the gaps left and right between the top and
+                bottom arcs, for a finished, intentional-looking break. */}
+            <circle className="cursor-icon-badge__ring-dot" cx="85" cy="48" r="3" />
+            <circle className="cursor-icon-badge__ring-dot" cx="11" cy="48" r="3" />
+          </svg>
+          <span className="cursor-icon-badge__mark">F</span>
+        </div>
       </div>
     </div>
   )
