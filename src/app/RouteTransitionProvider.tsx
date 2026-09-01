@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { useHeroTransitionRegistry } from '@/app/HeroTransitionProvider'
 import { useLenisInstance } from '@/hooks/useLenisInstance'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
@@ -24,26 +23,21 @@ export function useRouteTransition() {
 }
 
 /**
- * Owns navigation between routes. For Home → Experience specifically, while
- * the Hero is actually on screen to run it, the page swap is deferred until
- * Hero's own race-exit animation finishes (see HeroTransitionProvider) —
- * that's the flagship transition, but it depends on Hero's own DOM (the
- * name morphing into "MY WORK"), so it only ever applies from that one
- * screen. Every other transition (Work → Home, or Work from anywhere the
- * Hero isn't in view/mounted — e.g. clicking it while scrolled down to
- * Contact) goes through a generic full-screen wipe instead of navigating
- * instantly: an accent-colored panel sweeps down to fully cover the
- * viewport, the route swap happens hidden underneath it, then it continues
- * the same direction off the bottom to reveal the destination. Unlike the
- * Hero transition, this has no dependency on any particular page's
- * content, so it works from anywhere.
+ * Owns navigation between routes. Every cross-route navigation goes through
+ * one global wipe transition: a plain accent-colored panel sweeps down to
+ * fully cover the viewport, the route swap happens hidden underneath, then
+ * the panel continues the same direction off the bottom to reveal the
+ * destination. Deliberately kept plain for now — a fancier version of this
+ * wipe is a separate design pass. Using one mechanism for both directions
+ * (rather than a Hero-specific exit animation that only worked when Hero
+ * itself was on screen) is what makes this work from anywhere on the site,
+ * not just from the home hero.
  */
 export function RouteTransitionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const location = useLocation()
   const lenisRef = useLenisInstance()
   const reducedMotion = useReducedMotion()
-  const { runHeroExit } = useHeroTransitionRegistry()
   const busyRef = useRef(false)
   const overlayRef = useRef<HTMLDivElement>(null)
 
@@ -116,21 +110,9 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      const handled = path === '/experience' ? runHeroExit(() => finishNavigate(path, opts?.hash)) : false
-      if (handled) {
-        busyRef.current = true
-        // the hero animation's own completion drives finishNavigate; just
-        // release the busy guard shortly after so a stray double-click
-        // during the (short) animation window doesn't queue a second one
-        setTimeout(() => {
-          busyRef.current = false
-        }, 1600)
-        return
-      }
-
       runGlobalWipe(() => finishNavigate(path, opts?.hash))
     },
-    [location.pathname, reducedMotion, runHeroExit, finishNavigate, runGlobalWipe, lenisRef],
+    [location.pathname, reducedMotion, finishNavigate, runGlobalWipe, lenisRef],
   )
 
   return (

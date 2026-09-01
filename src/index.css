@@ -58,6 +58,20 @@ body {
   min-height: 100svh;
 }
 
+/* React Bits "Warp Text" — text is rasterized to a canvas texture and
+   redrawn each frame by a WebGL fragment shader that fbm-warps it and
+   splits the RGB channels near the pointer for a chromatic-aberration bend
+   (see WarpText.tsx). Width/height are deliberately left to each usage's
+   Tailwind classes (that's what sizes the text, via the auto-fit-to-
+   container canvas logic) — setting them here too would collide with those
+   utility classes at equal specificity and lose on source order. */
+.warp-text {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+}
+
 .warp-text canvas {
   position: absolute;
   inset: 0;

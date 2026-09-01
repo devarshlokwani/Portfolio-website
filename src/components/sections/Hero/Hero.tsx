@@ -1,31 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { useHeroTransitionRegistry } from '@/app/HeroTransitionProvider'
-import { HERO_NAME_CLASS, HERO_NAME_STYLE } from '@/components/sections/Hero/heroNameStyle'
 import { HeroChrome } from '@/components/sections/Hero/HeroChrome'
-import { ReloadText } from '@/components/sections/Hero/ReloadText'
+import { WarpText } from '@/components/sections/Hero/WarpText'
 import { useGlyphReload } from '@/hooks/useGlyphReload'
 import { useIntro } from '@/hooks/useIntro'
 import { gsap } from '@/lib/gsap'
-import { SCRAMBLE_CHARS } from '@/lib/scrambleChars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrambleReveal } from '@/hooks/useScrambleReveal'
+import { useTheme } from '@/hooks/useTheme'
+
+// Mirrors --color-fg / --color-fg-muted in theme.css — WarpText rasterizes
+// onto a canvas, so it needs resolved color values rather than CSS vars.
+const NAME_COLORS = {
+  dark: { fg: '#f4f3ef', muted: '#a3a1ab' },
+  light: { fg: '#17161a', muted: '#55525c' },
+} as const
 
 export function Hero() {
   const { introComplete } = useIntro()
   const reducedMotion = useReducedMotion()
-  const { registerHandler } = useHeroTransitionRegistry()
+  const { theme } = useTheme()
+  const { fg, muted } = NAME_COLORS[theme]
   const nameRef = useRef<HTMLDivElement>(null)
   const metaRef = useRef<HTMLDivElement>(null)
 
   const [devarshRevealed, setDevarshRevealed] = useState(false)
   const [lokwaniRevealed, setLokwaniRevealed] = useState(false)
-  // idle: normal hero, the recurring glyph-reload tic is live. exiting: a
-  // route change is underway — both words are scrambling toward their exit
-  // text (see playHeroExit).
-  const [heroPhase, setHeroPhase] = useState<'idle' | 'exiting'>('idle')
-  const [devarshExitText, setDevarshExitText] = useState('DEVARSH')
-  const [lokwaniExitText, setLokwaniExitText] = useState('LOKWANI')
 
   const revealTrigger = introComplete && !reducedMotion
   const devarshReveal = useScrambleReveal('DEVARSH', {
@@ -42,71 +42,12 @@ export function Hero() {
 
   // Once each word has settled from its initial reveal, keep it "alive" with
   // occasional character reloads — the same glyph(s) slide out one side and
-  // a fresh copy slides in from the other, like a magazine swap. Disabled
-  // once a route-exit is underway so it can't fight the scramble below.
-  const devarshTransitions = useGlyphReload('DEVARSH', {
-    enabled: devarshRevealed && !reducedMotion && heroPhase === 'idle',
-  })
-  const lokwaniTransitions = useGlyphReload('LOKWANI', {
-    enabled: lokwaniRevealed && !reducedMotion && heroPhase === 'idle',
-  })
+  // a fresh copy slides in from the other, like a magazine swap.
+  const devarshTransitions = useGlyphReload('DEVARSH', { enabled: devarshRevealed && !reducedMotion })
+  const lokwaniTransitions = useGlyphReload('LOKWANI', { enabled: lokwaniRevealed && !reducedMotion })
 
-  const devarshText = heroPhase === 'exiting' ? devarshExitText : devarshRevealed ? 'DEVARSH' : devarshReveal
-  const lokwaniText = heroPhase === 'exiting' ? lokwaniExitText : lokwaniRevealed ? 'LOKWANI' : lokwaniReveal
-
-  // Route exit: the same scramble-text "glitch" effect already used for the
-  // intro reveal (and the idle tic's own char cycling), run once more —
-  // DEVARSH scrambles into MY WORK, LOKWANI scrambles away to nothing. The
-  // rest of the hero (FoundrLink, tagline, socials, meta, bottom bar) stays
-  // put — only the name changes. Hero never unmounts while on Home (every
-  // section renders at once, just scrolled to), so this only actually runs
-  // when the name is somewhere in the viewport — declining otherwise lets
-  // the route transition fall back to its generic wipe instead of playing
-  // a scramble the user can't see and then just cutting to the next page.
-  const playHeroExit = useCallback((onComplete: () => void) => {
-    const nameEl = nameRef.current
-    if (!nameEl) return false
-    const rect = nameEl.getBoundingClientRect()
-    const isVisible = rect.bottom > 0 && rect.top < window.innerHeight
-    if (!isVisible) return false
-
-    setHeroPhase('exiting')
-
-    const devarshEl = document.createElement('span')
-    devarshEl.textContent = 'DEVARSH'
-    const lokwaniEl = document.createElement('span')
-    lokwaniEl.textContent = 'LOKWANI'
-
-    let wordsRemaining = 2
-    const onWordDone = () => {
-      wordsRemaining -= 1
-      if (wordsRemaining > 0) return
-      gsap.delayedCall(0.35, onComplete)
-    }
-
-    gsap.to(devarshEl, {
-      duration: 0.7,
-      scrambleText: { text: 'MY WORK', chars: SCRAMBLE_CHARS, speed: 0.4, revealDelay: 0.1 },
-      ease: 'none',
-      onUpdate: () => setDevarshExitText(devarshEl.textContent || 'DEVARSH'),
-      onComplete: onWordDone,
-    })
-    gsap.to(lokwaniEl, {
-      duration: 0.6,
-      delay: 0.1,
-      scrambleText: { text: '', chars: SCRAMBLE_CHARS, speed: 0.4, revealDelay: 0.1 },
-      ease: 'none',
-      onUpdate: () => setLokwaniExitText(lokwaniEl.textContent || ''),
-      onComplete: onWordDone,
-    })
-
-    return true
-  }, [])
-
-  useEffect(() => {
-    registerHandler(playHeroExit)
-    return () => registerHandler(null)
-  }, [registerHandler, playHeroExit])
+  const devarshText = devarshRevealed ? 'DEVARSH' : devarshReveal
+  const lokwaniText = lokwaniRevealed ? 'LOKWANI' : lokwaniReveal
 
   useEffect(() => {
     if (!introComplete) return
@@ -130,17 +71,19 @@ export function Hero() {
       animateIn
       name={
         <>
-          <ReloadText
+          <WarpText
             text={devarshText}
-            transitions={heroPhase === 'idle' ? devarshTransitions : []}
-            className={`${HERO_NAME_CLASS} text-fg`}
-            style={HERO_NAME_STYLE}
+            ariaLabel="DEVARSH"
+            color={fg}
+            glyphTransitions={devarshRevealed ? devarshTransitions : null}
+            className="h-[16vw] max-h-[230px] w-[92vw] max-w-[1400px]"
           />
-          <ReloadText
+          <WarpText
             text={lokwaniText}
-            transitions={heroPhase === 'idle' ? lokwaniTransitions : []}
-            className={`${HERO_NAME_CLASS} text-fg-muted`}
-            style={HERO_NAME_STYLE}
+            ariaLabel="LOKWANI"
+            color={muted}
+            glyphTransitions={lokwaniRevealed ? lokwaniTransitions : null}
+            className="h-[16vw] max-h-[230px] w-[92vw] max-w-[1400px]"
           />
         </>
       }

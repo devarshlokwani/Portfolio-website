@@ -177,10 +177,32 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       appliedFilled.current = true
       lastStartedAt.current = performance.now()
 
+      // xPercent is pinned to 0 at every step (not just the initial set) —
+      // if this click's mouse-move-then-click sequence overlapped with the
+      // hover fill's own in-flight xPercent slide (killed above, but GSAP
+      // freezes a killed tween's properties wherever they were mid-flight,
+      // it doesn't snap them back), a single .set() at the very start isn't
+      // enough insurance against that leftover value bleeding into a later
+      // step. Pinning it throughout guarantees a pure vertical roll no
+      // matter what state preceded this timeline.
       tl.set(fillText, { xPercent: 0, color: bgColor })
-      tl.to(fillText, { yPercent: -130, opacity: 0, color: accentColor, duration: 0.16, ease: 'power2.in' }, 0)
-      tl.set(fillText, { yPercent: 130 })
-      tl.to(fillText, { yPercent: 0, opacity: 1, color: bgColor, duration: 0.32, ease: 'power3.out' }, '+=0.02')
+      tl.to(fillText, { xPercent: 0, yPercent: -130, opacity: 0, color: accentColor, duration: 0.16, ease: 'power2.in' }, 0)
+      tl.set(fillText, { xPercent: 0, yPercent: 130 })
+      tl.to(
+        fillText,
+        { xPercent: 0, yPercent: 0, opacity: 1, color: bgColor, duration: 0.32, ease: 'power3.out' },
+        '+=0.02',
+      )
+      // The color tween above leaves its resolved value as an inline style,
+      // which (being higher specificity than the text-bg class) would keep
+      // overriding it from then on — frozen at whichever theme was active
+      // at click time. Clearing it hands color back to the CSS class, which
+      // reads var(--color-bg) live and so actually follows a later theme
+      // switch, instead of leaving stale near-invisible text if the fill
+      // color and this frozen text color end up nearly the same after a
+      // switch (e.g. a light-theme click's near-white leftover, still
+      // near-white against dark theme's white fill).
+      tl.set(fillText, { clearProps: 'color' })
     }
 
     e.preventDefault()
