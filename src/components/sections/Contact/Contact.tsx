@@ -1,5 +1,7 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
+import { LuMail } from 'react-icons/lu'
 
+import { CtaLaunchButton } from '@/components/ui/CtaLaunchButton'
 import { Section } from '@/components/ui/Section'
 
 const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID
@@ -15,6 +17,7 @@ type Status = 'idle' | 'submitting' | 'success' | 'error'
 
 export function Contact() {
   const [status, setStatus] = useState<Status>('idle')
+  const formRef = useRef<HTMLFormElement>(null)
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -69,7 +72,7 @@ export function Contact() {
           </ul>
         </div>
 
-        <form onSubmit={onSubmit} className="flex flex-col gap-3">
+        <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-3">
           <input
             name="name"
             required
@@ -95,13 +98,13 @@ export function Contact() {
               {status === 'success' && 'Message sent — thank you!'}
               {status === 'error' && "Couldn't send — try emailing directly instead."}
             </p>
-            <button
-              type="submit"
+            <CtaLaunchButton
+              label={status === 'submitting' ? 'Sending...' : 'Send message'}
+              icon={LuMail}
               disabled={status === 'submitting'}
+              onLaunch={() => formRef.current?.requestSubmit()}
               className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-            >
-              {status === 'submitting' ? 'Sending...' : 'Send message'}
-            </button>
+            />
           </div>
         </form>
       </div>
