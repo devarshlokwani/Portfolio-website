@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from 'react'
 import { LuArrowUpRight } from 'react-icons/lu'
 
+import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
+
 export interface ProjectEntry {
   index: number
   slug: string
@@ -93,16 +95,12 @@ export function ProjectRow({ project, screens, defaultOpen = false }: ProjectRow
                     </a>
                   )}
                   {project.links.live && (
-                    <a
+                    <CtaLaunchLink
                       href={project.links.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-cursor-hover
-                      onClick={(e) => e.stopPropagation()}
+                      label="View"
+                      external
                       className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5"
-                    >
-                      View
-                    </a>
+                    />
                   )}
                 </div>
               </div>

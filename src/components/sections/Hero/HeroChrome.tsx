@@ -5,6 +5,7 @@ import { useRouteTransition } from '@/app/RouteTransitionProvider'
 import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
 import { SocialIcons } from '@/components/sections/Hero/SocialIcons'
 import { BorderGlow } from '@/components/ui/BorderGlow'
+import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
 
 interface HeroChromeProps {
   /** The two-line name area — the one piece of this chrome allowed to differ between Home and the Work page. */
@@ -70,14 +71,12 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroCh
           ship, and actually work.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-          <a
+          <CtaLaunchLink
             href="#projects"
-            data-cursor-hover
-            onClick={goToHash('#projects')}
+            label="View Projects"
+            onNavigate={() => goTo('/', { hash: '#projects' })}
             className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5"
-          >
-            View Projects
-          </a>
+          />
           <BorderGlow className="hover:!border-transparent">
             <a
               href="#contact"
