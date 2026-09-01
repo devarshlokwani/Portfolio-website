@@ -137,10 +137,10 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
   // Apple-nav-style click flourish: the visible (on-fill) label rolls up and
   // out, then re-enters from below — deliberately vertical where the hover
   // fill is horizontal, so the two motions read as distinct beats instead of
-  // the click just replaying the hover — with a brief flash to the accent
-  // orange and back riding along the same roll. Reuses the same timelineRef
-  // as the hover fill so the two can't fight over fillText if the mouse
-  // leaves mid-roll.
+  // the click just replaying the hover. Alongside that, the fill pill's own
+  // background (not the text) flashes from its base color to the accent
+  // orange and back. Reuses the same timelineRef as the hover fill so the
+  // two can't fight over fillText/fill if the mouse leaves mid-roll.
   const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const fill = fillRef.current
     const fillText = fillTextRef.current
@@ -154,9 +154,10 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       // (it needs an actual hex/rgb literal to interpolate channel-by-
       // channel), so these are resolved to real values up front — read
       // fresh on every click so it's always correct for whichever theme is
-      // currently active.
+      // currently active. --color-fg is the pill's own base fill color (the
+      // `bg-fg` class), not --color-bg — this arc is base -> accent -> base.
       const rootStyles = getComputedStyle(document.documentElement)
-      const bgColor = rootStyles.getPropertyValue('--color-bg').trim()
+      const fgColor = rootStyles.getPropertyValue('--color-fg').trim()
       const accentColor = rootStyles.getPropertyValue('--color-accent').trim()
 
       // If this link wasn't already filled (hovered) before the click —
@@ -185,24 +186,36 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       // enough insurance against that leftover value bleeding into a later
       // step. Pinning it throughout guarantees a pure vertical roll no
       // matter what state preceded this timeline.
-      tl.set(fillText, { xPercent: 0, color: bgColor })
-      tl.to(fillText, { xPercent: 0, yPercent: -130, opacity: 0, color: accentColor, duration: 0.16, ease: 'power2.in' }, 0)
+      const EXIT_DUR = 0.16
+      const ENTER_DUR = 0.32
+
+      tl.set(fillText, { xPercent: 0, yPercent: 0, opacity: 1 })
+      tl.to(fillText, { xPercent: 0, yPercent: -130, opacity: 0, duration: EXIT_DUR, ease: 'power2.in' }, 0)
       tl.set(fillText, { xPercent: 0, yPercent: 130 })
       tl.to(
         fillText,
-        { xPercent: 0, yPercent: 0, opacity: 1, color: bgColor, duration: 0.32, ease: 'power3.out' },
-        '+=0.02',
+        { xPercent: 0, yPercent: 0, opacity: 1, duration: ENTER_DUR, ease: 'power3.out' },
+        EXIT_DUR + 0.02,
       )
-      // The color tween above leaves its resolved value as an inline style,
-      // which (being higher specificity than the text-bg class) would keep
-      // overriding it from then on — frozen at whichever theme was active
-      // at click time. Clearing it hands color back to the CSS class, which
-      // reads var(--color-bg) live and so actually follows a later theme
-      // switch, instead of leaving stale near-invisible text if the fill
-      // color and this frozen text color end up nearly the same after a
-      // switch (e.g. a light-theme click's near-white leftover, still
-      // near-white against dark theme's white fill).
-      tl.set(fillText, { clearProps: 'color' })
+
+      // The pill's own background never goes invisible during any of this
+      // (unlike fillText, it isn't riding the opacity roll — for an
+      // already-filled link its clipPath just stays fully revealed
+      // throughout), so unlike the text this can run as one continuous
+      // color arc across the whole gesture instead of needing to dodge an
+      // invisible middle.
+      const TO_ACCENT_DUR = 0.22
+      const BACK_TO_BASE_DUR = 0.3
+
+      tl.set(fill, { backgroundColor: fgColor }, 0)
+      tl.to(fill, { backgroundColor: accentColor, duration: TO_ACCENT_DUR, ease: 'power2.out' }, 0)
+      tl.to(fill, { backgroundColor: fgColor, duration: BACK_TO_BASE_DUR, ease: 'power2.inOut' }, TO_ACCENT_DUR)
+      // Leaves a resolved inline background-color that (being higher
+      // specificity than the bg-fg class) would otherwise keep overriding
+      // it forever, frozen at whichever theme was active at click time.
+      // Clearing it hands the color back to the CSS class, which reads
+      // var(--color-fg) live and so actually follows a later theme switch.
+      tl.set(fill, { clearProps: 'backgroundColor' })
     }
 
     e.preventDefault()
