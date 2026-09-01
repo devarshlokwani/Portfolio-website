@@ -58,8 +58,18 @@ export function Hero() {
   // intro reveal (and the idle tic's own char cycling), run once more —
   // DEVARSH scrambles into MY WORK, LOKWANI scrambles away to nothing. The
   // rest of the hero (FoundrLink, tagline, socials, meta, bottom bar) stays
-  // put — only the name changes.
+  // put — only the name changes. Hero never unmounts while on Home (every
+  // section renders at once, just scrolled to), so this only actually runs
+  // when the name is somewhere in the viewport — declining otherwise lets
+  // the route transition fall back to its generic wipe instead of playing
+  // a scramble the user can't see and then just cutting to the next page.
   const playHeroExit = useCallback((onComplete: () => void) => {
+    const nameEl = nameRef.current
+    if (!nameEl) return false
+    const rect = nameEl.getBoundingClientRect()
+    const isVisible = rect.bottom > 0 && rect.top < window.innerHeight
+    if (!isVisible) return false
+
     setHeroPhase('exiting')
 
     const devarshEl = document.createElement('span')
@@ -89,6 +99,8 @@ export function Hero() {
       onUpdate: () => setLokwaniExitText(lokwaniEl.textContent || ''),
       onComplete: onWordDone,
     })
+
+    return true
   }, [])
 
   useEffect(() => {
