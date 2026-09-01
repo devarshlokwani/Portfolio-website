@@ -137,22 +137,50 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
   // Apple-nav-style click flourish: the visible (on-fill) label rolls up and
   // out, then re-enters from below — deliberately vertical where the hover
   // fill is horizontal, so the two motions read as distinct beats instead of
-  // the click just replaying the hover. Reuses the same timelineRef as the
-  // hover fill so the two can't fight over fillText if the mouse leaves
-  // mid-roll.
+  // the click just replaying the hover — with a brief flash to the accent
+  // orange and back riding along the same roll. Reuses the same timelineRef
+  // as the hover fill so the two can't fight over fillText if the mouse
+  // leaves mid-roll.
   const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const fill = fillRef.current
     const fillText = fillTextRef.current
-    if (fillText) {
+    const defaultText = defaultTextRef.current
+    if (fill && fillText && defaultText) {
       timelineRef.current?.kill()
       const tl = gsap.timeline()
       timelineRef.current = tl
 
-      // Guards against a click landing mid-hover-animation, where fillText's
-      // xPercent could still be mid-flight when its timeline gets killed above.
-      tl.set(fillText, { xPercent: 0 })
-      tl.to(fillText, { yPercent: -130, opacity: 0, duration: 0.16, ease: 'power2.in' })
+      // GSAP's color interpolation can't parse a raw `var(--x)` reference
+      // (it needs an actual hex/rgb literal to interpolate channel-by-
+      // channel), so these are resolved to real values up front — read
+      // fresh on every click so it's always correct for whichever theme is
+      // currently active.
+      const rootStyles = getComputedStyle(document.documentElement)
+      const bgColor = rootStyles.getPropertyValue('--color-bg').trim()
+      const accentColor = rootStyles.getPropertyValue('--color-accent').trim()
+
+      // If this link wasn't already filled (hovered) before the click —
+      // e.g. keyboard activation, or a fast click that outruns the hover
+      // fill's own hold delay — clicking is about to change `filled` from
+      // false to true, which the *other* effect below reacts to. Left
+      // alone, that would call its own play(true) right after this and
+      // kill this timeline before it renders a single frame. Marking
+      // appliedFilled/lastStartedAt here, synchronously, makes that
+      // effect's `filled === appliedFilled.current` check see no change
+      // and skip re-triggering — so this timeline has to pick up the slack
+      // and do the pill reveal + default-text fade itself in that case.
+      const alreadyFilled = appliedFilled.current
+      if (!alreadyFilled) {
+        tl.to(fill, { clipPath: REVEALED_CLIP, duration: 0.32, ease: 'power3.out' }, 0)
+        tl.to(defaultText, { xPercent: 130, opacity: 0, duration: 0.14, ease: 'power2.in' }, 0)
+      }
+      appliedFilled.current = true
+      lastStartedAt.current = performance.now()
+
+      tl.set(fillText, { xPercent: 0, color: bgColor })
+      tl.to(fillText, { yPercent: -130, opacity: 0, color: accentColor, duration: 0.16, ease: 'power2.in' }, 0)
       tl.set(fillText, { yPercent: 130 })
-      tl.to(fillText, { yPercent: 0, opacity: 1, duration: 0.32, ease: 'power3.out' }, '+=0.02')
+      tl.to(fillText, { yPercent: 0, opacity: 1, color: bgColor, duration: 0.32, ease: 'power3.out' }, '+=0.02')
     }
 
     e.preventDefault()

@@ -49,6 +49,13 @@ export function Nav() {
       return undefined
     }
 
+    // Coming back to '/' from a route link (e.g. clicking the corner mark
+    // while "Work" is active) otherwise leaves that route's stale index in
+    // place — nothing here re-evaluates it until a section's own
+    // intersection fires, which doesn't happen at all if landing at the
+    // very top of the page, above every observed section.
+    setActiveIndex(null)
+
     const sections = LINKS.map((l) => (l.kind === 'hash' ? document.querySelector<HTMLElement>(l.href) : null))
 
     const observer = new IntersectionObserver(
