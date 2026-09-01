@@ -1,5 +1,7 @@
 import { useId } from 'react'
 
+import { TechTag } from '@/components/ui/TechTag'
+
 interface FlightCardProps {
   role: string
   company: string
@@ -59,10 +61,10 @@ export function FlightCard({ role, company, period, location, points, skills, ro
           {skills.map((skill) => (
             <span
               key={skill}
-              className="rounded-full px-2.5 py-0.5 font-mono text-[10px]"
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px]"
               style={{ border: '1px solid #c9bda2', color: '#5c5245' }}
             >
-              {skill}
+              <TechTag name={skill} iconClassName="h-2.5 w-2.5 shrink-0" />
             </span>
           ))}
         </div>

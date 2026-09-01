@@ -1,9 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { LuPenLine } from 'react-icons/lu'
 
 import { getClientId, getThrottleRemaining, markSubmitted } from '@/lib/clientId'
 import { db, firebaseEnabled } from '@/lib/firebase'
 import { containsBlockedWord } from '@/lib/moderation'
+import { CtaLaunchButton } from '@/components/ui/CtaLaunchButton'
 
 const NAME_MAX = 40
 const MESSAGE_MAX = 200
@@ -15,6 +17,7 @@ export function WallEntryForm() {
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -62,7 +65,7 @@ export function WallEntryForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-3">
+    <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-3">
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -88,13 +91,13 @@ export function WallEntryForm() {
             `${message.length}/${MESSAGE_MAX}`
           )}
         </p>
-        <button
-          type="submit"
+        <CtaLaunchButton
+          label={status === 'submitting' ? 'Signing...' : 'Sign the wall'}
+          icon={LuPenLine}
           disabled={status === 'submitting'}
+          onLaunch={() => formRef.current?.requestSubmit()}
           className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-        >
-          {status === 'submitting' ? 'Signing...' : 'Sign the wall'}
-        </button>
+        />
       </div>
     </form>
   )

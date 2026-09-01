@@ -15,7 +15,7 @@ export function FoundrLink() {
       target="_blank"
       rel="noopener noreferrer"
       data-cursor-hover
-      className="foundr-pill group inline-flex items-center gap-2 rounded-full bg-surface/70 px-4 py-2 font-mono text-xs font-medium text-emerald-100/60 backdrop-blur-sm transition-colors duration-300 hover:text-white"
+      className="foundr-pill group inline-flex items-center gap-2 rounded-full bg-surface/70 px-4 py-2 font-mono text-xs font-medium text-emerald-800/70 backdrop-blur-sm transition-colors duration-300 hover:text-emerald-950 dark:text-emerald-100/60 dark:hover:text-white"
     >
       <span className="flex h-5 w-5 items-center justify-center rounded-[6px] bg-[#2c4a3d] font-accent text-[13px] font-bold text-white">
         F

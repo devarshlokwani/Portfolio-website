@@ -1,3 +1,5 @@
+import { TechTag } from '@/components/ui/TechTag'
+
 interface ExperienceDetailProps {
   role: string
   company: string
@@ -38,9 +40,9 @@ export function ExperienceDetail({ role, company, period, location, points, skil
         {skills.map((skill) => (
           <span
             key={skill}
-            className="rounded-full border border-border px-3 py-1 font-mono text-[11px] text-fg-muted"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 font-mono text-[11px] text-fg-muted"
           >
-            {skill}
+            <TechTag name={skill} />
           </span>
         ))}
       </div>

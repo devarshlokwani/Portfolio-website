@@ -17,7 +17,7 @@
         { "id": "react", "label": "React", "set": "si", "icon": "SiReact", "color": "#61DAFB" },
         { "id": "react-native", "label": "React Native", "set": "si", "icon": "SiReact", "color": "#61DAFB" },
         { "id": "nodejs", "label": "Node.js", "set": "si", "icon": "SiNodedotjs", "color": "#5FA04E" },
-        { "id": "express", "label": "Express.js", "set": "si", "icon": "SiExpress", "color": "#ffffff" },
+        { "id": "express", "label": "Express.js", "set": "si", "icon": "SiExpress", "color": "var(--color-fg)" },
         { "id": "tailwind", "label": "Tailwind CSS", "set": "si", "icon": "SiTailwindcss", "color": "#38BDF8" },
         { "id": "gsap", "label": "GSAP", "set": "si", "icon": "SiGreensock", "color": "#88CE02" }
       ]
@@ -34,8 +34,8 @@
       "items": [
         { "id": "aws", "label": "AWS", "set": "fa6", "icon": "FaAws", "color": "#FF9900" },
         { "id": "git", "label": "Git", "set": "si", "icon": "SiGit", "color": "#F05032" },
-        { "id": "github", "label": "GitHub", "set": "si", "icon": "SiGithub", "color": "#ffffff" },
-        { "id": "vercel", "label": "Vercel", "set": "si", "icon": "SiVercel", "color": "#ffffff" },
+        { "id": "github", "label": "GitHub", "set": "si", "icon": "SiGithub", "color": "var(--color-fg)" },
+        { "id": "vercel", "label": "Vercel", "set": "si", "icon": "SiVercel", "color": "var(--color-fg)" },
         { "id": "render", "label": "Render", "set": "si", "icon": "SiRender", "color": "#46E3B7" },
         { "id": "vite", "label": "Vite", "set": "si", "icon": "SiVite", "color": "#646CFF" }
       ]

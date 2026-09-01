@@ -20,7 +20,11 @@ const LINKS: SocialLink[] = [
     label: 'GitHub',
     href: 'https://github.com/devarshlokwani',
     icon: LuGithub,
-    glow: '#f4f3ef',
+    // GitHub has no real brand color — glow toward the theme's own
+    // foreground instead of a fixed hex, so it reads dark-on-light and
+    // light-on-dark rather than staying a fixed near-white that vanishes
+    // against a light theme's pale background.
+    glow: 'var(--color-fg)',
   },
   {
     label: 'Email',

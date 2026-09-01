@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react'
-import { LuArrowUpRight } from 'react-icons/lu'
+import { LuArrowUpRight, LuGithub } from 'react-icons/lu'
 
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
+import { TechTag } from '@/components/ui/TechTag'
 
 export interface ProjectEntry {
   index: number
@@ -75,24 +76,22 @@ export function ProjectRow({ project, screens, defaultOpen = false }: ProjectRow
                   {project.stack.map((tech) => (
                     <li
                       key={tech}
-                      className="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-fg-subtle"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-fg-subtle"
                     >
-                      {tech}
+                      <TechTag name={tech} />
                     </li>
                   ))}
                 </ul>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {project.links.github && (
-                    <a
+                    <CtaLaunchLink
                       href={project.links.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-cursor-hover
-                      onClick={(e) => e.stopPropagation()}
+                      label="GitHub"
+                      icon={LuGithub}
+                      tone="fg"
+                      external
                       className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-fg transition-colors hover:border-accent hover:text-accent"
-                    >
-                      GitHub
-                    </a>
+                    />
                   )}
                   {project.links.live && (
                     <CtaLaunchLink

@@ -1,4 +1,5 @@
 import type { ReactNode, Ref } from 'react'
+import { LuMail } from 'react-icons/lu'
 import { TbBriefcase2, TbMapPin } from 'react-icons/tb'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
@@ -31,11 +32,6 @@ interface HeroChromeProps {
  */
 export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroChromeProps) {
   const { goTo } = useRouteTransition()
-
-  const goToHash = (hash: string) => (e: React.MouseEvent) => {
-    e.preventDefault()
-    goTo('/', { hash })
-  }
 
   return (
     <section
@@ -78,14 +74,14 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroCh
             className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5"
           />
           <BorderGlow className="hover:!border-transparent">
-            <a
+            <CtaLaunchLink
               href="#contact"
-              data-cursor-hover
-              onClick={goToHash('#contact')}
+              label="Get in Touch"
+              icon={LuMail}
+              tone="fg"
+              onNavigate={() => goTo('/', { hash: '#contact' })}
               className="rounded-full px-6 py-3 text-sm font-medium text-fg"
-            >
-              Get in Touch
-            </a>
+            />
           </BorderGlow>
         </div>
       </div>

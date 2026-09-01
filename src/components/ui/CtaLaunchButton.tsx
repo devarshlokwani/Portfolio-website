@@ -9,6 +9,8 @@ interface CtaLaunchButtonProps {
   disabled?: boolean
   /** called at the launch beat instead of the button's default submit */
   onLaunch: () => void
+  /** see SpeedLaunchVisual — "accent" (default) for a solid accent-fill CTA, "fg" for a bordered/transparent one */
+  tone?: 'accent' | 'fg'
 }
 
 /**
@@ -19,7 +21,7 @@ interface CtaLaunchButtonProps {
  * (it just skips the flourish, going straight through the browser's normal
  * submit path — nothing here to animate in that case anyway).
  */
-export function CtaLaunchButton({ label, className, icon, disabled = false, onLaunch }: CtaLaunchButtonProps) {
+export function CtaLaunchButton({ label, className, icon, disabled = false, onLaunch, tone }: CtaLaunchButtonProps) {
   const { play, ...refs } = useSpeedLaunch()
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -35,7 +37,7 @@ export function CtaLaunchButton({ label, className, icon, disabled = false, onLa
       onClick={handleClick}
       className={`relative isolate overflow-hidden ${className}`}
     >
-      <SpeedLaunchVisual label={label} icon={icon} {...refs} />
+      <SpeedLaunchVisual label={label} icon={icon} tone={tone} {...refs} />
     </button>
   )
 }

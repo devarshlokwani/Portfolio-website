@@ -11,6 +11,8 @@ interface CtaLaunchLinkProps {
   external?: boolean
   /** for non-external links: called instead of the default anchor navigation, once the launch beat fires */
   onNavigate?: () => void
+  /** see SpeedLaunchVisual — "accent" (default) for a solid accent-fill CTA, "fg" for a bordered/transparent one */
+  tone?: 'accent' | 'fg'
 }
 
 /**
@@ -21,7 +23,15 @@ interface CtaLaunchLinkProps {
  * in-page scroll leaves it sitting in the hero, and an external project
  * link opens in a new tab while this page doesn't move at all.
  */
-export function CtaLaunchLink({ href, label, className, icon, external = false, onNavigate }: CtaLaunchLinkProps) {
+export function CtaLaunchLink({
+  href,
+  label,
+  className,
+  icon,
+  external = false,
+  onNavigate,
+  tone,
+}: CtaLaunchLinkProps) {
   const { play, ...refs } = useSpeedLaunch()
 
   const fire = () => {
@@ -57,7 +67,7 @@ export function CtaLaunchLink({ href, label, className, icon, external = false, 
       onClick={handleClick}
       className={`relative isolate overflow-hidden ${className}`}
     >
-      <SpeedLaunchVisual label={label} icon={icon} {...refs} />
+      <SpeedLaunchVisual label={label} icon={icon} tone={tone} {...refs} />
     </a>
   )
 }

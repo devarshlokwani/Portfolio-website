@@ -28,7 +28,9 @@ const LEGAL_LINKS: FooterLink[] = [
 ]
 
 const ICON_LINKS = [
-  { label: 'GitHub', href: 'https://github.com/devarshlokwani', icon: LuGithub, glow: '#f4f3ef' },
+  // GitHub has no real brand color — glow toward the theme's own
+  // foreground instead of a fixed hex (see SocialIcons.tsx for the same fix)
+  { label: 'GitHub', href: 'https://github.com/devarshlokwani', icon: LuGithub, glow: 'var(--color-fg)' },
   {
     label: 'LinkedIn',
     href: 'https://www.linkedin.com/in/devarsh-lokwani-a802b2296/',
