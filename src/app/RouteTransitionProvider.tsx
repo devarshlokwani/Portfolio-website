@@ -1,6 +1,11 @@
 import { createContext, useCallback, useContext, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+import {
+  TransitionLaunchIcon,
+  type TransitionDirection,
+  type TransitionLaunchIconHandle,
+} from '@/components/ui/TransitionLaunchIcon'
 import { useLenisInstance } from '@/hooks/useLenisInstance'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
@@ -22,16 +27,32 @@ export function useRouteTransition() {
   return ctx
 }
 
+// Positive skew shifts a point's x by +y*tan(angle) in the panel's local
+// space (y growing downward) — since the panel sweeps in from the right
+// (moving toward -x), a larger positive shift at the bottom means the
+// bottom of the leading edge sits further right (less progressed) than the
+// top at any instant, so the top-right corner is the first thing on screen.
+const SKEW_DEG = 14
+// The panel is oversized relative to the clipping wrapper (which is exactly
+// viewport-sized) so the skewed corners still fully cover every edge at
+// rest instead of leaving a gap: horizontal overscan needs to clear
+// viewportHeight * tan(SKEW_DEG), which for a typical viewport is well
+// under 20% of its width.
+const PANEL_OVERSCAN = '20%'
+const PANEL_WIDTH = '140%'
+
 /**
  * Owns navigation between routes. Every cross-route navigation goes through
- * one global wipe transition: a plain accent-colored panel sweeps down to
- * fully cover the viewport, the route swap happens hidden underneath, then
- * the panel continues the same direction off the bottom to reveal the
- * destination. Deliberately kept plain for now — a fancier version of this
- * wipe is a separate design pass. Using one mechanism for both directions
- * (rather than a Hero-specific exit animation that only worked when Hero
- * itself was on screen) is what makes this work from anywhere on the site,
- * not just from the home hero.
+ * one global wipe transition: a skewed accent-colored panel sweeps in from
+ * the right — its diagonal leading edge angled so the top-right corner
+ * arrives first — to fully cover the viewport, the route swap happens
+ * hidden underneath, then the panel continues the same direction off the
+ * left to reveal the destination. The diagonal edge (vs. a flat one) is
+ * what keeps this reading as a smooth directional sweep rather than a
+ * blunt block wipe. Using one mechanism for both directions (rather than a
+ * Hero-specific exit animation that only worked when Hero itself was on
+ * screen) is what makes this work from anywhere on the site, not just from
+ * the home hero.
  */
 export function RouteTransitionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
@@ -40,6 +61,7 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
   const reducedMotion = useReducedMotion()
   const busyRef = useRef(false)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const launchRef = useRef<TransitionLaunchIconHandle>(null)
 
   // The destination route may still be a frame or two from having mounted
   // its hash targets when this runs right after navigate(), so poll briefly
@@ -73,7 +95,7 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     [navigate, landOnDestination],
   )
 
-  const runGlobalWipe = useCallback((onCovered: () => void) => {
+  const runGlobalWipe = useCallback((direction: TransitionDirection, onCovered: () => void) => {
     const overlay = overlayRef.current
     if (!overlay) {
       onCovered()
@@ -81,19 +103,33 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     }
 
     busyRef.current = true
-    gsap.set(overlay, { transformOrigin: 'top', scaleY: 0 })
+    // opacity (not a transform) hides the panel until this first `set` runs
+    // — xPercent must be the *only* thing that ever establishes its
+    // transform, since GSAP composes x/xPercent additively with whatever
+    // transform was already on the element rather than replacing it, and a
+    // pre-existing inline translateX would otherwise double up with this.
+    gsap.set(overlay, { opacity: 1, skewX: SKEW_DEG, xPercent: 100 })
     const tl = gsap.timeline({
       onComplete: () => {
         busyRef.current = false
       },
     })
-    tl.to(overlay, { scaleY: 1, duration: 0.5, ease: 'power3.inOut' })
+    tl.to(overlay, { xPercent: 0, duration: 0.5, ease: 'power3.inOut' })
+    // With power3.inOut, xPercent (and so the wall's leading edge) crosses
+    // its own halfway point at exactly half the tween's duration — that's
+    // also where the diagonal edge clears the viewport's horizontal
+    // center, so the launch icon's reveal is timed to that same instant
+    // rather than a guessed fraction of the total transition.
+    tl.call(() => launchRef.current?.show(direction), [], 0.25)
     tl.call(() => onCovered())
-    // continuing off the bottom (not retracing back up) reads as one
-    // continuous sweep rather than a bounce, and gives the destination
+    // continuing off the left (not retracing back out the right) reads as
+    // one continuous sweep rather than a bounce, and gives the destination
     // page a beat to actually paint before it's uncovered
-    tl.set(overlay, { transformOrigin: 'bottom' })
-    tl.to(overlay, { scaleY: 0, duration: 0.5, ease: 'power3.inOut' }, '+=0.08')
+    tl.addLabel('exit', '+=0.08')
+    tl.to(overlay, { xPercent: -100, duration: 0.5, ease: 'power3.inOut' }, 'exit')
+    // same halfway-point logic as the reveal, mirrored: the wall's
+    // trailing edge clears center at the midpoint of this tween too
+    tl.call(() => launchRef.current?.hide(), [], 'exit+=0.25')
   }, [])
 
   const goTo = useCallback(
@@ -110,7 +146,12 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      runGlobalWipe(() => finishNavigate(path, opts?.hash))
+      // Only the Work route gets its own icon — everything else (home, the
+      // hash-anchored sections, the legal pages) reads as "home" rather
+      // than trying to invent a third icon for pages that aren't really
+      // work content.
+      const direction: TransitionDirection = path === '/experience' ? 'work' : 'home'
+      runGlobalWipe(direction, () => finishNavigate(path, opts?.hash))
     },
     [location.pathname, reducedMotion, finishNavigate, runGlobalWipe, lenisRef],
   )
@@ -118,12 +159,14 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
   return (
     <RouteTransitionContext.Provider value={{ goTo }}>
       {children}
-      <div
-        ref={overlayRef}
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[300] bg-accent"
-        style={{ transform: 'scaleY(0)' }}
-      />
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[300] overflow-hidden">
+        <div
+          ref={overlayRef}
+          className="absolute inset-y-0 bg-accent"
+          style={{ left: `-${PANEL_OVERSCAN}`, width: PANEL_WIDTH, opacity: 0 }}
+        />
+      </div>
+      <TransitionLaunchIcon ref={launchRef} />
     </RouteTransitionContext.Provider>
   )
 }
