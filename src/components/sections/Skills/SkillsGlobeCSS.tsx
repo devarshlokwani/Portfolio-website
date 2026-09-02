@@ -40,7 +40,7 @@ function makeConnection(a: number, b: number, category: string | null): Connecti
     a,
     b,
     category,
-    cycleTicks: 280 + Math.random() * 340, // one flight roughly every 4.5–10s at 60fps
+    cycleTicks: 150 + Math.random() * 220, // one flight roughly every 2.5–6.2s at 60fps
     flightTicks: 50 + Math.random() * 30, // each flight lasts roughly 0.8–1.3s
     phaseOffset: Math.random() * 900,
     brightness: 0.5 + Math.random() * Math.random() * 1.3, // squared distribution: mostly modest, occasionally a standout
@@ -197,7 +197,7 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
 
       star.setAttribute('stroke-dasharray', `${dashLen} ${Math.max(length - dashLen, 1)}`)
       star.setAttribute('stroke-dashoffset', String(-(t * length)))
-      star.style.opacity = String(envelope * 0.4 * conn.brightness)
+      star.style.opacity = String(envelope * 0.52 * conn.brightness)
     })
   }, [basePoints, connections, arcSamples, activeCategory, reducedMotion])
 
@@ -324,7 +324,7 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
             strokeLinecap="round"
             opacity={0}
             style={{
-              filter: `drop-shadow(0 0 ${(1 + conn.brightness * 1.6).toFixed(1)}px var(--color-accent))`,
+              filter: `drop-shadow(0 0 ${(1.8 + conn.brightness * 2.2).toFixed(1)}px var(--color-accent))`,
             }}
           />
         ))}

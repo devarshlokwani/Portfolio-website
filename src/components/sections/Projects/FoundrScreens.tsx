@@ -41,7 +41,7 @@ export function FoundrScreens() {
       aria-label="Open the live Foundr site"
       data-cursor-icon="foundr"
       data-cursor-hover
-      className="relative flex min-h-[240px] items-center justify-center overflow-hidden rounded-2xl border border-border md:min-h-[300px]"
+      className="relative flex aspect-[10/9] w-full items-center justify-center self-start overflow-hidden rounded-2xl border border-border"
       style={{
         backgroundColor: CANVAS_GREEN,
         backgroundImage: `radial-gradient(${DOT_COLOR} 1px, transparent 1px)`,

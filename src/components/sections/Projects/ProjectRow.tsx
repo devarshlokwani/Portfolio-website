@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { LuArrowUpRight, LuGithub } from 'react-icons/lu'
 
+import { BorderGlow } from '@/components/ui/BorderGlow'
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
 import { TechTag } from '@/components/ui/TechTag'
 
@@ -84,14 +85,16 @@ export function ProjectRow({ project, screens, defaultOpen = false }: ProjectRow
                 </ul>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {project.links.github && (
-                    <CtaLaunchLink
-                      href={project.links.github}
-                      label="GitHub"
-                      icon={LuGithub}
-                      tone="fg"
-                      external
-                      className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-fg transition-colors hover:border-accent hover:text-accent"
-                    />
+                    <BorderGlow className="hover:!border-transparent">
+                      <CtaLaunchLink
+                        href={project.links.github}
+                        label="GitHub"
+                        icon={LuGithub}
+                        tone="fg"
+                        external
+                        className="rounded-full px-5 py-2.5 text-sm font-medium text-fg"
+                      />
+                    </BorderGlow>
                   )}
                   {project.links.live && (
                     <CtaLaunchLink

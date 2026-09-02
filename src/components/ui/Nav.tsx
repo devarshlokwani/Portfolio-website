@@ -58,13 +58,39 @@ export function Nav() {
 
     const sections = LINKS.map((l) => (l.kind === 'hash' ? document.querySelector<HTMLElement>(l.href) : null))
 
+    // Mirrors the observer's own '-45% 0px -45% 0px' rootMargin — the
+    // center 10% band of the viewport that counts as "intersecting".
+    const findIndexInBand = () => {
+      const bandTop = window.innerHeight * 0.45
+      const bandBottom = window.innerHeight * 0.55
+      for (let i = 0; i < sections.length; i++) {
+        const rect = sections[i]?.getBoundingClientRect()
+        if (rect && rect.top < bandBottom && rect.bottom > bandTop) return i
+      }
+      return null
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (suppressSpyRef.current) return
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue
           const idx = sections.findIndex((s) => s === entry.target)
-          if (idx !== -1) setActiveIndex(idx)
+          if (idx === -1) continue
+          if (entry.isIntersecting) {
+            setActiveIndex(idx)
+          } else {
+            // The exiting section only tells us it left the band, not
+            // what (if anything) is in it now — an instant jump (e.g. the
+            // corner mark's back-to-top, or scrolling above the topmost
+            // hash section into Hero) can skip every section in between
+            // without any of them ever registering as intersecting, so
+            // there's no later entry to correct a stale index. Recomputing
+            // from actual geometry whenever the *active* section is the
+            // one exiting covers both that case and the plain "scrolled
+            // back up past About" case, instead of leaving whatever was
+            // last active stuck on indefinitely.
+            setActiveIndex((prev) => (prev === idx ? findIndexInBand() : prev))
+          }
         }
       },
       { rootMargin: '-45% 0px -45% 0px', threshold: 0 },

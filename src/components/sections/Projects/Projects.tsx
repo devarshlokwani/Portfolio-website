@@ -3,6 +3,7 @@ import { LuGithub } from 'react-icons/lu'
 import { Section } from '@/components/ui/Section'
 import { FoundrScreens } from '@/components/sections/Projects/FoundrScreens'
 import { ProjectRow } from '@/components/sections/Projects/ProjectRow'
+import { BorderGlow } from '@/components/ui/BorderGlow'
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
 import projectsData from '@/data/projects.json'
 
@@ -30,14 +31,16 @@ export function Projects() {
           </h2>
           <p className="mt-3 max-w-md text-fg-muted">Recent projects that solve real problems.</p>
         </div>
-        <CtaLaunchLink
-          href="https://github.com/devarshlokwani"
-          label="Explore More"
-          icon={LuGithub}
-          tone="fg"
-          external
-          className="rounded-full border border-border px-6 py-3 text-sm font-medium text-fg transition-colors hover:border-accent hover:text-accent"
-        />
+        <BorderGlow className="hover:!border-transparent">
+          <CtaLaunchLink
+            href="https://github.com/devarshlokwani"
+            label="Explore More"
+            icon={LuGithub}
+            tone="fg"
+            external
+            className="rounded-full px-6 py-3 text-sm font-medium text-fg"
+          />
+        </BorderGlow>
       </div>
 
       <div className="flex flex-col">
