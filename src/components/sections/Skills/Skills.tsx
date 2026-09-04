@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 
 import { FillPill } from '@/components/ui/FillPill'
+import { GlobeWidget } from '@/components/ui/GlobeWidget'
 import { Section } from '@/components/ui/Section'
+import { SectionHeading } from '@/components/ui/SectionHeading'
 import { SkillsGlobeCSS } from '@/components/sections/Skills/SkillsGlobeCSS'
 import type { SkillItem } from '@/components/sections/Skills/SkillNode'
 import skillsData from '@/data/skills.json'
@@ -22,16 +24,21 @@ export function Skills() {
 
   return (
     <Section id="skills" label="03 — Skills">
-      <div className="grid items-center gap-12 md:grid-cols-2 md:gap-8">
-        <div>
-          <h2 className="font-display text-3xl font-semibold text-fg md:text-5xl">
-            A toolkit built for shipping
-          </h2>
-          <p className="mt-6 max-w-md text-fg-muted">
+      <SectionHeading title="Skills" intro="A toolkit built for shipping." />
+
+      {/* The skills sphere is far taller than the copy beside it. Rather than
+          pick which end of the column eats the leftover height, the widget
+          occupies it — copy, globe, filters, top to bottom. */}
+      <div className="grid gap-12 md:grid-cols-2 md:gap-8">
+        <div className="flex flex-col justify-between gap-8">
+          <p className="max-w-md text-fg-muted">
             Drag the sphere to look around, or tap a category to spotlight just those skills.
             Every icon here is something I've used to ship production code.
           </p>
-          <ul className="mt-8 flex flex-wrap gap-2">
+
+          <GlobeWidget className="hidden md:block" />
+
+          <ul className="flex flex-wrap gap-2">
             {categories.map((name) => (
               <li key={name}>
                 <FillPill

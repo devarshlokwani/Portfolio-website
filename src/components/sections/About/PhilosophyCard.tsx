@@ -12,6 +12,7 @@ export function PhilosophyCard({ className = '' }: { className?: string }) {
   return (
     <AboutCard
       className={className}
+      cog="right"
       icon={LuMousePointer2}
       eyebrow="UI Philosophy"
       title="Detail,"

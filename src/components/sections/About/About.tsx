@@ -1,34 +1,29 @@
-import { useRef, useState } from 'react'
 import { LuGraduationCap, LuLayers } from 'react-icons/lu'
 
 import { AboutCard } from '@/components/sections/About/AboutCard'
-import { ElectricConnectors } from '@/components/sections/About/ElectricConnectors'
 import { PhilosophyCard } from '@/components/sections/About/PhilosophyCard'
 import { Section } from '@/components/ui/Section'
+import { SectionHeading } from '@/components/ui/SectionHeading'
 
-const CARD = 'rounded-2xl border border-border bg-surface/60 p-6 backdrop-blur-sm md:p-8'
+// Fully opaque, not the translucent surface it used to be: the cogs sit
+// behind these cards, and anything less than solid leaves their buried half
+// showing through as a ghost instead of genuinely disappearing under the
+// card. (`backdrop-blur` went with it — there's nothing to see through now.)
+//
+const CARD = 'rounded-2xl border border-border bg-surface p-6 md:p-8'
 
 export function About() {
-  const [hovering, setHovering] = useState(false)
-  // A ref (not state) for the live cursor position — this updates on every
-  // mousemove, and routing that through setState would re-render the whole
-  // section every pixel of movement. ElectricConnectors reads it directly
-  // off its own animation ticker instead.
-  const mouseRef = useRef({ x: 0, y: 0 })
-
   return (
     <Section id="about" label="01 — About">
-      <div
-        className="flex flex-col gap-6 md:gap-0"
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
-        onMouseMove={(e) => {
-          mouseRef.current = { x: e.clientX, y: e.clientY }
-        }}
-      >
+      <SectionHeading title="About" />
+
+      {/* The gap used to be supplied by the connector row that lived between
+          these two blocks; with that gone, it's a real gap. */}
+      <div className="flex flex-col gap-6 md:gap-20">
         <AboutCard
           className={CARD}
           size="lg"
+          cog="top"
           icon={LuGraduationCap}
           eyebrow="Who I Am"
           title="Graduated,"
@@ -42,11 +37,10 @@ export function About() {
           </p>
         </AboutCard>
 
-        <ElectricConnectors active={hovering} mouseRef={mouseRef} />
-
         <div className="grid gap-6 md:grid-cols-2 md:gap-10">
           <AboutCard
             className={CARD}
+            cog="left"
             icon={LuLayers}
             eyebrow="What I've Shipped"
             title="Full-stack,"

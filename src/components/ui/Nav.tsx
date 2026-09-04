@@ -16,7 +16,7 @@ const LINKS: LinkConfig[] = [
   { kind: 'hash', href: '#about', label: 'About' },
   { kind: 'hash', href: '#skills', label: 'Skills' },
   { kind: 'hash', href: '#projects', label: 'Projects' },
-  { kind: 'hash', href: '#contact', label: 'Contact' },
+  { kind: 'route', to: '/contact', label: 'Contact' },
   { kind: 'route', to: '/experience', label: 'Work' },
 ]
 

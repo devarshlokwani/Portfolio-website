@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { LuGithub, LuLinkedin, LuMail } from 'react-icons/lu'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { CornerCog } from '@/components/ui/CornerCog'
 
 interface FooterLink {
   label: string
@@ -16,7 +17,7 @@ const GENERAL_LINKS: FooterLink[] = [
   { label: 'About', href: '#about', hash: true },
   { label: 'Skills', href: '#skills', hash: true },
   { label: 'Projects', href: '#projects', hash: true },
-  { label: 'Contact', href: '#contact', hash: true },
+  { label: 'Contact', href: '/contact' },
   { label: 'Work', href: '/experience' },
 ]
 
@@ -89,21 +90,30 @@ function Signature({ children }: { children: ReactNode }) {
 export function Footer() {
   return (
     <footer className="mx-auto w-full max-w-6xl px-6 pb-10 pt-4 md:px-10 md:pb-14">
-      <div className="rounded-3xl border border-border bg-surface/60 px-8 py-10 backdrop-blur-sm md:px-12 md:py-14">
-        <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-16">
-          <div>
-            <Signature>Devarsh Lokwani</Signature>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
-              Building software that ships — from full-stack features at work to personal projects
-              that solve real problems. AI graduate from Macquarie University, spending most of my
-              time in the space between clean code and good product sense.
-            </p>
-          </div>
+      {/* The cog is a sibling painted before the card so the card's own opaque
+          surface covers its buried half — hence the wrapper, and hence the
+          card being solid rather than the translucent panel it was. */}
+      <div className="relative">
+        {/* kept small: the sub-footer's closing gear sits just above this one,
+            and two the same size read as a competition rather than a motif */}
+        <CornerCog placement="top-right" className="h-24 w-24 lg:h-28 lg:w-28" />
 
-          <div className="grid grid-cols-3 gap-6 sm:gap-8">
-            <FooterColumn title="General" links={GENERAL_LINKS} />
-            <FooterColumn title="Apps" links={APP_LINKS} />
-            <FooterColumn title="Legal" links={LEGAL_LINKS} />
+        <div className="relative rounded-3xl border border-border bg-surface px-8 py-10 md:px-12 md:py-14">
+          <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-16">
+            <div>
+              <Signature>Devarsh Lokwani</Signature>
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
+                Building software that ships — from full-stack features at work to personal
+                projects that solve real problems. AI graduate from Macquarie University, spending
+                most of my time in the space between clean code and good product sense.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-6 sm:gap-8">
+              <FooterColumn title="General" links={GENERAL_LINKS} />
+              <FooterColumn title="Apps" links={APP_LINKS} />
+              <FooterColumn title="Legal" links={LEGAL_LINKS} />
+            </div>
           </div>
         </div>
       </div>

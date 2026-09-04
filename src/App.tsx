@@ -6,8 +6,10 @@ import { CornerMark } from '@/components/ui/CornerMark'
 import { CustomCursor } from '@/components/ui/CustomCursor'
 import { Nav } from '@/components/ui/Nav'
 import { Footer } from '@/components/ui/Footer'
+import { SubFooter } from '@/components/ui/SubFooter'
 import { IntroLoader } from '@/components/intro/IntroLoader'
 import { HomePage } from '@/pages/HomePage'
+import { ContactPage } from '@/pages/ContactPage'
 import { ExperiencePage } from '@/pages/ExperiencePage'
 import { PrivacyPolicy } from '@/pages/PrivacyPolicy'
 import { TermsAndConditions } from '@/pages/TermsAndConditions'
@@ -23,11 +25,13 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/experience" element={<ExperiencePage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           {/* any unknown path (typos, old bookmarks, etc.) lands on Home instead of rendering blank */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <SubFooter />
         <Footer />
       </RouteTransitionProvider>
     </AppProviders>

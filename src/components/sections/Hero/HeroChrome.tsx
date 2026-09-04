@@ -75,11 +75,11 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroCh
           />
           <BorderGlow className="hover:!border-transparent">
             <CtaLaunchLink
-              href="#contact"
+              href="/contact"
               label="Get in Touch"
               icon={LuMail}
               tone="fg"
-              onNavigate={() => goTo('/', { hash: '#contact' })}
+              onNavigate={() => goTo('/contact')}
               className="rounded-full px-6 py-3 text-sm font-medium text-fg"
             />
           </BorderGlow>
