@@ -5,9 +5,9 @@
     "period": "Feb 2026 — Jul 2026",
     "location": "Sydney, NSW",
     "summary": "Owned the Contacts module of an AI marketing CRM end to end, shipping full-stack features across a 6-person Agile team.",
-    "skills": ["React", "TypeScript", "Node.js", "REST APIs", "Git"],
+    "skills": ["Django", "Python", "PostgreSQL", "REST APIs", "Git"],
     "points": [
-      "Owned the Contacts module of a fully interconnected CRM for an AI marketing platform, delivered by a 6-person Agile team, contributing across the stack from backend APIs to the React front end.",
+      "Owned the Contacts module of a fully interconnected CRM for an AI marketing platform, delivered by a 6-person Agile team, contributing full-stack across a Django/Python codebase backed by PostgreSQL.",
       "Shipped full CRUD, bulk actions, and soft delete/restore end to end, plus CSV import/export pipelines with live preview, improving data-management workflows for B2B, B2C, eCommerce, and Education clients.",
       "Designed Contacts to auto-link with Accounts and Opportunities so lead conversion creates linked records in a single step, with every action logged to a shared activity timeline for full audit traceability.",
       "Built persona-driven contact classification and buying-group tracking to power Account-Based Marketing, collaborating through code reviews and version control in a fast-paced delivery environment."

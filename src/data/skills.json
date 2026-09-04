@@ -18,6 +18,7 @@
         { "id": "react-native", "label": "React Native", "set": "si", "icon": "SiReact", "color": "#61DAFB" },
         { "id": "nodejs", "label": "Node.js", "set": "si", "icon": "SiNodedotjs", "color": "#5FA04E" },
         { "id": "express", "label": "Express.js", "set": "si", "icon": "SiExpress", "color": "var(--color-fg)" },
+        { "id": "django", "label": "Django", "set": "si", "icon": "SiDjango", "color": "#092E20" },
         { "id": "tailwind", "label": "Tailwind CSS", "set": "si", "icon": "SiTailwindcss", "color": "#38BDF8" },
         { "id": "gsap", "label": "GSAP", "set": "si", "icon": "SiGreensock", "color": "#88CE02" }
       ]
@@ -26,6 +27,7 @@
       "name": "Databases",
       "items": [
         { "id": "mysql", "label": "MySQL", "set": "si", "icon": "SiMysql", "color": "#4479A1" },
+        { "id": "postgresql", "label": "PostgreSQL", "set": "si", "icon": "SiPostgresql", "color": "#4169E1" },
         { "id": "mongodb", "label": "MongoDB", "set": "si", "icon": "SiMongodb", "color": "#47A248" }
       ]
     },

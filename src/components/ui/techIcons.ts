@@ -1,5 +1,6 @@
 import type { IconType } from 'react-icons'
 import {
+  SiDjango,
   SiExpress,
   SiFigma,
   SiGit,
@@ -11,6 +12,7 @@ import {
   SiNodedotjs,
   SiNumpy,
   SiPandas,
+  SiPostgresql,
   SiPython,
   SiReact,
   SiTailwindcss,
@@ -41,8 +43,10 @@ export const TECH_ICONS: Record<string, TechIconEntry> = {
   'Tailwind CSS': { icon: SiTailwindcss, color: '#38BDF8' },
   GSAP: { icon: SiGreensock, color: '#88CE02' },
   MySQL: { icon: SiMysql, color: '#4479A1' },
+  PostgreSQL: { icon: SiPostgresql, color: '#4169E1' },
   SQL: { icon: TbSql, color: '#4479A1' },
   Python: { icon: SiPython, color: '#3776AB' },
+  Django: { icon: SiDjango, color: '#092E20' },
   Pandas: { icon: SiPandas, color: '#150458' },
   NumPy: { icon: SiNumpy, color: '#4DABCF' },
   Jupyter: { icon: SiJupyter, color: '#F37626' },
