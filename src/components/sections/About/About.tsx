@@ -31,14 +31,14 @@ export function About() {
           size="lg"
           icon={LuGraduationCap}
           eyebrow="Who I Am"
-          title="Building,"
-          subtitle="not just studying."
+          title="Graduated,"
+          subtitle="already shipping."
         >
           <p className="md:text-base">
-            I'm a penultimate-year Information Technology student at Macquarie University, majoring
-            in Artificial Intelligence — but most of my time goes into shipping real software, not
-            just studying it. I like owning a module end to end: schema, API, UI, and the small
-            details that make it feel finished.
+            I graduated from Macquarie University this July with a degree in Information
+            Technology, majoring in Artificial Intelligence — though most of my time there went
+            into shipping real software, not just studying it. I like owning a module end to end:
+            schema, API, UI, and the small details that make it feel finished.
           </p>
         </AboutCard>
 

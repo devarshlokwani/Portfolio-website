@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 
+import { FillPill } from '@/components/ui/FillPill'
 import { gsap } from '@/lib/gsap'
 
 interface PhilosophyTab {
@@ -36,36 +37,19 @@ const TABS: PhilosophyTab[] = [
   },
 ]
 
-const FILL_DURATION = 0.5
-// power2.inOut reads as slow-fast-slow — the fill eases into motion,
-// races through the middle, then eases back out as it reaches the top,
-// rather than growing at a flat constant rate.
-const FILL_EASE = 'power2.inOut'
-
 /**
  * The tab row and its detail panel for the philosophy card. Single accent
- * color throughout (no per-tab hue): the selected tab's fill is a solid
- * orange panel that grows from the bottom edge up to cover the pill, and
- * the previously-selected tab's fill retreats the same way in reverse,
- * both on the same eased curve.
+ * color throughout (no per-tab hue); the bottom-up fill on selection lives
+ * in FillPill, shared with the Skills category filter.
  */
 export function PhilosophyTabs() {
   const [activeId, setActiveId] = useState(TABS[0].id)
   const panelRef = useRef<HTMLDivElement>(null)
-  const fillRefs = useRef<(HTMLSpanElement | null)[]>([])
   const active = TABS.find((t) => t.id === activeId) ?? TABS[0]
 
   const selectTab = (id: string) => {
     if (id === activeId) return
-    const prevIndex = TABS.findIndex((t) => t.id === activeId)
-    const nextIndex = TABS.findIndex((t) => t.id === id)
     setActiveId(id)
-
-    const prevFill = fillRefs.current[prevIndex]
-    const nextFill = fillRefs.current[nextIndex]
-    if (prevFill) gsap.to(prevFill, { scaleY: 0, duration: FILL_DURATION, ease: FILL_EASE })
-    if (nextFill) gsap.fromTo(nextFill, { scaleY: 0 }, { scaleY: 1, duration: FILL_DURATION, ease: FILL_EASE })
-
     const panel = panelRef.current
     if (panel) gsap.fromTo(panel, { opacity: 0, y: 4 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' })
   }
@@ -73,38 +57,17 @@ export function PhilosophyTabs() {
   return (
     <div className="flex flex-col gap-4">
       <ul className="flex flex-wrap gap-2">
-        {TABS.map((tab, i) => {
-          const isActive = tab.id === activeId
-          return (
-            <li key={tab.id}>
-              <button
-                type="button"
-                data-cursor-hover
-                onClick={() => selectTab(tab.id)}
-                aria-pressed={isActive}
-                className={`group relative isolate overflow-hidden rounded-full border px-3.5 py-1.5 font-mono text-xs transition-colors duration-300 ${
-                  isActive ? 'border-accent' : 'border-border hover:border-accent'
-                }`}
-              >
-                <span
-                  ref={(el) => {
-                    fillRefs.current[i] = el
-                  }}
-                  aria-hidden="true"
-                  className="absolute inset-0 -z-10 origin-bottom bg-accent"
-                  style={{ transform: `scaleY(${isActive ? 1 : 0})` }}
-                />
-                <span
-                  className={`transition-colors duration-300 ${
-                    isActive ? 'text-accent-fg' : 'text-fg-muted group-hover:text-accent'
-                  }`}
-                >
-                  {tab.label}
-                </span>
-              </button>
-            </li>
-          )
-        })}
+        {TABS.map((tab) => (
+          <li key={tab.id}>
+            <FillPill
+              active={tab.id === activeId}
+              onClick={() => selectTab(tab.id)}
+              className="px-3.5 py-1.5"
+            >
+              {tab.label}
+            </FillPill>
+          </li>
+        ))}
       </ul>
 
       <div ref={panelRef}>

@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { FlightCard } from '@/components/sections/Experience/FlightCard'
 import { buildFlightPath, sampleFlightPath, type PathPoint } from '@/components/sections/Experience/flightPathMath'
 import { PaperPlaneIcon } from '@/components/sections/Experience/PaperPlaneIcon'
-import { Scenery } from '@/components/sections/Experience/Scenery'
+import { SceneryBackdrop } from '@/components/sections/Experience/SceneryBackdrop'
 import { gsap } from '@/lib/gsap'
 
 interface Job {
@@ -250,18 +250,11 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
                 </filter>
               </defs>
 
-              {/* offset well clear of each checkpoint card, which is
-                  centered on the same x as its checkpoint and would
-                  otherwise sit directly on top of — and hide — the doodle.
-                  Anchored to the trail's own y at that checkpoint (not the
-                  canvas floor), so each doodle sits up near the path
-                  itself, to the left of its note. */}
-              <Scenery
-                windmillX={(geometry.checkpoints[0]?.x ?? geometry.totalWidth * 0.15) - 300}
-                windmillY={geometry.checkpoints[0]?.y ?? geometry.laneHeight * 0.5}
-                mountainX={(geometry.checkpoints[1]?.x ?? geometry.totalWidth * 0.5) - 300}
-                mountainY={geometry.checkpoints[1]?.y ?? geometry.laneHeight * 0.5}
-              />
+              {/* The drawn country, in the track's own coordinate space so
+                  it's anchored to the paper: the camera pans across it as
+                  the plane travels, revealing new ground the whole way,
+                  rather than one screen of scenery held for the trip. */}
+              <SceneryBackdrop width={geometry.totalWidth} height={geometry.laneHeight} />
 
               {/* soft peach glow underneath, then the main crayon-orange dashes, then a thin dark fleck on top — a layered waxy trail rather than one flat dashed line */}
               <g filter="url(#trail-sketch)">

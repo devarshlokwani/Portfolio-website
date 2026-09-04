@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 
+import { FillPill } from '@/components/ui/FillPill'
 import { Section } from '@/components/ui/Section'
 import { SkillsGlobeCSS } from '@/components/sections/Skills/SkillsGlobeCSS'
 import type { SkillItem } from '@/components/sections/Skills/SkillNode'
@@ -31,26 +32,17 @@ export function Skills() {
             Every icon here is something I've used to ship production code.
           </p>
           <ul className="mt-8 flex flex-wrap gap-2">
-            {categories.map((name) => {
-              const isActive = activeCategory === name
-              return (
-                <li key={name}>
-                  <button
-                    type="button"
-                    data-cursor-hover
-                    onClick={() => toggleCategory(name)}
-                    aria-pressed={isActive}
-                    className={`rounded-full border px-3 py-1 font-mono text-xs transition-colors duration-300 ${
-                      isActive
-                        ? 'border-accent bg-accent text-accent-fg'
-                        : 'border-border text-fg-muted hover:border-accent hover:text-accent'
-                    }`}
-                  >
-                    {name}
-                  </button>
-                </li>
-              )
-            })}
+            {categories.map((name) => (
+              <li key={name}>
+                <FillPill
+                  active={activeCategory === name}
+                  onClick={() => toggleCategory(name)}
+                  className="px-3 py-1"
+                >
+                  {name}
+                </FillPill>
+              </li>
+            ))}
           </ul>
         </div>
         <SkillsGlobeCSS items={items} activeCategory={activeCategory} />

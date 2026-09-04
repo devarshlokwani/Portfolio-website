@@ -184,7 +184,7 @@ export function ElectricConnectors({ active, mouseRef }: ElectricConnectorsProps
     return () => {
       gsap.ticker.remove(tick)
     }
-  }, [])
+  }, [mouseRef])
 
   // Dropping back to resting state is its own explicit step (not just
   // "stop updating") — otherwise an orb the cursor happened to be right on

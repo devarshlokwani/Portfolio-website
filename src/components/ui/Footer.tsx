@@ -95,7 +95,7 @@ export function Footer() {
             <Signature>Devarsh Lokwani</Signature>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
               Building software that ships — from full-stack features at work to personal projects
-              that solve real problems. Studying AI at Macquarie University, spending most of my
+              that solve real problems. AI graduate from Macquarie University, spending most of my
               time in the space between clean code and good product sense.
             </p>
           </div>
