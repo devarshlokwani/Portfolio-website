@@ -8,7 +8,7 @@ interface LegalLayoutProps {
 
 /**
  * Shared prose shell for the standalone legal pages (Privacy Policy, Terms
- * & Conditions) — plain readable text rather than portfolio-style sections,
+ * & Conditions): plain readable text rather than portfolio-style sections,
  * but still themed/spaced consistently with the rest of the site.
  */
 export function LegalLayout({ title, lastUpdated, children }: LegalLayoutProps) {

@@ -19,7 +19,7 @@ interface GlyphReloadOptions {
 }
 
 // Successive letters in a group start with a shrinking gap after the
-// previous one and animate a bit quicker each time — a small accelerating
+// previous one and animate a bit quicker each time, a small accelerating
 // cascade rather than everything moving in lockstep.
 const GROUP_START_OFFSETS = [0, 0.15, 0.25]
 const GROUP_DURATION_SCALE = [1, 0.85, 0.7]
@@ -30,7 +30,7 @@ const GROUP_DURATION_SCALE = [1, 0.85, 0.7]
  * copy of the same character slides in from the other. Sometimes it's a
  * single letter, sometimes two or three, spaced every other letter (skip
  * one between picks) so a multi-letter event reads as one deliberate
- * pattern rather than a random cluster. Purely a kinetic idle tic — the
+ * pattern rather than a random cluster. Purely a kinetic idle tic, the
  * text content itself never changes, only the transient slide progress fed
  * to WarpText's `glyphTransitions` prop.
  */

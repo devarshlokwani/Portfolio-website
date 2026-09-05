@@ -135,7 +135,7 @@ interface WarpTextProps {
   className?: string
   /** Accessible name, in case `text` is mid-animation (e.g. a scramble reveal) and doesn't match the final word. Defaults to `text`. */
   ariaLabel?: string
-  /** Characters mid-"reload": each one's old glyph slides out to the left while a fresh copy slides in from the right, clipped to that character's own cell — a kinetic idle tic, not a content change (`text` stays the settled word throughout). */
+  /** Characters mid-"reload": each one's old glyph slides out to the left while a fresh copy slides in from the right, clipped to that character's own cell, a kinetic idle tic, not a content change (`text` stays the settled word throughout). */
   glyphTransitions?: GlyphTransition[] | null
 }
 
@@ -295,21 +295,21 @@ const buildTextCanvas = ({
 }
 
 /**
- * Ported from React Bits' Warp Text (reactbits.dev) — text is rasterized to
+ * Ported from React Bits' Warp Text (reactbits.dev), text is rasterized to
  * a canvas texture, then a WebGL fragment shader fbm-warps it continuously
  * and splits the RGB channels near the pointer for a bending, chromatic-
  * aberration "bulge" effect. The text auto-fits to the container, so a
- * large container yields large text — this is what gives the hero name its
+ * large container yields large text. This is what gives the hero name its
  * scale, not a fixed font size.
  *
  * The render loop deliberately doesn't start until the first rasterize()
- * has actually resolved (see `firstRasterDone` below) — rasterize awaits
+ * has actually resolved (see `firstRasterDone` below), rasterize awaits
  * document.fonts.ready before drawing, and starting the loop immediately on
  * mount used to render the mesh with its texture uniform still at ogl's
  * default (an opaque white 1x1 pixel) for however many frames that wait
  * took, which is what produced this component's earlier "white strip" bug.
- * That's no longer just latent — every current usage only ever mounts this
- * behind an already-opaque cover — but there's no reason to leave the
+ * That's no longer just latent, every current usage only ever mounts this
+ * behind an already-opaque cover: but there's no reason to leave the
  * window open regardless.
  */
 export function WarpText({
@@ -482,8 +482,8 @@ export function WarpText({
       renderer.render({ scene: mesh })
     }
 
-    // Only starts the loop once the mesh actually has real text data —
-    // called both after a successful first rasterize and from the
+    // Only starts the loop once the mesh actually has real text data.
+    // Called both after a successful first rasterize and from the
     // visibility/intersection handlers, in case either fires first.
     const maybeStartLoop = () => {
       if (raf || disposed || contextLost) return

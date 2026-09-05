@@ -58,12 +58,12 @@ body {
   min-height: 100svh;
 }
 
-/* React Bits "Warp Text" — text is rasterized to a canvas texture and
+/* React Bits "Warp Text": text is rasterized to a canvas texture and
    redrawn each frame by a WebGL fragment shader that fbm-warps it and
    splits the RGB channels near the pointer for a chromatic-aberration bend
    (see WarpText.tsx). Width/height are deliberately left to each usage's
    Tailwind classes (that's what sizes the text, via the auto-fit-to-
-   container canvas logic) — setting them here too would collide with those
+   container canvas logic): setting them here too would collide with those
    utility classes at equal specificity and lose on source order. */
 .warp-text {
   position: relative;
@@ -80,7 +80,7 @@ body {
   display: block;
 }
 
-/* Custom cursor — CustomCursor adds this class to <html> once it sees a real
+/* Custom cursor: CustomCursor adds this class to <html> once it sees a real
    mouse-typed pointer event, and removes it on touch input. Everything under
    it loses the native cursor so our arrow glyph reads as the pointer
    instead. */
@@ -167,7 +167,7 @@ body {
 }
 
 /* The dark greyscale ring behind the brand mark, slightly larger so its
-   band shows all the way around, with "VIEW MORE" curving along it —
+   band shows all the way around, with "VIEW MORE" curving along it,
    spins slowly so the repeated label reads clearly as it passes rather
    than sitting static and half-legible. */
 .cursor-icon-badge__ring {
@@ -234,7 +234,7 @@ body {
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* Theme toggle circular reveal — the toggle drives a clip-path grow on the
+/* Theme toggle circular reveal: the toggle drives a clip-path grow on the
    new-theme snapshot via the View Transitions API; the browser's default
    crossfade is turned off so only that clip-path animation shows. Browsers
    without support just fall back to the plain color transition below. */
@@ -273,7 +273,7 @@ body {
   background-size: 100% 1px;
 }
 
-/* Foundr pill's border — a conic gradient in Foundr's own greens, masked
+/* Foundr pill's border: a conic gradient in Foundr's own greens, masked
    down to a thin ring around the pill and continuously rotated, so it reads
    as a light chasing around the border rather than a static outline. Same
    idea as an animated rainbow-border pill, just green instead of rainbow. */
@@ -324,7 +324,7 @@ body {
   }
 }
 
-/* Ported from React Bits' Border Glow (reactbits.dev) — pointer position
+/* Ported from React Bits' Border Glow (reactbits.dev), pointer position
    (set as --edge-proximity / --cursor-angle by BorderGlow.tsx) drives a
    conic-gradient-masked glow that tracks the cursor around the border,
    fading in the closer it gets to the edge. Adapted from the source's
@@ -378,7 +378,7 @@ body {
     var(--gradient-base) border-box;
   opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
   /* The border-box gradient layers above paint across the WHOLE element,
-     not just its edge — the source relied on an opaque --card-bg sitting on
+     not just its edge: the source relied on an opaque --card-bg sitting on
      a padding-box layer on top to visually hide the interior portion, which
      only works when the card actually has a solid background. On a
      transparent pill that hid nothing, so the fill read as a solid interior
@@ -408,7 +408,7 @@ body {
 }
 
 /* The source's third layer (a soft mesh-gradient wash filling the card's
-   interior near the edges) is dropped entirely here — on a small pill that
+   interior near the edges) is dropped entirely here, on a small pill that
    "near the edges" radius covers almost the whole button, reading as a
    solid color fill instead of a glow. Border ring + outer shadow glow only. */
 
@@ -458,7 +458,7 @@ body {
   border-radius: inherit;
 }
 
-/* Social icon buttons — a light, quick wiggle on hover (not a spin or a
+/* Social icon buttons: a light, quick wiggle on hover (not a spin or a
    bounce, just a nervous little shake) while the icon's own color and a
    matching glow fade in, driven per-button via --social-glow. */
 .social-icon-btn {
@@ -498,9 +498,9 @@ body {
   }
 }
 
-/* Footer's plain icon-only links — enlarge and tint to the brand color on
+/* Footer's plain icon-only links: enlarge and tint to the brand color on
    hover, driven per-link via --icon-glow (same convention as the social
-   icon buttons above, minus their wiggle — this row is quieter/smaller). */
+   icon buttons above, minus their wiggle. This row is quieter/smaller). */
 .footer-icon-link {
   --icon-glow: var(--color-fg);
 }
@@ -511,7 +511,7 @@ body {
 }
 
 /* Continuous slow spin for the "OPEN TO EXPLORE" circular badge on project
-   screenshots — a lazy rotation, not a spinner, so it reads as ambient
+   screenshots: a lazy rotation, not a spinner, so it reads as ambient
    rather than a loading state. */
 .explore-badge-spin {
   animation: explore-badge-spin 9s linear infinite;

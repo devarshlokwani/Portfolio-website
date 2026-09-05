@@ -10,7 +10,7 @@ import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
 import { ACCENT_GRADIENT } from '@/components/ui/gradients'
 
 interface HeroChromeProps {
-  /** The two-line name area — the one piece of this chrome allowed to differ between Home and the Work page. */
+  /** The two-line name area: the one piece of this chrome allowed to differ between Home and the Work page. */
   name: ReactNode
   /**
    * Home only: refs + baseline `opacity-0` for the intro reveal-in Hero
@@ -24,7 +24,7 @@ interface HeroChromeProps {
 }
 
 /**
- * Everything in the hero except the name — FoundrLink, tagline, socials,
+ * Everything in the hero except the name, FoundrLink, tagline, socials,
  * the "ship, and actually work." meta block with its buttons, and the
  * bottom info bar. Shared verbatim between Home's Hero and the Work page's
  * own hero so the whole thing reads as one continuous surface across the

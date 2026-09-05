@@ -13,7 +13,7 @@ import foundrMac from '@/assets/foundr-mac.png'
 
 /**
  * Near-black, not the lifted `surface` these started on. The cards should sit
- * *in* the page rather than on top of it — a visibly lighter panel reads as a
+ * *in* the page rather than on top of it, a visibly lighter panel reads as a
  * grey box pasted onto black, which is the opposite of the submerged look.
  */
 const CARD_SURFACE: CSSProperties = {
@@ -55,7 +55,7 @@ function CardShell({
 }
 
 /**
- * The bottom row. Its text never darkens on hover — that was making the call
+ * The bottom row. Its text never darkens on hover, that was making the call
  * to action harder to read at exactly the moment it mattered; the underline
  * carries the state change instead.
  */
@@ -68,7 +68,7 @@ function FootRow({ cta }: { cta: string }) {
           {/* the resting track */}
           <span aria-hidden="true" className="absolute -bottom-1 left-0 h-px w-full bg-border" />
           {/* Sweeps in leftward from the right edge, and retracts back the
-              same way — a single right-hand origin drives both directions,
+              same way: a single right-hand origin drives both directions,
               so it never looks like it reverses into a different animation. */}
           <span
             aria-hidden="true"
@@ -103,7 +103,7 @@ function Arc() {
   )
 }
 
-/** Card one — the arc card, with a brand-style lockup. */
+/** Card one: the arc card, with a brand-style lockup. */
 function WorkCard() {
   return (
     <CardShell href="/experience">
@@ -143,12 +143,12 @@ const TALK_ABOUT = ['a role.', 'a project.', 'an idea.', 'the details.']
 /** Seconds a word sits still, and seconds the swap takes. */
 const WORD_HOLD = 2.2
 const WORD_SWAP = 0.7
-/** Height of both the clipping window and each word inside it — they have to
+/** Height of both the clipping window and each word inside it. They have to
  *  match for the slide-out to clear the frame. */
 const WORD_BOX = 'h-[2.6rem] leading-[2.6rem]'
 
 /**
- * Card two — no arc, no mark. Its device is the headline itself, whose last
+ * Card two: no arc, no mark. Its device is the headline itself, whose last
  * word cycles on a loop.
  *
  * A single node, whose text is swapped while it sits outside the frame.
@@ -172,7 +172,7 @@ function ContactCard() {
     const ctx = gsap.context(() => {
       // One element, whose text is swapped while it sits outside the frame.
       // Stacking the four words and cross-animating them meant any timing
-      // fault — a stale timeline, a mis-set height — put two of them on
+      // fault (a stale timeline, a mis-set height) put two of them on
       // screen together. With a single node there is nothing to overlap.
       const tl = gsap.timeline({ repeat: -1 })
       tl.to(el, {
@@ -235,7 +235,7 @@ function ContactCard() {
   )
 }
 
-/** Card three — the product card. The screenshot is the payload, the way the
+/** Card three: the product card. The screenshot is the payload, the way the
  *  reference's third card leans on artwork rather than a headline. */
 function FoundrCard() {
   return (
@@ -262,7 +262,7 @@ function FoundrCard() {
           The transition list matters: Tailwind v4 emits `translate` and
           `rotate` as their own CSS properties, leaving `transform` as `none`.
           Transitioning `transform` therefore animates nothing and the move
-          snaps between states — these have to be named individually. */}
+          snaps between states: these have to be named individually. */}
       <img
         src={foundrMac}
         alt=""
@@ -281,7 +281,7 @@ function FoundrCard() {
   )
 }
 
-/** Card four — the way back. Its device is the signature, the site's own
+/** Card four: the way back. Its device is the signature, the site's own
  *  mark, set huge and cropped by the card's edge. */
 function HomeCard() {
   return (
@@ -326,8 +326,8 @@ function HomeCard() {
 
 /**
  * Ordered so that whichever route is filtered out, the remaining three still
- * make a full row. Sliced to three for the routes that match nothing — the
- * legal pages — which would otherwise wrap a fourth card onto its own line.
+ * make a full row. Sliced to three for the routes that match nothing, the
+ * legal pages: which would otherwise wrap a fourth card onto its own line.
  */
 const CARDS = [
   { id: 'home', path: '/', node: <HomeCard /> },
@@ -347,7 +347,7 @@ function Display({ children }: { children: ReactNode }) {
 /**
  * The block between the last section and the footer.
  *
- * Landing straight on a footer from the end of a page is a dead end — this
+ * Landing straight on a footer from the end of a page is a dead end, this
  * gives the reader somewhere to go next, then closes on a statement rather
  * than another button. The card for the current route filters itself out, so
  * the Work page never offers a card back to Work.

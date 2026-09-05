@@ -9,7 +9,7 @@ interface ScrambleTextProps {
   /** skip straight to onDone with no animation (repeat-visit fast path) */
   skip?: boolean
   className?: string
-  /** per-word class overrides, index-aligned with `words` — swapped in as each word starts scrambling in, replacing (not adding to) the base className for that word. An empty/missing entry falls back to the base className. */
+  /** per-word class overrides, index-aligned with `words`, swapped in as each word starts scrambling in, replacing (not adding to) the base className for that word. An empty/missing entry falls back to the base className. */
   wordClassNames?: (string | undefined)[]
 }
 
@@ -41,7 +41,7 @@ export function ScrambleText({
         ease: 'none',
         onStart: () => {
           // Reset to the base className each word, then layer this word's
-          // override on top — avoids overrides accumulating across words.
+          // override on top: avoids overrides accumulating across words.
           el.className = className
           const override = wordClassNames?.[i]
           if (override) el.classList.add(...override.split(' ').filter(Boolean))

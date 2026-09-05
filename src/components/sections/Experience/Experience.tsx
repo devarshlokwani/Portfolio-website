@@ -14,7 +14,7 @@ const HEADING = (
 /**
  * Desktop: the section pins with the heading locked at the top and further
  * scroll drives a paper plane along a wandering flight path in the space
- * below it, one checkpoint per job — see FlightPath. Reduced motion and
+ * below it, one checkpoint per job, see FlightPath. Reduced motion and
  * mobile (no room for a pinned horizontal scene) both fall back to the
  * same plain stacked list of full ExperienceDetail cards, with the heading
  * rendered normally above it.

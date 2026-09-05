@@ -38,7 +38,7 @@ export const SkillNode = forwardRef<HTMLDivElement, SkillNodeProps>(function Ski
           opacity: state === 'dimmed' ? 0.25 : 1,
           // color-mix (not a hex-alpha string suffix) so this still works for
           // entries whose "color" is a var(--color-fg) reference rather than
-          // a literal hex — brands like GitHub with no real color of their
+          // a literal hex: brands like GitHub with no real color of their
           // own, which need to flip with the theme instead of staying fixed
           boxShadow:
             state === 'active'

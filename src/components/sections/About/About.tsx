@@ -8,7 +8,7 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 // Fully opaque, not the translucent surface it used to be: the cogs sit
 // behind these cards, and anything less than solid leaves their buried half
 // showing through as a ghost instead of genuinely disappearing under the
-// card. (`backdrop-blur` went with it — there's nothing to see through now.)
+// card. (`backdrop-blur` went with it: there's nothing to see through now.)
 //
 const CARD = 'rounded-2xl border border-border bg-surface p-6 md:p-8'
 

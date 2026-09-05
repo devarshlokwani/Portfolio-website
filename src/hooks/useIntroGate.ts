@@ -37,7 +37,7 @@ export function useIntroGate() {
     try {
       sessionStorage.setItem(SESSION_KEY, '1')
     } catch {
-      // sessionStorage unavailable — intro will simply replay next load, which is harmless.
+      // sessionStorage unavailable: intro will simply replay next load, which is harmless.
     }
     document.body.style.overflow = ''
     lenisRef.current?.start()

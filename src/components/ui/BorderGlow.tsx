@@ -12,7 +12,7 @@ interface BorderGlowProps {
   glowRadius?: number
   glowIntensity?: number
   coneSpread?: number
-  /** Colors for the mesh-gradient border ring — repeats cyclically if fewer than 3. */
+  /** Colors for the mesh-gradient border ring, repeats cyclically if fewer than 3. */
   colors?: string[]
 }
 
@@ -57,7 +57,7 @@ function buildGradientVars(colors: string[]) {
 }
 
 /**
- * Ported from React Bits' Border Glow (reactbits.dev) — pointer position is
+ * Ported from React Bits' Border Glow (reactbits.dev), pointer position is
  * converted into edge-proximity and angle-from-center, which drive a
  * conic-gradient-masked border glow that tracks the cursor around the
  * element (stronger the closer the pointer gets to the edge). Scaled down

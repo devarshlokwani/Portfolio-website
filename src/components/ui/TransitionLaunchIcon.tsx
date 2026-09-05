@@ -8,7 +8,7 @@ export type TransitionDirection = 'work' | 'contact' | 'home'
 
 /**
  * One icon per destination. `home` is also the fallback for anything without
- * its own mark — the legal pages.
+ * its own mark: the legal pages.
  *
  * Contact gets an envelope rather than a handset: the page is a message form
  * and an email address, and a phone icon would promise a channel that isn't
@@ -29,7 +29,7 @@ export interface TransitionLaunchIconHandle {
 }
 
 // Trailing behind a leftward launch (opposite of the CTA buttons' own
-// rightward one — this rides the same leftward direction the wall itself
+// rightward one: this rides the same leftward direction the wall itself
 // exits in), longest line through the center, shorter ones above/below.
 const LINES = [
   { y: -11, length: 30, thickness: 3 },
@@ -149,7 +149,7 @@ function Burst({
 
 /**
  * The content-aware launch mark shown centered in the viewport
- * mid-transition — see RouteTransitionProvider, which owns exactly when it
+ * mid-transition: see RouteTransitionProvider, which owns exactly when it
  * shows/hides relative to the sweeping wall's own position, and picks the
  * direction from the destination route.
  *
@@ -161,7 +161,7 @@ function Burst({
 export const TransitionLaunchIcon = forwardRef<TransitionLaunchIconHandle>(function TransitionLaunchIcon(_props, ref) {
   const rootRef = useRef<HTMLDivElement>(null)
 
-  // Called unconditionally and in a fixed order — one per key of ICONS.
+  // Called unconditionally and in a fixed order. One per key of ICONS.
   const bursts: Record<TransitionDirection, ReturnType<typeof useBurst>> = {
     work: useBurst(),
     contact: useBurst(),

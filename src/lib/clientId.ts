@@ -30,6 +30,6 @@ export function markSubmitted(): void {
   try {
     localStorage.setItem(LAST_SUBMIT_KEY, String(Date.now()))
   } catch {
-    // localStorage unavailable — throttle simply won't persist across reloads for this visitor.
+    // localStorage unavailable: throttle simply won't persist across reloads for this visitor.
   }
 }

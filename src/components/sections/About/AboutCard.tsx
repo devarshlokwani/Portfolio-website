@@ -7,14 +7,14 @@ interface AboutCardProps {
   icon: IconType
   /** which edge the half-hidden gear hangs off, if this card gets one */
   cog?: 'top' | 'left' | 'right'
-  /** small tracked caps above the title — what this card is about */
+  /** small tracked caps above the title, what this card is about */
   eyebrow: string
   /** display-face first line */
   title: string
   /** serif-italic second line, same pairing the hero uses */
   subtitle: string
   children: ReactNode
-  /** the philosophy card's tab row — the other two cards don't get one */
+  /** the philosophy card's tab row, the other two cards don't get one */
   footer?: ReactNode
   /** the full-width card carries a larger title than the two half-width ones */
   size?: 'md' | 'lg'

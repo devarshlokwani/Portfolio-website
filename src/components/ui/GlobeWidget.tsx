@@ -16,7 +16,7 @@ interface Place {
   tz: string
 }
 
-/** Only places that are actually true of me — where I'm based, and where I
+/** Only places that are actually true of me, where I'm based, and where I
  *  worked before that. */
 const PLACES: Place[] = [
   { id: 'sydney', label: 'Sydney', note: 'Based here', lat: -33.87, lon: 151.21, tz: 'Australia/Sydney' },
@@ -40,13 +40,13 @@ const DEG = Math.PI / 180
 const LAT_STEP = 2.6
 const LON_ARC = 2.6
 
-/** Resolved once — the coastlines don't move, only the camera does. */
+/** Resolved once: the coastlines don't move, only the camera does. */
 const LAND_POINTS = buildLandPoints(LAT_STEP, LON_ARC)
 
 /**
  * Orthographic projection of a lat/lon onto a sphere seen from (lat0, lon0).
  * `front` is the cosine of the angular distance from the centre of the
- * visible face — positive on the near side, and doubling as a depth cue for
+ * visible face: positive on the near side, and doubling as a depth cue for
  * fading dots out toward the limb.
  */
 function project(lat: number, lon: number, lat0: number, lon0: number) {
@@ -74,7 +74,7 @@ const HUB = { x: 95, y: 95, r: 34, teeth: 14 }
  * One hub driving four satellites, rather than a chain.
  *
  * A chain placed tangent-to-the-last folds back on itself as soon as the
- * bearings come round — the fifth gear ends up buried inside the first. Every
+ * bearings come round: the fifth gear ends up buried inside the first. Every
  * satellite here is placed at its own bearing from the *hub*, so meshing is
  * guaranteed by construction and the cluster always fans out.
  *

@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { gsap } from '@/lib/gsap'
 
 export interface TransitionGearHandle {
-  /** Instant — a hard cut, not a fade, so it reads as the sweeping wall
+  /** Instant: a hard cut, not a fade, so it reads as the sweeping wall
    *  uncovering something already there rather than a separately-timed
    *  fade-in of its own. Also (re)starts the meter's empty-to-full fill. */
   show: () => void
@@ -14,7 +14,7 @@ const SPARK_COUNT = 16
 
 const METER_RADIUS = 25
 const METER_CIRCUMFERENCE = 2 * Math.PI * METER_RADIUS
-/** How much of the ring shows at rest, before a fill starts — "just a
+/** How much of the ring shows at rest, before a fill starts, "just a
  *  little", not empty, so the mark reads as a meter and not a blank ring. */
 const METER_START_FRACTION = 0.08
 const METER_START_OFFSET = METER_CIRCUMFERENCE * (1 - METER_START_FRACTION)
@@ -23,13 +23,13 @@ const PLATE_POINTS = '0,-48 37.53,-29.93 46.81,10.68 20.83,43.25 -20.83,43.25 -4
 const HUB_RING_POINTS = '0,-17 13.29,-10.6 16.58,3.78 7.38,15.32 -7.38,15.32 -16.58,3.78 -13.29,-10.6'
 
 /**
- * The heptagon badge shown centered in the viewport mid-transition — see
+ * The heptagon badge shown centered in the viewport mid-transition, see
  * RouteTransitionProvider, which owns exactly when it shows/hides relative
  * to the sweeping wall's own position. Three layers: the dark plate, a thin
  * meter ring that fills from a sliver to a full circle each time show()
  * fires, and a hollow orange hub (same seven-sided shape as the plate,
  * scaled down, with a punched-out center and a dot). The sparks are the one
- * thing that runs continuously from mount rather than starting on show() —
+ * thing that runs continuously from mount rather than starting on show(),
  * cheap for something this small, and it means there's never a warm-up lag
  * to account for: whatever moment the wall reveals it, sparks are already
  * mid-flight, like they'd been going the whole time.
@@ -47,7 +47,7 @@ export const TransitionGear = forwardRef<TransitionGearHandle>(function Transiti
         meterTweenRef.current?.kill()
         // Every show() resets the ring to its starting sliver first, rather
         // than animating from wherever a previous (possibly interrupted)
-        // fill left off — otherwise a fast back-to-back navigation could
+        // fill left off: otherwise a fast back-to-back navigation could
         // start the next fill already half (or fully) full.
         gsap.set(meterRef.current, { strokeDashoffset: METER_START_OFFSET })
         meterTweenRef.current = gsap.to(meterRef.current, {
@@ -66,7 +66,7 @@ export const TransitionGear = forwardRef<TransitionGearHandle>(function Transiti
     // Sparks originate near the badge's right-hand arc (roughly facing the
     // wall's incoming direction) and fly outward with a strong leftward
     // bias plus a little fall, like debris thrown off something moving fast
-    // to the left — the same direction the wall itself exits in, so the
+    // to the left: the same direction the wall itself exits in, so the
     // burst reads as illustrating that motion. Both ends are absolute
     // function-based values (not `+=` relative ones) re-rolled every cycle
     // via repeatRefresh: a relative delta on a repeating tween keeps adding
@@ -84,7 +84,7 @@ export const TransitionGear = forwardRef<TransitionGearHandle>(function Transiti
           scaleX: 0.5,
         },
         {
-          // scaleX grows rather than shrinks — a streak that's stretching
+          // scaleX grows rather than shrinks, a streak that's stretching
           // as it flies reads as accelerating, not as a dot shrinking away
           x: () => gsap.utils.random(-95, -50),
           y: () => gsap.utils.random(-10, 48),

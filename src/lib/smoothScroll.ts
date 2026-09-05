@@ -1,7 +1,7 @@
 import type Lenis from 'lenis'
 
 // Fixed nav sits on top of the page, so scrolling straight to a section's
-// top would tuck its heading behind it — offset upward by roughly the nav's
+// top would tuck its heading behind it, offset upward by roughly the nav's
 // height plus breathing room.
 const DEFAULT_OFFSET = -100
 

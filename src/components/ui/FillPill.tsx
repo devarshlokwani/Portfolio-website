@@ -3,7 +3,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { gsap } from '@/lib/gsap'
 
 const FILL_DURATION = 0.5
-// power2.inOut reads as slow-fast-slow — the fill eases into motion, races
+// power2.inOut reads as slow-fast-slow: the fill eases into motion, races
 // through the middle, then eases back out as it reaches the top, rather
 // than growing at a flat constant rate.
 const FILL_EASE = 'power2.inOut'
@@ -33,8 +33,8 @@ export function FillPill({ active, onClick, children, className = '' }: FillPill
   useEffect(() => {
     const fill = fillRef.current
     if (!fill) return
-    // The first pass just establishes whatever state the pill mounts in —
-    // only later changes are worth animating, otherwise a pill that starts
+    // The first pass just establishes whatever state the pill mounts in.
+    // Only later changes are worth animating; otherwise a pill that starts
     // selected would play its fill on page load.
     if (!mounted.current) {
       mounted.current = true

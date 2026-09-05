@@ -5,7 +5,7 @@ interface PaperPlaneIconProps {
 }
 
 /**
- * A hand-sketched paper plane in pastel crayon tones — nose pointing along
+ * A hand-sketched paper plane in pastel crayon tones, nose pointing along
  * +x at zero rotation, so it drops straight into the flight path's
  * atan2-based rotation with no extra offset. A simple wide dart/kite
  * silhouette (the classic paper-plane top-view shape) reads clearly at

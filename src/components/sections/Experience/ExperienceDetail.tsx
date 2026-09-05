@@ -10,7 +10,7 @@ interface ExperienceDetailProps {
 }
 
 /**
- * The "widget" card: role, company, full bullet list, and the skills used —
+ * The "widget" card: role, company, full bullet list, and the skills used,
  * always shown, no hover-expand (that made the card's height shift while it
  * was sitting sticky against the scrolling company column, which read as
  * janky rather than satisfying). Used both as the sticky left panel on

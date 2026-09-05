@@ -4,7 +4,7 @@ import { AboutCard } from '@/components/sections/About/AboutCard'
 import { PhilosophyTabs } from '@/components/sections/About/PhilosophyTabs'
 
 /**
- * The About section's bottom-right card — the same shell as the other two,
+ * The About section's bottom-right card, the same shell as the other two,
  * plus the one thing they don't get: a tab row whose selection fills from
  * the bottom up.
  */

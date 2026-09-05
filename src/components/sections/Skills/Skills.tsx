@@ -28,7 +28,7 @@ export function Skills() {
 
       {/* The skills sphere is far taller than the copy beside it. Rather than
           pick which end of the column eats the leftover height, the widget
-          occupies it — copy, globe, filters, top to bottom. */}
+          occupies it: copy, globe, filters, top to bottom. */}
       <div className="grid gap-12 md:grid-cols-2 md:gap-8">
         <div className="flex flex-col justify-between gap-8">
           <p className="max-w-md text-fg-muted">

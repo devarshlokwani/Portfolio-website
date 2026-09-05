@@ -16,7 +16,7 @@ interface ProjectData {
   links: { live?: string; github?: string }
 }
 
-// Only Foundr has real screenshots ready to show right now — the rest come
+// Only Foundr has real screenshots ready to show right now, the rest come
 // back once their own assets are ready, reusing this same row/showcase shell.
 const VISIBLE_SLUGS = ['foundr']
 

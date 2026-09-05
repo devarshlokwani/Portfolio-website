@@ -29,7 +29,7 @@ function WashiTape({ className = '' }: { className?: string }) {
 }
 
 /**
- * The widget that appears at a checkpoint along the flight path — styled
+ * The widget that appears at a checkpoint along the flight path, styled
  * like a photo/note taped to a corkboard (cream paper, a slight tilt, a
  * strip of washi tape overlapping the top edge) rather than the site's
  * usual dark glass card, to match the flight path's paper-and-crayon theme.

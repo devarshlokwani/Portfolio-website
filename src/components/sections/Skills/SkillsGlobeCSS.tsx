@@ -15,20 +15,20 @@ const IDLE_SPEED = 0.0012
 const FRICTION = 0.94
 const DRAG_SENSITIVITY = 0.006
 const MAX_PITCH = 1.15
-const RING_TILTS = [0, 55, 110] // deg — evenly-spaced great circles around the yaw axis
+const RING_TILTS = [0, 55, 110] // deg: evenly-spaced great circles around the yaw axis
 const VIEWBOX = RADIUS * 1.1 // half-extent of the SVG's coordinate space, in the same units as projected node positions
 const ARC_STEPS = 10 // sample points per connection's great-circle arc
 
 interface Connection {
   a: number
   b: number
-  /** Set only when both endpoints share a category — that's what lets a
+  /** Set only when both endpoints share a category. That's what lets a
    *  category filter keep this one flying while others go dark. */
   category: string | null
   cycleTicks: number
   flightTicks: number
   phaseOffset: number
-  /** Per-connection brightness multiplier — without this every star peaks
+  /** Per-connection brightness multiplier: without this every star peaks
    *  at the same opacity, which reads as mechanical. A few noticeably
    *  brighter ones and a few dimmer ones among mostly-average stars sells
    *  the "random shooting star" feel much better than uniform glow. */
@@ -48,7 +48,7 @@ function makeConnection(a: number, b: number, category: string | null): Connecti
 }
 
 /** A sparse, mostly-same-category-biased set of node pairs to send shooting
- *  stars along — a couple of links per category (so filtering to any one
+ *  stars along: a couple of links per category (so filtering to any one
  *  category reliably has something to show) plus a handful of cross-category
  *  links for the default view's texture. Deliberately kept small: this is
  *  meant to read as occasional, subtle flickers of connection, not a busy
@@ -263,7 +263,7 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
       className="relative mx-auto h-[380px] w-[380px] cursor-grab touch-none select-none active:cursor-grabbing md:h-[480px] md:w-[480px]"
       style={{ perspective: '1200px' }}
     >
-      {/* Shaded backdrop sphere — pure CSS radial gradient, no image assets — so
+      {/* Shaded backdrop sphere, a pure CSS radial gradient with no image assets, so
           the icon cloud reads as a globe rather than a scattered pile of icons. */}
       <div
         aria-hidden="true"
@@ -304,7 +304,7 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
       </div>
 
       {/* Occasional shooting-star pulses along great-circle arcs between
-          skills — each connection is invisible almost all the time, briefly
+          skills: each connection is invisible almost all the time, briefly
           fading in as a small comet travels its arc, then fading out again.
           A category filter keeps only same-category connections firing. */}
       <svg

@@ -66,7 +66,7 @@ function buildGeometry(viewportWidth: number, laneHeight: number, count: number)
 
 /**
  * Pins the section with `heading` locked at the top and turns further
- * scroll into horizontal travel in the paper canvas below it — a paper
+ * scroll into horizontal travel in the paper canvas below it, a paper
  * plane glides along a wandering (not straight) path, leaving a dotted
  * trail behind it (clipped to a rect whose width tracks the plane's x, so
  * the dots only ever exist behind where it's already been), and a widget
@@ -118,7 +118,7 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
     const travel = Math.max(1, totalWidth - window.innerWidth)
 
     // each checkpoint's visible window reaches about 65% of the way to its
-    // nearest neighbor on either side — a modest crossfade zone rather than
+    // nearest neighbor on either side, a modest crossfade zone rather than
     // a hard cut, without adjacent cards both sitting at full opacity
     const cpProgress = checkpoints.map((cp) => cp.arcLength / totalLength)
     const halfWindows = cpProgress.map((p, i) => {
@@ -136,7 +136,7 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
     // the camera releases and freezes, letting the plane fly on off the
     // right edge. Clamping camera x to [2*centerX - totalWidth, 0] gives
     // all three phases (and their handoffs) for free, no phase branching.
-    // Centered on the canvas's own width, not the viewport's — the canvas
+    // Centered on the canvas's own width, not the viewport's, the canvas
     // sits inset inside a max-width layout, narrower than window.innerWidth.
     const centerX = canvasEl.clientWidth / 2
     const camMin = 2 * centerX - totalWidth
@@ -162,7 +162,7 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
     }
 
     const ctx = gsap.context(() => {
-      // The tween's own target is a throwaway proxy — track.x is now set
+      // The tween's own target is a throwaway proxy, track.x is now set
       // directly inside applyProgress (camera-follow math above), so all
       // this tween needs to provide is a scrubbed, eased progress value.
       const scrub = { progress: 0 }
@@ -198,7 +198,7 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
       <div className="shrink-0 pt-28 md:pt-32">{heading}</div>
 
       <div ref={canvasRef} className="relative flex-1 overflow-hidden">
-        {/* Fixed backdrop — the paper itself and the landscape drawn on it.
+        {/* Fixed backdrop: the paper itself and the landscape drawn on it.
             Sized to the canvas (not the much-wider scrolling track), so it
             sits still behind the plane/trail/cards as they travel across
             it, rather than panning along with them. */}
@@ -212,7 +212,7 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
             <defs>
               {/* A gentle, static paper-grain texture: turbulence noise
                   used as a bump map, multiplied over the flat paper
-                  color — a fixed, moderate crease level rather than an
+                  color: a fixed, moderate crease level rather than an
                   animated crumple. */}
               <filter id="paper-grain" x="-5%" y="-15%" width="110%" height="130%">
                 <feTurbulence type="fractalNoise" baseFrequency="0.004 0.007" numOctaves={4} seed={7} result="noise" />
@@ -240,7 +240,7 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
                   <rect ref={clipRectRef} x={0} y={0} width={0} height={geometry.laneHeight} />
                 </clipPath>
 
-                {/* Light edge roughening for the trail — the path already
+                {/* Light edge roughening for the trail, the path already
                     has a hand-wobble baked into its geometry, this filter
                     adds fine surface irregularity on top so it reads as a
                     scribbled crayon line rather than a clean stroke. */}
@@ -256,7 +256,7 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
                   rather than one screen of scenery held for the trip. */}
               <SceneryBackdrop width={geometry.totalWidth} height={geometry.laneHeight} />
 
-              {/* soft peach glow underneath, then the main crayon-orange dashes, then a thin dark fleck on top — a layered waxy trail rather than one flat dashed line */}
+              {/* soft peach glow underneath, then the main crayon-orange dashes, then a thin dark fleck on top, a layered waxy trail rather than one flat dashed line */}
               <g filter="url(#trail-sketch)">
                 <path
                   d={geometry.d}

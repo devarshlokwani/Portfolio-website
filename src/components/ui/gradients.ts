@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 
 /**
  * Accent, lightened along its own hue rather than blended toward another
- * colour — a two-hue gradient would break the orange/black palette the rest
+ * colour: a two-hue gradient would break the orange/black palette the rest
  * of the site holds to.
  *
  * Shared so the hero's tagline and the sub-footer's headlines pick up the

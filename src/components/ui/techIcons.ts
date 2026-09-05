@@ -27,7 +27,7 @@ interface TechIconEntry {
 }
 
 // Keyed by the exact display strings used in the stack/skills arrays across
-// experience.json and projects.json — not every entry there names an actual
+// experience.json and projects.json: not every entry there names an actual
 // tool (a job's "skills" list mixes in things like "Content Strategy"), so
 // this only covers ones with a real brand mark; TechTag falls back to a
 // plain label for anything not listed here.

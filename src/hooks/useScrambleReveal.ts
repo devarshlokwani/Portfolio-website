@@ -15,7 +15,7 @@ interface ScrambleRevealOptions {
 /**
  * Drives the same GSAP ScrambleTextPlugin the intro loader uses, but reads
  * the in-progress string back out on every tick instead of letting it paint
- * to a DOM node — so a WebGL-rasterized target (WarpText's canvas) can be
+ * to a DOM node: so a WebGL-rasterized target (WarpText's canvas) can be
  * fed the same reload-style character cycling. The scramble runs against a
  * detached span that's never attached to the document.
  */

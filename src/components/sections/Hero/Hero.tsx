@@ -9,7 +9,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrambleReveal } from '@/hooks/useScrambleReveal'
 import { useTheme } from '@/hooks/useTheme'
 
-// Mirrors --color-fg / --color-fg-muted in theme.css — WarpText rasterizes
+// Mirrors --color-fg / --color-fg-muted in theme.css, WarpText rasterizes
 // onto a canvas, so it needs resolved color values rather than CSS vars.
 const NAME_COLORS = {
   dark: { fg: '#f4f3ef', muted: '#a3a1ab' },
@@ -41,7 +41,7 @@ export function Hero() {
   })
 
   // Once each word has settled from its initial reveal, keep it "alive" with
-  // occasional character reloads — the same glyph(s) slide out one side and
+  // occasional character reloads: the same glyph(s) slide out one side and
   // a fresh copy slides in from the other, like a magazine swap.
   const devarshTransitions = useGlyphReload('DEVARSH', { enabled: devarshRevealed && !reducedMotion })
   const lokwaniTransitions = useGlyphReload('LOKWANI', { enabled: lokwaniRevealed && !reducedMotion })

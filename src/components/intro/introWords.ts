@@ -1,7 +1,7 @@
 export const INTRO_WORDS = ['Think', 'Design', 'Build', 'Ship', 'Devarsh Lokwani']
 
 /**
- * Every word in the intro is set in the signature script — the same hand the
+ * Every word in the intro is set in the signature script, the same hand the
  * name itself uses.
  *
  * The action words used to cycle through display/mono/serif-italic variants,

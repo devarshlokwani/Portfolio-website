@@ -13,7 +13,7 @@ const SETTLE_MS = 120
  * frame, so on some engines nothing at the pointer is considered to have
  * changed: whatever was hovered when the cursor last moved stays hovered,
  * even once it has scrolled off screen, and only corrects on the next mouse
- * move. It affects every hover on the site — CSS and JS alike — because
+ * move. It affects every hover on the site (CSS and JS alike) because
  * `mouseleave` doesn't fire either.
  *
  * The check is cheap and exact: compare the deepest element the document
@@ -25,7 +25,7 @@ const SETTLE_MS = 120
  * custom cursor together.
  *
  * Pointer events come back after two frames rather than being held off for
- * the whole scroll — the common version of this trick disables them until
+ * the whole scroll: the common version of this trick disables them until
  * scrolling stops, which silently swallows clicks through a trackpad's
  * momentum, and Lenis keeps easing long after the reader has let go.
  */

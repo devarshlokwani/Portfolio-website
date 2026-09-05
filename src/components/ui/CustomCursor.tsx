@@ -14,7 +14,7 @@ const INTERACTIVE_SELECTOR =
  *
  * Enabling is decided from live pointer events (first "mouse"-typed
  * pointermove) rather than a `(hover: hover) and (pointer: fine)` media
- * query — hybrid touchscreen laptops routinely report `pointer: coarse`
+ * query: hybrid touchscreen laptops routinely report `pointer: coarse`
  * even with a mouse attached, which would otherwise disable this
  * permanently. A touch pointerdown flips it back off so hybrid devices
  * degrade to the native cursor.
@@ -46,7 +46,7 @@ export function CustomCursor() {
 
     // Instant, not a fade: leaving the window means the real OS cursor is
     // immediately visible out there, so any lingering fade on ours reads as
-    // lag. Only `root`'s opacity tween is killed here — `cursor`'s x/y are
+    // lag. Only `root`'s opacity tween is killed here, `cursor`'s x/y are
     // owned by the quickTo functions above, and externally killing their
     // tweens breaks quickTo's internal reference to them permanently (every
     // future moveX/moveY call becomes a no-op), which is what was freezing
@@ -134,18 +134,18 @@ export function CustomCursor() {
         </svg>
         {/* Swapped in over the Foundr screenshot showcase (see
             data-cursor-icon="foundr" in FoundrScreens.tsx) in place of the
-            arrow: a dark greyscale ring — slightly larger than, and
-            centered behind, the green "F" disc — with "VIEW MORE" curving
+            arrow: a dark greyscale ring: slightly larger than, and
+            centered behind, the green "F" disc, with "VIEW MORE" curving
             around the band between them. */}
         <div className="cursor-icon-badge cursor-icon-badge--foundr">
           <svg className="cursor-icon-badge__ring" viewBox="0 0 96 96">
             <circle className="cursor-icon-badge__ring-bg" cx="48" cy="48" r="47" />
             <defs>
               {/* Short arcs centered exactly on the top and bottom points
-                  (not full semicircles — a semicircle left "VIEW MORE"
+                  (not full semicircles: a semicircle left "VIEW MORE"
                   centered via startOffset but still stretching most of the
                   way around to the sides, reading as a left/right split
-                  rather than top/bottom) — traced in opposite directions so
+                  rather than top/bottom): traced in opposite directions so
                   each label's "up" faces outward and reads upright, rather
                   than the bottom copy coming out upside down. */}
               <path id={`${ringTextPathId}-top`} d="M 19.7,24.2 A 37,37 0 0 1 76.3,24.2" />
@@ -161,7 +161,7 @@ export function CustomCursor() {
                 VIEW MORE
               </textPath>
             </text>
-            {/* Separator dots at 3 and 9 o'clock — equal distance from both
+            {/* Separator dots at 3 and 9 o'clock, equal distance from both
                 labels, in the gaps left and right between the top and
                 bottom arcs, for a finished, intentional-looking break. */}
             <circle className="cursor-icon-badge__ring-dot" cx="85" cy="48" r="3" />

@@ -5,13 +5,13 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useTheme } from '@/hooks/useTheme'
 
 /**
- * Adapted from React Bits' `Orb` background (MIT) — https://reactbits.dev —
+ * Adapted from React Bits' `Orb` background (MIT, https://reactbits.dev),
  * which builds it on `ogl`, already a dependency here for the hero's
  * WarpText, so this costs no new package.
  *
  * Changes from the original: typed, hue defaulted to the site's accent, the
  * background colour resolved from the live theme token rather than a fixed
- * hex, reduced-motion support, and — the significant one — rendering is
+ * hex, reduced-motion support, and most significantly, rendering is
  * suspended while the orb is off-screen. The original runs its rAF loop for
  * the life of the page; this orb sits at the foot of *every* route, so left
  * alone it would drive the GPU continuously the entire time someone is on
@@ -109,7 +109,7 @@ const frag = /* glsl */ `
   }
 
   // The original's violet/cyan/indigo, replaced with the site's own ember
-  // range. Rotating hue off a violet base to reach orange is guesswork —
+  // range. Rotating hue off a violet base to reach orange is guesswork.
   // YIQ rotation isn't a true hue shift, and a first attempt at it landed on
   // green. Naming the three colours outright is exact and readable.
   const vec3 baseColor1 = vec3(1.000000, 0.352941, 0.235294);
@@ -239,7 +239,7 @@ export function Orb({
 
   // Uniforms are updated in place rather than being effect dependencies.
   // Rebuilding the GL context on every theme toggle or prop tweak means
-  // tearing down and re-creating the renderer — browsers cap live WebGL
+  // tearing down and re-creating the renderer, browsers cap live WebGL
   // contexts and start dropping the oldest, which shows up as a dead canvas.
   useEffect(() => {
     const program = programRef.current
@@ -312,7 +312,7 @@ export function Orb({
     container.addEventListener('mousemove', onMove)
     container.addEventListener('mouseleave', onLeave)
 
-    // Reduced motion still gets an orb — just a still one, painted once.
+    // Reduced motion still gets an orb, just a still one, painted once.
     if (reducedMotion) {
       program.uniforms.iTime.value = 1.4
       renderer.render({ scene: mesh })
@@ -354,7 +354,7 @@ export function Orb({
       cancelAnimationFrame(raf)
     }
 
-    // Only render while it's actually on screen — this sits at the foot of
+    // Only render while it's actually on screen. This sits at the foot of
     // every route, so an always-on loop would cost the whole visit.
     const io = new IntersectionObserver(
       ([entry]) => (entry.isIntersecting ? start() : stop()),

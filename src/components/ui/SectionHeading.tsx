@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 interface SectionHeadingProps {
-  /** rendered in caps by the type styles — pass it in normal case */
+  /** rendered in caps by the type styles, pass it in normal case */
   title: string
   /** the accent punctuation that closes the title */
   mark?: string

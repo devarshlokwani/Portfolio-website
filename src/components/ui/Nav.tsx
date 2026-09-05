@@ -45,7 +45,7 @@ export function Nav() {
   // A nav-triggered smooth scroll passes through every section between here
   // and the target, and each one crossing the scroll-spy's center threshold
   // along the way would otherwise flip activeIndex (and fire that link's
-  // fill animation) for the split-second it's in view — a flicker cascade
+  // fill animation) for the split-second it's in view, a flicker cascade
   // down the whole nav. Suppressed for the duration of that one scroll; the
   // click itself sets the destination's index immediately instead.
   const suppressSpyRef = useRef(false)
@@ -63,14 +63,14 @@ export function Nav() {
 
     // Coming back to '/' from a route link (e.g. clicking the corner mark
     // while "Work" is active) otherwise leaves that route's stale index in
-    // place — nothing here re-evaluates it until a section's own
+    // place: nothing here re-evaluates it until a section's own
     // intersection fires, which doesn't happen at all if landing at the
     // very top of the page, above every observed section.
     setActiveIndex(null)
 
     const sections = LINKS.map((l) => (l.kind === 'hash' ? document.querySelector<HTMLElement>(l.href) : null))
 
-    // Mirrors the observer's own '-45% 0px -45% 0px' rootMargin — the
+    // Mirrors the observer's own '-45% 0px -45% 0px' rootMargin, the
     // center 10% band of the viewport that counts as "intersecting".
     const findIndexInBand = () => {
       const bandTop = window.innerHeight * 0.45
@@ -92,7 +92,7 @@ export function Nav() {
             setActiveIndex(idx)
           } else {
             // The exiting section only tells us it left the band, not
-            // what (if anything) is in it now — an instant jump (e.g. the
+            // what (if anything) is in it now, an instant jump (e.g. the
             // corner mark's back-to-top, or scrolling above the topmost
             // hash section into Hero) can skip every section in between
             // without any of them ever registering as intersecting, so
@@ -148,7 +148,7 @@ export function Nav() {
       return
     }
     // Safety net in case Lenis's onComplete doesn't fire for some edge case
-    // (e.g. the target is already at the current scroll position) — the
+    // (e.g. the target is already at the current scroll position), the
     // scroll-spy should never stay suppressed indefinitely.
     suppressTimeoutRef.current = setTimeout(resumeSpy, 1600)
   }

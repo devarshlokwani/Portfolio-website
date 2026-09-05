@@ -6,11 +6,11 @@ import { gsap } from '@/lib/gsap'
 const INK = '#b8622f'
 const INK_SOFT = '#c98b5c'
 /** The paper the scene is drawn on. Nearer landforms are filled with it so
- *  they *occlude* whatever sits behind them — without that, two ridgelines
+ *  they *occlude* whatever sits behind them. Without that, two ridgelines
  *  simply cross each other into an X instead of one standing in front. */
 const PAPER = '#f4ecd8'
 
-/** Deterministic RNG — the same track width always draws the same map, so
+/** Deterministic RNG: the same track width always draws the same map, so
  *  the landscape doesn't reshuffle itself on every re-render or resize. */
 function makeRng(seed: number) {
   let a = seed >>> 0
@@ -26,7 +26,7 @@ function makeRng(seed: number) {
 /**
  * Horizontal occupancy for one depth band. Everything placed on the ground
  * goes through one of these, so a barn can't land on a church and a paddock
- * can't be dropped across a field — the generator asks for a span and is
+ * can't be dropped across a field, the generator asks for a span and is
  * told whether it's free, rather than trusting spacing arithmetic.
  */
 class Lane {
@@ -44,7 +44,7 @@ class Lane {
 }
 
 /* ------------------------------------------------------------------ *
- * Primitives — each draws around its own local origin at ground level
+ * Primitives: each draws around its own local origin at ground level
  * (0,0 = where the thing meets the earth), so placing one is just a
  * translate to the spot it should stand on.
  * ------------------------------------------------------------------ */
@@ -108,7 +108,7 @@ function Barn({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
   )
 }
 
-/** Round thatched hut — the roof drawn as a fan of straws, not a plain cone. */
+/** Round thatched hut: the roof drawn as a fan of straws, not a plain cone. */
 function Hut({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`}>
@@ -202,7 +202,7 @@ function Field({
 }
 
 /**
- * Distant farmland on the hills — an irregular quad rather than the near
+ * Distant farmland on the hills, an irregular quad rather than the near
  * field's tidy parallelogram, because at that range plots read as a
  * patchwork of odd shapes, not as rows you can pick out.
  */
@@ -562,7 +562,7 @@ function buildScene(width: number, height: number): SceneParts {
   const fields: SceneParts['fields'] = []
   const paddocks: SceneParts['paddocks'] = []
 
-  // villages first — they get priority on the building lane
+  // villages first: they get priority on the building lane
   for (let x = 260; x < width - 160; x += 700 + rng() * 320) {
     const plan: { kind: Placement['kind']; dx: number; half: number; s: number }[] = [
       { kind: 'barn', dx: -150, half: 24, s: 0.9 },
@@ -745,13 +745,13 @@ function RidgeLayer({ ridge, opacity, width }: { ridge: Ridge; opacity: number; 
 }
 
 /**
- * The hand-inked country the flight crosses — one long panorama laid out
+ * The hand-inked country the flight crosses. One long panorama laid out
  * across the whole track, so it's fixed to the paper rather than to the
  * viewport: the plane flies over it and the camera pans across it,
  * revealing new ground the whole way.
  *
- * Depth is built two ways. Bands set the vertical order — three ranges,
- * forest, two runs of rolling hills, the settled valley, the road — and
+ * Depth is built two ways. Bands set the vertical order, three ranges,
+ * forest, two runs of rolling hills, the settled valley, the road, and
  * every landform in front is *filled with the paper color* so it occludes
  * what stands behind it, which is what stops ridgelines from crossing into
  * an X. Horizontally, everything on the ground is placed through `Lane`
@@ -770,7 +770,7 @@ export function SceneryBackdrop({ width, height }: { width: number; height: numb
       if (!el) return null
       return gsap.to(el, {
         rotation: 360,
-        // each mill runs at its own pace — in lockstep they'd read as one
+        // each mill runs at its own pace, in lockstep they'd read as one
         // mechanism rather than separate mills catching the same wind
         duration: 8 + (i % 5) * 2.2,
         ease: 'none',
@@ -804,7 +804,7 @@ export function SceneryBackdrop({ width, height }: { width: number; height: numb
         {scene.forest.map((p, i) => renderPlacement(p, i, mill, millIndex))}
       </g>
 
-      {/* upper rolling ground — filled, so it cuts off the forest behind it */}
+      {/* upper rolling ground: filled, so it cuts off the forest behind it */}
       <g {...STROKE} stroke={INK} strokeWidth={1.4} opacity={0.2}>
         <path d={scene.hillFar.d} fill={PAPER} />
       </g>

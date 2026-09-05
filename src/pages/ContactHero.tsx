@@ -7,12 +7,12 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrambleReveal } from '@/hooks/useScrambleReveal'
 import { useTheme } from '@/hooks/useTheme'
 
-// Mirrors --color-fg in theme.css — WarpText rasterizes onto a canvas, so
+// Mirrors --color-fg in theme.css: WarpText rasterizes onto a canvas, so
 // it needs a resolved color value rather than a CSS var.
 const NAME_COLOR = { dark: '#f4f3ef', light: '#17161a' } as const
 
 /**
- * The Contact route's own hero — the same arrangement as the Work route's:
+ * The Contact route's own hero, the same arrangement as the Work route's:
  * Hero's exact chrome via `HeroChrome`, so nothing but the name changes
  * across the route swap, and the single name line is padded by half a line
  * on each side so it sits centred in a block the same height as Home's

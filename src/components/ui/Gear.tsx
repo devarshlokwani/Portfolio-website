@@ -18,7 +18,7 @@ interface GearGeometry {
  * A gear outline with the bore punched out by `evenodd`, drawn once and
  * reused for both the face and the body behind it.
  *
- * The tooth is built from four points per pitch — root, tip, tip, root —
+ * The tooth is built from four points per pitch (root, tip, tip, root)
  * with arcs along the root and tip lands, so the flanks stay straight and
  * the profile reads as machined rather than as a wavy star.
  */
@@ -41,7 +41,7 @@ export function gearPath({ teeth, rTip, rRoot, rBore }: GearGeometry) {
   }
   d += ` A${rRoot} ${rRoot} 0 0 1 ${pt(rRoot, -rootHalf)} Z`
 
-  // the bore — a separate subpath, punched out by fill-rule evenodd
+  // the bore: a separate subpath, punched out by fill-rule evenodd
   d +=
     ` M${rBore},0` +
     ` A${rBore} ${rBore} 0 1 0 ${-rBore},0` +
@@ -56,7 +56,7 @@ interface GearProps {
   /**
    * How far the body sits behind the face. Offsetting down-right puts the
    * cut edge on the lower-right outside and, because the bore moves with it,
-   * exposes a crescent of body wall inside the upper-left of the hole —
+   * exposes a crescent of body wall inside the upper-left of the hole,
    * which is what makes it read as a solid disc rather than a flat sticker.
    */
   depth?: [number, number]
@@ -72,7 +72,7 @@ interface GearProps {
  * One extruded gear: a darker body drawn behind an accent face.
  *
  * The depth offset is applied *outside* the rotating groups, so the shading
- * direction stays fixed while the gear turns — a lit solid keeps its
+ * direction stays fixed while the gear turns, a lit solid keeps its
  * highlight where it is, and only the teeth should appear to move.
  */
 export function Gear({

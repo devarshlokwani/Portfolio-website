@@ -16,14 +16,14 @@ export interface ProjectEntry {
 
 interface ProjectRowProps {
   project: ProjectEntry
-  /** the screenshot showcase for the expanded state — a component-per-project since each one's real assets differ */
+  /** the screenshot showcase for the expanded state, a component-per-project since each one's real assets differ */
   screens: ReactNode
   defaultOpen?: boolean
 }
 
 /**
  * One row in the projects list: collapsed, it's just a title with a small
- * arrow-in-box glyph, separated by a hairline — no border box, matching a
+ * arrow-in-box glyph, separated by a hairline, no border box, matching a
  * plain list. Hovering the row (mouse) expands it in place into a bordered,
  * rounded card revealing the numbered badge, description, stack/links, and
  * the project's own screenshot showcase; moving off collapses it again.

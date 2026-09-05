@@ -20,7 +20,7 @@ const LINKS: SocialLink[] = [
     label: 'GitHub',
     href: 'https://github.com/devarshlokwani',
     icon: LuGithub,
-    // GitHub has no real brand color — glow toward the theme's own
+    // GitHub has no real brand color, glow toward the theme's own
     // foreground instead of a fixed hex, so it reads dark-on-light and
     // light-on-dark rather than staying a fixed near-white that vanishes
     // against a light theme's pale background.
@@ -35,7 +35,7 @@ const LINKS: SocialLink[] = [
 ]
 
 /**
- * Circular icon buttons with clean line-drawn (Lucide) icons — on hover the
+ * Circular icon buttons with clean line-drawn (Lucide) icons, on hover the
  * icon does a quick nervous wiggle and glows toward its brand color, while
  * the ring border also tints to match.
  */

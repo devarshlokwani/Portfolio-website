@@ -28,7 +28,7 @@ export function useRouteTransition() {
 }
 
 // Positive skew shifts a point's x by +y*tan(angle) in the panel's local
-// space (y growing downward) — since the panel sweeps in from the right
+// space (y growing downward): since the panel sweeps in from the right
 // (moving toward -x), a larger positive shift at the bottom means the
 // bottom of the leading edge sits further right (less progressed) than the
 // top at any instant, so the top-right corner is the first thing on screen.
@@ -51,8 +51,8 @@ const PANEL_WIDTH = '140%'
 /**
  * Owns navigation between routes. Every cross-route navigation goes through
  * one global wipe transition: a skewed accent-colored panel sweeps in from
- * the right — its diagonal leading edge angled so the top-right corner
- * arrives first — to fully cover the viewport, the route swap happens
+ * the right: its diagonal leading edge angled so the top-right corner
+ * arrives first: to fully cover the viewport, the route swap happens
  * hidden underneath, then the panel continues the same direction off the
  * left to reveal the destination. The diagonal edge (vs. a flat one) is
  * what keeps this reading as a smooth directional sweep rather than a
@@ -110,8 +110,8 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     }
 
     busyRef.current = true
-    // opacity (not a transform) hides the panel until this first `set` runs
-    // — xPercent must be the *only* thing that ever establishes its
+    // opacity (not a transform) hides the panel until this first `set` runs.
+    // xPercent must be the *only* thing that ever establishes its
     // transform, since GSAP composes x/xPercent additively with whatever
     // transform was already on the element rather than replacing it, and a
     // pre-existing inline translateX would otherwise double up with this.
@@ -123,7 +123,7 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     })
     tl.to(overlay, { xPercent: 0, duration: 0.5, ease: 'power3.inOut' })
     // With power3.inOut, xPercent (and so the wall's leading edge) crosses
-    // its own halfway point at exactly half the tween's duration — that's
+    // its own halfway point at exactly half the tween's duration. That's
     // also where the diagonal edge clears the viewport's horizontal
     // center, so the launch icon's reveal is timed to that same instant
     // rather than a guessed fraction of the total transition.
@@ -153,8 +153,8 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      // Each real destination has its own mark; everything else — home, the
-      // hash-anchored sections, the legal pages — falls back to the house
+      // Each real destination has its own mark; everything else (home, the
+      // hash-anchored sections, the legal pages) falls back to the house
       // rather than inventing an icon for a page that isn't its own place.
       const direction: TransitionDirection = ROUTE_DIRECTIONS[path] ?? 'home'
       runGlobalWipe(direction, () => finishNavigate(path, opts?.hash))

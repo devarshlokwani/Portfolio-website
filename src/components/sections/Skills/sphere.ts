@@ -35,7 +35,7 @@ export function slerpOnSphere(a: Point3D, b: Point3D, t: number, radius: number)
   const dot = (a.x * b.x + a.y * b.y + a.z * b.z) / (radius * radius)
   const omega = Math.acos(Math.min(1, Math.max(-1, dot)))
 
-  if (omega < 1e-4) return a // points coincide (or are antipodal-adjacent) — nothing meaningful to interpolate
+  if (omega < 1e-4) return a // points coincide (or are antipodal-adjacent). Nothing meaningful to interpolate
 
   const sinOmega = Math.sin(omega)
   const wa = Math.sin((1 - t) * omega) / sinOmega

@@ -6,7 +6,7 @@ interface SectionProps {
   id: string
   children: ReactNode
   className?: string
-  /** eyebrow label shown above the section, e.g. "02 — Skills" */
+  /** eyebrow label shown above the section, e.g. "02: Skills" */
   label?: string
 }
 

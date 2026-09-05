@@ -5,8 +5,8 @@ import { LuFileText } from 'react-icons/lu'
 import { gsap } from '@/lib/gsap'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
-// A symmetric converging fan — longest line through the center, shorter
-// ones above and below — straight/horizontal lines, each just at a
+// A symmetric converging fan: longest line through the center, shorter
+// ones above and below: straight/horizontal lines, each just at a
 // different height, growing out from the icon toward the left. Each has
 // its own small burst delay so they don't all snap in as one flat sweep,
 // with the center line (closest to the icon's own path) leading.
@@ -26,13 +26,13 @@ interface SpeedLaunchRefs {
 
 /**
  * Shared engine behind the accent CTA "launch" flourish (anime/manga-style
- * speed lines) — used by both link CTAs (CtaLaunchLink) and the button/form
+ * speed lines): used by both link CTAs (CtaLaunchLink) and the button/form
  * CTA (CtaLaunchButton): the label rolls up and out (same vertical exit as
  * the nav's own click roll), an icon enters small, grows while shifting
- * right with a small y-axis shake (never rotation/curving — just a jitter
+ * right with a small y-axis shake (never rotation/curving, just a jitter
  * on the path, to sell gathering speed), a handful of straight lines at
  * different heights grow out from short stubs behind it, then it fades at
- * full size (never shrinking — it's already at its biggest by then) as
+ * full size (never shrinking: it's already at its biggest by then) as
  * `onLaunch` fires the real action a beat later, and the label rolls back
  * in so the control is ready to use again.
  */
@@ -71,20 +71,20 @@ export function useSpeedLaunch(): SpeedLaunchRefs & { play: (onLaunch: () => voi
     tl.to(labelEl, { yPercent: -130, opacity: 0, duration: 0.16, ease: 'power2.in' }, 0)
 
     // the icon's true starting state has to be set explicitly before burst
-    // opacity turns on — otherwise it sits at its untouched default (full
+    // opacity turns on: otherwise it sits at its untouched default (full
     // size, fully opaque) for the gap between burst becoming visible and
     // the icon's own tween starting, which flashes it big for a frame
     // before snapping small. Setting it here removes that gap entirely.
     tl.set(iconEl, { scale: 0.3, opacity: 0 }, 0)
     tl.set(burst, { opacity: 1 }, 0.08)
 
-    // a clean, modest entrance — small up to normal size, nothing bigger
+    // a clean, modest entrance: small up to normal size, nothing bigger
     // yet. The growth that actually needs to read has to happen *during*
-    // the rightward move (below), fully opaque — growing it here first
+    // the rightward move (below), fully opaque, growing it here first
     // would make it look biggest while still sitting on the left.
     tl.to(iconEl, { scale: 1, opacity: 1, duration: 0.22, ease: 'power2.out' }, 0.1)
 
-    // shifts right — the "taking off" beat — enlarging the whole way while
+    // shifts right (the "taking off" beat), enlarging the whole way while
     // staying fully opaque, so the growth is what's actually visible as it
     // travels, not masked by a simultaneous fade. A small vertical shake
     // rides along the same path (never rotation/curving, just a jitter on
@@ -98,8 +98,8 @@ export function useSpeedLaunch(): SpeedLaunchRefs & { play: (onLaunch: () => voi
     tl.to(group, { y: 0, duration: 0.05, ease: 'sine.inOut' }, 0.52)
 
     // each line grows from a short stub near the icon out to its full
-    // length WHILE the icon is moving — the elongation itself is what
-    // reads as gathering speed, not an instant full-length snap — and each
+    // length WHILE the icon is moving, the elongation itself is what
+    // reads as gathering speed, not an instant full-length snap, and each
     // starts at its own slightly offset moment for an irregular ripple
     // rather than a single uniform sweep
     LINES.forEach((cfg, i) => {
@@ -114,7 +114,7 @@ export function useSpeedLaunch(): SpeedLaunchRefs & { play: (onLaunch: () => voi
     })
 
     // a beat to actually register the burst, then icon + lines launch off
-    // together and the real action fires as they vanish — the icon is
+    // together and the real action fires as they vanish, the icon is
     // already at its biggest by now, so this is just a fade, not a shrink;
     // it stays large all the way out rather than receding
     tl.to(iconEl, { opacity: 0, duration: 0.16, ease: 'power2.in' }, 0.66)
@@ -140,7 +140,7 @@ interface SpeedLaunchVisualProps extends SpeedLaunchRefs {
    * Icon/line color: "accent" (text-accent-fg, the default) is for CTAs
    * with a solid accent-colored fill, where accent-fg is what actually
    * contrasts. A CTA with a transparent/bordered background (no accent
-   * fill) needs "fg" instead — accent-fg is tuned against the *accent*
+   * fill) needs "fg" instead: accent-fg is tuned against the *accent*
    * color specifically, and reads as near-invisible (near-black on dark
    * theme, near-white on light) against a plain page-colored background.
    */

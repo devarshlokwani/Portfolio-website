@@ -9,12 +9,12 @@ interface NavLinkProps {
   onHoverStart: () => void
   onHoverEnd: () => void
   /** Nav owns the actual scroll (and suppressing scroll-spy flicker while it
-   *  runs) since it also owns activeIndex — this just tells it to go. */
+   *  runs) since it also owns activeIndex. This just tells it to go. */
   onNavigate: () => void
 }
 
 // A circle anchored at the left-center, growing from a point to comfortably
-// past the pill's farthest corner (150% covers any label width) — reads as
+// past the pill's farthest corner (150% covers any label width), reads as
 // an airbag inflating outward rather than a rectangle sliding across. The
 // pill's own rounded shape clips it further once the circle outgrows the
 // left cap, so it starts as a small dot, briefly fills just the rounded cap,
@@ -25,7 +25,7 @@ const REVEALED_CLIP = 'circle(150% at 0% 50%)'
 // Once a fill/unfill starts, it commits to that direction for at least this
 // long before a reversal is allowed to start. Without this, flicking the
 // mouse across the nav quickly kills and restarts the timeline every few
-// milliseconds — each restart is individually smooth, but the rapid-fire
+// milliseconds: each restart is individually smooth, but the rapid-fire
 // reversals read as jitter. This coalesces that noise into one clean cycle.
 const MIN_HOLD_MS = 110
 
@@ -37,7 +37,7 @@ const MIN_HOLD_MS = 110
  * reverse: the fill deflates back toward the left, the inverted text exits
  * leftward with it, and the default text slides back in from the right.
  * `filled` also drives this from scroll-spy, so the active section's link
- * and a separately-hovered link can both be filled at once — each link owns
+ * and a separately-hovered link can both be filled at once. Each link owns
  * its own animation.
  */
 export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavigate }: NavLinkProps) {
@@ -71,7 +71,7 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       timelineRef.current = tl
 
       if (isFilled) {
-        // The outgoing text needs to clear out fast — any slower and there's
+        // The outgoing text needs to clear out fast, any slower and there's
         // a visible gap where neither text is showing, which reads as a
         // stuck blank blob rather than a fill. The incoming text follows
         // almost immediately behind it, well before the fill finishes.
@@ -81,7 +81,7 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
         tl.to(fillText, { xPercent: 0, opacity: 1, duration: 0.28, ease: 'power3.out' }, 0.03)
       } else {
         // Exit fast (matching how quickly the fill text arrived), then let
-        // the original text drop back in noticeably slower — a gradual
+        // the original text drop back in noticeably slower, a gradual
         // settle rather than a snap, so the two directions don't feel
         // symmetric. Both move leftward, retracing the fill's own retreat.
         tl.to(fill, { clipPath: HIDDEN_CLIP, duration: 0.3, ease: 'power3.inOut' }, 0)
@@ -101,7 +101,7 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
     }
 
     if (pendingTimeout.current !== null) {
-      // A reversal is already queued for whenever the hold expires — it
+      // A reversal is already queued for whenever the hold expires, it
       // reads desiredFilled at fire time, so nothing to do here except drop
       // the queue entirely if we've flicked right back to the applied state.
       if (filled === appliedFilled.current) {
@@ -135,7 +135,7 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
   )
 
   // Apple-nav-style click flourish: the visible (on-fill) label rolls up and
-  // out, then re-enters from below — deliberately vertical where the hover
+  // out, then re-enters from below, deliberately vertical where the hover
   // fill is horizontal, so the two motions read as distinct beats instead of
   // the click just replaying the hover. Alongside that, the fill pill's own
   // background (not the text) flashes from its base color to the accent
@@ -152,23 +152,23 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
 
       // GSAP's color interpolation can't parse a raw `var(--x)` reference
       // (it needs an actual hex/rgb literal to interpolate channel-by-
-      // channel), so these are resolved to real values up front — read
+      // channel), so these are resolved to real values up front, read
       // fresh on every click so it's always correct for whichever theme is
       // currently active. --color-fg is the pill's own base fill color (the
-      // `bg-fg` class), not --color-bg — this arc is base -> accent -> base.
+      // `bg-fg` class), not --color-bg: this arc is base -> accent -> base.
       const rootStyles = getComputedStyle(document.documentElement)
       const fgColor = rootStyles.getPropertyValue('--color-fg').trim()
       const accentColor = rootStyles.getPropertyValue('--color-accent').trim()
 
-      // If this link wasn't already filled (hovered) before the click —
+      // If this link wasn't already filled (hovered) before the click,
       // e.g. keyboard activation, or a fast click that outruns the hover
-      // fill's own hold delay — clicking is about to change `filled` from
+      // fill's own hold delay: clicking is about to change `filled` from
       // false to true, which the *other* effect below reacts to. Left
       // alone, that would call its own play(true) right after this and
       // kill this timeline before it renders a single frame. Marking
       // appliedFilled/lastStartedAt here, synchronously, makes that
       // effect's `filled === appliedFilled.current` check see no change
-      // and skip re-triggering — so this timeline has to pick up the slack
+      // and skip re-triggering: so this timeline has to pick up the slack
       // and do the pill reveal + default-text fade itself in that case.
       const alreadyFilled = appliedFilled.current
       if (!alreadyFilled) {
@@ -178,10 +178,10 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       appliedFilled.current = true
       lastStartedAt.current = performance.now()
 
-      // xPercent is pinned to 0 at every step (not just the initial set) —
-      // if this click's mouse-move-then-click sequence overlapped with the
+      // xPercent is pinned to 0 at every step, not just the initial set.
+      // If this click's mouse-move-then-click sequence overlapped with the
       // hover fill's own in-flight xPercent slide (killed above, but GSAP
-      // freezes a killed tween's properties wherever they were mid-flight,
+      // freezes a killed tween's properties wherever they were mid-flight;
       // it doesn't snap them back), a single .set() at the very start isn't
       // enough insurance against that leftover value bleeding into a later
       // step. Pinning it throughout guarantees a pure vertical roll no
@@ -199,7 +199,7 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       )
 
       // The pill's own background never goes invisible during any of this
-      // (unlike fillText, it isn't riding the opacity roll — for an
+      // (unlike fillText, it isn't riding the opacity roll, for an
       // already-filled link its clipPath just stays fully revealed
       // throughout), so unlike the text this can run as one continuous
       // color arc across the whole gesture instead of needing to dodge an

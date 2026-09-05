@@ -9,7 +9,7 @@ const GEAR = gearPath({ teeth: 12, rTip: 100, rRoot: 78, rBore: R_BORE })
 
 /** Overall strength of the decoration. At full accent the cog reads as the
  *  loudest thing on the page and fights the copy for attention, so it's held
- *  well back — present and clearly orange, but furniture. */
+ *  well back: present and clearly orange, but furniture. */
 const COG_OPACITY = 0.55
 
 type Placement = 'top' | 'left' | 'right' | 'top-right'
@@ -24,7 +24,7 @@ const ANCHOR: Record<Placement, string> = {
 }
 
 /** Turns per full pass through the viewport. Deliberately not a whole
- *  number — a 12-tooth gear is rotationally symmetric every 30°, so landing
+ *  number: a 12-tooth gear is rotationally symmetric every 30°, so landing
  *  back on a multiple of a full turn would leave it looking untouched. */
 const TURNS = 0.75
 
@@ -36,7 +36,7 @@ const SPIN: Record<Placement, number> = { top: 1, left: -1, right: 1, 'top-right
  * A gear sitting half-hidden behind the corner or edge of a card.
  *
  * It's rendered as a *sibling before* the card rather than a child of it, so
- * the card's own opaque surface does the covering — which is what sells it
+ * the card's own opaque surface does the covering, which is what sells it
  * as sitting behind the card rather than being clipped by it. The card needs
  * a `relative` wrapper around the pair.
  *
@@ -52,7 +52,7 @@ export function CornerCog({
   className = 'h-40 w-40 lg:h-48 lg:w-48',
 }: {
   placement: Placement
-  /** size utilities — the footer's cog is smaller than the About cards' */
+  /** size utilities: the footer's cog is smaller than the About cards' */
   className?: string
 }) {
   const svgRef = useRef<SVGSVGElement>(null)
