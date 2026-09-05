@@ -29,7 +29,7 @@ export function ExperienceDetail({ role, company, period, location, points, skil
         {points.map((point) => (
           <li
             key={point}
-            className="relative pl-4 before:absolute before:left-0 before:content-['—']"
+            className="relative pl-4 before:absolute before:left-0 before:content-['•']"
           >
             {point}
           </li>

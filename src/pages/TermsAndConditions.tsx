@@ -6,7 +6,7 @@ export function TermsAndConditions() {
       <section>
         <h2>Acceptance</h2>
         <p>
-          This site is Devarsh Lokwani's personal portfolio — a place to see his work, get in
+          This site is Devarsh Lokwani's personal portfolio, a place to see his work, get in
           touch, and (if the guestbook is live) leave a note. By using it, you're agreeing to the
           few, low-stakes terms below.
         </p>
@@ -41,7 +41,7 @@ export function TermsAndConditions() {
         <h2>No warranty</h2>
         <p>
           This site is provided as-is. It's a personal project, kept up and improved on a
-          best-effort basis — not a commercial product with uptime guarantees or formal support.
+          best-effort basis, not a commercial product with uptime guarantees or formal support.
         </p>
       </section>
 

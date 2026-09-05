@@ -31,7 +31,7 @@ export function WallEntryForm() {
       return
     }
     if (containsBlockedWord(trimmedName) || containsBlockedWord(trimmedMessage)) {
-      setError("Let's keep it clean — try rewording that.")
+      setError("Let's keep it clean. Try rewording that.")
       return
     }
 
@@ -42,7 +42,7 @@ export function WallEntryForm() {
     }
 
     if (!firebaseEnabled || !db) {
-      setError('The wall is not connected yet — check back soon.')
+      setError('The wall is not connected yet. Check back soon.')
       return
     }
 
@@ -60,7 +60,7 @@ export function WallEntryForm() {
       setStatus('success')
     } catch {
       setStatus('error')
-      setError('Something went wrong — try again in a moment.')
+      setError('Something went wrong. Try again in a moment.')
     }
   }
 

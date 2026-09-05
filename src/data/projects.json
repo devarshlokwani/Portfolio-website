@@ -3,7 +3,7 @@
     "slug": "foundr",
     "title": "Foundr",
     "tagline": "Full-stack finance tracker for solo founders",
-    "description": "A live, deployed finance-tracking web app that turns manual records into clear metrics — burn rate, runway, ROI, and margins. Decoupled architecture: a static TypeScript/Lit landing frontend on Vercel and an independent Node.js/Express waitlist API on Render, backed by MongoDB Atlas.",
+    "description": "A live, deployed finance-tracking web app that turns manual records into clear metrics: burn rate, runway, ROI, and margins. Decoupled architecture: a static TypeScript/Lit landing frontend on Vercel and an independent Node.js/Express waitlist API on Render, backed by MongoDB Atlas.",
     "stack": ["TypeScript", "Node.js", "Express", "MongoDB", "Lit", "Vite"],
     "links": { "live": "https://foundr-xi.vercel.app/", "github": "https://github.com/devarshlokwani/foundr" },
     "featured": true,

@@ -54,7 +54,7 @@ export function WallEntryList() {
   if (!firebaseEnabled) {
     return (
       <p className="font-mono text-sm text-fg-subtle">
-        The wall isn't connected yet — add Firebase credentials to see live signatures here.
+        The wall isn't connected yet. Add Firebase credentials to see live signatures here.
       </p>
     )
   }
@@ -72,7 +72,7 @@ export function WallEntryList() {
           className="w-56 rounded-lg border border-border bg-surface p-4 shadow-md"
         >
           <p className="text-sm text-fg">{entry.message}</p>
-          <p className="mt-3 font-mono text-xs text-fg-subtle">— {entry.name}</p>
+          <p className="mt-3 font-mono text-xs text-fg-subtle">{entry.name}</p>
         </div>
       ))}
     </div>

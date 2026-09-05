@@ -95,8 +95,8 @@ export function Contact() {
           />
           <div className="flex items-center justify-between gap-4">
             <p className="font-mono text-xs text-fg-subtle">
-              {status === 'success' && 'Message sent — thank you!'}
-              {status === 'error' && "Couldn't send — try emailing directly instead."}
+              {status === 'success' && 'Message sent. Thank you!'}
+              {status === 'error' && "Couldn't send. Try emailing directly instead."}
             </p>
             <CtaLaunchButton
               label={status === 'submitting' ? 'Sending...' : 'Send message'}

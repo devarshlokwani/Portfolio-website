@@ -372,7 +372,7 @@ export function GlobeWidget({ className = '' }: { className?: string }) {
           </ul>
 
           <p className="mt-3 font-display text-2xl font-semibold leading-none text-fg">
-            {time || '—'}
+            {time || '--:--'}
           </p>
           <p className="mt-1 font-mono text-[10px] uppercase tracking-wide text-fg-subtle">
             {active.note}

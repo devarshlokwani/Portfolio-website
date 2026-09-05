@@ -51,7 +51,7 @@ export function FlightCard({ role, company, period, location, points, skills, ro
 
         <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed" style={{ color: '#4a4235' }}>
           {points.slice(0, 2).map((point) => (
-            <li key={point} className="relative pl-4 before:absolute before:left-0 before:content-['—']">
+            <li key={point} className="relative pl-4 before:absolute before:left-0 before:content-['•']">
               {point}
             </li>
           ))}

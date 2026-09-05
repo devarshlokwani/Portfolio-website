@@ -14,7 +14,7 @@ const CARD = 'rounded-2xl border border-border bg-surface p-6 md:p-8'
 
 export function About() {
   return (
-    <Section id="about" label="01 — About">
+    <Section id="about" label="01 / About">
       <SectionHeading title="About" />
 
       {/* The gap used to be supplied by the connector row that lived between
@@ -31,7 +31,7 @@ export function About() {
         >
           <p className="md:text-base">
             I graduated from Macquarie University this July with a degree in Information
-            Technology, majoring in Artificial Intelligence — though most of my time there went
+            Technology, majoring in Artificial Intelligence. Most of my time there went
             into shipping real software, not just studying it. I like owning a module end to end:
             schema, API, UI, and the small details that make it feel finished.
           </p>
@@ -49,7 +49,7 @@ export function About() {
             <p>
               I recently shipped features across a full-stack CRM as part of a 6-person Agile team,
               working from backend APIs through to the interface with Django, Python, and
-              PostgreSQL. Outside of that, I build my own projects end to end — from a live finance
+              PostgreSQL. Outside of that, I build my own projects end to end, from a live finance
               tracker for solo founders to relational database systems and React Native prototypes.
             </p>
           </AboutCard>

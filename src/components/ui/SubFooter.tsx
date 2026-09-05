@@ -227,7 +227,7 @@ function ContactCard() {
       </h3>
 
       <p className="relative mt-5 max-w-[15rem] text-sm leading-relaxed text-fg-muted">
-        Send a message straight to my inbox — hiring, collaborating, or just talking shop.
+        Send a message straight to my inbox: hiring, collaborating, or just talking shop.
       </p>
 
       <FootRow cta="Contact" />
@@ -251,7 +251,7 @@ function FoundrCard() {
       </div>
 
       <p className="relative mt-8 max-w-[13rem] text-base leading-relaxed text-fg-muted">
-        I built <span className="font-semibold text-fg">Foundr</span> — a finance tracker that
+        I built <span className="font-semibold text-fg">Foundr</span>, a finance tracker that
         shows <span className="font-semibold text-fg">solo founders</span> their runway, burn and
         cash left, at a glance.
       </p>
@@ -309,7 +309,7 @@ function HomeCard() {
       </h3>
 
       <p className="relative mt-5 max-w-[15rem] text-sm leading-relaxed text-fg-muted">
-        The hero, the philosophy, the projects — the whole tour from the beginning.
+        The hero, the philosophy, the projects: the whole tour from the beginning.
       </p>
 
       <span

@@ -24,7 +24,7 @@ export function Projects() {
   const projects = (projectsData as ProjectData[]).filter((p) => VISIBLE_SLUGS.includes(p.slug))
 
   return (
-    <Section id="projects" label="03 — Projects">
+    <Section id="projects" label="03 / Projects">
       <SectionHeading
         title="Projects"
         mark="!"

@@ -18,7 +18,7 @@ export function PrivacyPolicy() {
           <strong className="text-fg">Contact form.</strong> If you send a message through the
           Contact section, your name, email address, and message are submitted to Formspree, a
           third-party form service, and forwarded to Devarsh's inbox. They're used only to read
-          and reply to what you sent — not stored in any database this site controls, not added
+          and reply to what you sent. It is not stored in any database this site controls, not added
           to a mailing list, not used for anything else.
         </p>
         <p>
@@ -26,7 +26,7 @@ export function PrivacyPolicy() {
           live and you leave an entry, the name and message you type are stored in a Firebase
           database and shown publicly to other visitors on the wall. A randomly-generated,
           anonymous identifier is stored alongside your entry solely to prevent repeated
-          submissions in a short window — it isn't linked to any other information about you.
+          submissions in a short window. It isn't linked to any other information about you.
         </p>
         <p>
           Nothing else is collected. There's no account system, no payment processing, and no
@@ -37,8 +37,8 @@ export function PrivacyPolicy() {
       <section>
         <h2>Cookies &amp; local storage</h2>
         <p>
-          The site stores a couple of small preferences directly in your browser — your dark/light
-          theme choice, and whether you've already seen the intro animation — so they persist
+          The site stores a couple of small preferences directly in your browser: your dark/light
+          theme choice, and whether you've already seen the intro animation, so they persist
           between visits. Both stay on your device, are never transmitted anywhere, and exist
           purely to make the site work the way you left it.
         </p>
@@ -75,7 +75,7 @@ export function PrivacyPolicy() {
           Want a guestbook entry removed, or want to know exactly what's been submitted under your
           name? Email{' '}
           <a href="mailto:devarshlokwani480@gmail.com">devarshlokwani480@gmail.com</a> and it'll be
-          sorted out directly — no formal process needed for a site this size.
+          sorted out directly, with no formal process needed for a site this size.
         </p>
       </section>
 

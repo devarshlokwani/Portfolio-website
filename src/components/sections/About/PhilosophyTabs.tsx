@@ -33,7 +33,7 @@ const TABS: PhilosophyTab[] = [
     id: 'edges',
     label: 'Edges',
     heading: 'The states nobody asks for',
-    detail: 'Empty, loading, error, mid-transition — designed, not left to chance.',
+    detail: 'Empty, loading, error, mid-transition: designed, not left to chance.',
   },
 ]
 

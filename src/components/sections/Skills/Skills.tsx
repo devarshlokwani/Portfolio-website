@@ -23,7 +23,7 @@ export function Skills() {
   }
 
   return (
-    <Section id="skills" label="02 — Skills">
+    <Section id="skills" label="02 / Skills">
       <SectionHeading title="Skills" intro="A toolkit built for shipping." />
 
       {/* The skills sphere is far taller than the copy beside it. Rather than
