@@ -28,7 +28,7 @@ export function FoundrLink() {
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="h-3 w-3 transition-transform duration-300 ease-out group-hover:translate-x-1"
+        className="h-3 w-3 transition-[transform,translate,rotate,scale] duration-300 ease-out group-hover:translate-x-1"
       >
         <path d="M6 3l5 5-5 5" />
       </svg>

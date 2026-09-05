@@ -6,7 +6,7 @@ import experience from '@/data/experience.json'
 
 const HEADING = (
   <>
-    <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-fg-subtle">02 — Experience</p>
+    <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-fg-subtle">My Work</p>
     <h2 className="mb-14 font-display text-3xl font-semibold text-fg md:text-5xl">Where I've worked</h2>
   </>
 )

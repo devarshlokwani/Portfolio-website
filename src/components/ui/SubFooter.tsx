@@ -1,158 +1,346 @@
-import { useEffect, useRef } from 'react'
-import type { IconType } from 'react-icons'
-import { LuArrowUpRight, LuMail } from 'react-icons/lu'
-import { TbBriefcase2 } from 'react-icons/tb'
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
+import { LuArrowRight } from 'react-icons/lu'
+import { TbBriefcase2, TbHome2 } from 'react-icons/tb'
 import { useLocation } from 'react-router-dom'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
-import { Gear, gearPath } from '@/components/ui/Gear'
+import { ACCENT_GRADIENT, GREEN_GRADIENT } from '@/components/ui/gradients'
+import { Orb } from '@/components/ui/Orb'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap } from '@/lib/gsap'
+import foundrLogo from '@/assets/foundr-logo.png'
+import foundrMac from '@/assets/foundr-mac.png'
 
-interface Destination {
-  id: string
-  eyebrow: string
-  title: string
-  body: string
-  cta: string
-  icon: IconType
-  /** internal route, or an external URL when `external` */
-  href: string
-  external?: boolean
+/**
+ * Near-black, not the lifted `surface` these started on. The cards should sit
+ * *in* the page rather than on top of it — a visibly lighter panel reads as a
+ * grey box pasted onto black, which is the opposite of the submerged look.
+ */
+const CARD_SURFACE: CSSProperties = {
+  backgroundImage:
+    'linear-gradient(158deg, color-mix(in srgb, var(--color-bg) 90%, #fff), var(--color-bg) 62%)',
 }
 
-const DESTINATIONS: Destination[] = [
-  {
-    id: 'work',
-    eyebrow: 'Experience',
-    title: 'Where I’ve shipped',
-    body: 'The roles, the stack behind each one, and what actually went out the door.',
-    cta: 'See the work',
-    icon: TbBriefcase2,
-    href: '/experience',
-  },
-  {
-    id: 'contact',
-    eyebrow: 'Say hello',
-    title: 'Start a conversation',
-    body: 'Hiring, collaborating, or just want to talk shop — the inbox is open.',
-    cta: 'Get in touch',
-    icon: LuMail,
-    href: '/contact',
-  },
-  {
-    id: 'foundr',
-    eyebrow: 'Live product',
-    title: 'Foundr, in the wild',
-    body: 'A finance tracker built for solo founders. Go and click around it.',
-    cta: 'Open Foundr',
-    icon: LuArrowUpRight,
-    href: 'https://foundr-xi.vercel.app/',
-    external: true,
-  },
-]
-
-function DestinationCard({ dest }: { dest: Destination }) {
+function CardShell({
+  href,
+  external,
+  children,
+}: {
+  href: string
+  external?: boolean
+  children: ReactNode
+}) {
   const { goTo } = useRouteTransition()
-  const Icon = dest.icon
 
   return (
     <a
-      href={dest.href}
+      href={href}
       data-cursor-hover
-      target={dest.external ? '_blank' : undefined}
-      rel={dest.external ? 'noopener noreferrer' : undefined}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
       onClick={
-        dest.external
+        external
           ? undefined
           : (e) => {
               e.preventDefault()
-              goTo(dest.href)
+              goTo(href)
             }
       }
-      className="group relative flex min-h-[300px] flex-col overflow-hidden rounded-2xl border border-border bg-surface p-6 transition-colors duration-500 hover:border-accent md:p-8"
+      style={CARD_SURFACE}
+      className="group relative flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-border p-7 transition-colors duration-500 hover:border-accent md:p-8"
     >
-      {/* The arc is the card's whole visual payload: a wide, soft band of
-          accent sitting just below the bottom edge, so only its crown shows.
-          It lifts and brightens on hover, which is what makes the card feel
-          lit from underneath rather than merely outlined. */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-[42%] left-1/2 h-[70%] w-[130%] -translate-x-1/2 rounded-[50%] opacity-40 blur-2xl transition-all duration-700 ease-out group-hover:-bottom-[36%] group-hover:opacity-90"
-        style={{ backgroundColor: 'var(--color-accent)' }}
-      />
-      {/* a crisper inner edge, so the glow reads as an arc and not a haze */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-[46%] left-1/2 h-[70%] w-[118%] -translate-x-1/2 rounded-[50%] opacity-0 blur-md transition-all duration-700 ease-out group-hover:-bottom-[42%] group-hover:opacity-50"
-        style={{ backgroundColor: 'var(--color-accent)' }}
-      />
-
-      <div className="relative flex items-center gap-3">
-        <span
-          aria-hidden="true"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-bg text-fg-muted transition-colors duration-300 group-hover:border-accent group-hover:text-accent"
-        >
-          <Icon className="h-4 w-4" />
-        </span>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-fg-subtle">
-          {dest.eyebrow}
-        </p>
-      </div>
-
-      <div className="relative mt-6">
-        <h3 className="font-display text-2xl font-semibold leading-tight text-fg">{dest.title}</h3>
-        <p className="mt-3 max-w-xs text-sm leading-relaxed text-fg-muted">{dest.body}</p>
-      </div>
-
-      {/* On hover the arc washes right over this line, so it flips to the
-          on-accent token rather than to accent itself — accent on accent is
-          the one combination that disappears. */}
-      <span className="relative mt-auto inline-flex items-center gap-2 pt-8 font-mono text-xs uppercase tracking-[0.15em] text-fg transition-colors duration-300 group-hover:text-accent-fg">
-        {dest.cta}
-        <LuArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-      </span>
+      {children}
     </a>
   )
 }
 
-const CLOSER_GEAR = gearPath({ teeth: 14, rTip: 100, rRoot: 79, rBore: 44 })
+/**
+ * The bottom row. Its text never darkens on hover — that was making the call
+ * to action harder to read at exactly the moment it mattered; the underline
+ * carries the state change instead.
+ */
+function FootRow({ cta }: { cta: string }) {
+  return (
+    <div className="relative mt-auto flex items-end justify-end pt-10">
+      <span className="inline-flex items-center gap-2 font-medium text-fg">
+        <span className="relative inline-block">
+          {cta}
+          {/* the resting track */}
+          <span aria-hidden="true" className="absolute -bottom-1 left-0 h-px w-full bg-border" />
+          {/* Sweeps in leftward from the right edge, and retracts back the
+              same way — a single right-hand origin drives both directions,
+              so it never looks like it reverses into a different animation. */}
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-accent transition-[transform,translate,rotate,scale] duration-500 ease-out group-hover:scale-x-100"
+          />
+        </span>
+        <LuArrowRight className="h-4 w-4 transition-[transform,translate,rotate,scale] duration-500 group-hover:translate-x-1" />
+      </span>
+    </div>
+  )
+}
 
-/** The lit gear beside the closing line — the site's motif at full size, as
- *  the last thing before the footer. */
-function CloserGear() {
-  const bodyRef = useRef<SVGGElement>(null)
-  const faceRef = useRef<SVGGElement>(null)
-  const rootRef = useRef<HTMLDivElement>(null)
+/**
+ * Card one's device: a huge ellipse drawn as a thick blurred *border*, placed
+ * so only its crown crosses the card. A filled ellipse would light the whole
+ * bottom; the ring leaves darkness beneath the arc for it to read against.
+ */
+function Arc() {
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[58%] h-[120%] w-[150%] -translate-x-1/2 rounded-[50%] opacity-50 blur-xl transition-all duration-700 ease-out group-hover:top-[51%] group-hover:opacity-100"
+        style={{ border: '26px solid var(--color-accent)' }}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[58%] h-[120%] w-[150%] -translate-x-1/2 rounded-[50%] opacity-30 blur-md transition-all duration-700 ease-out group-hover:top-[51%] group-hover:opacity-95"
+        style={{ border: '6px solid var(--color-accent)' }}
+      />
+    </>
+  )
+}
+
+/** Card one — the arc card, with a brand-style lockup. */
+function WorkCard() {
+  return (
+    <CardShell href="/experience">
+      <Arc />
+
+      <div className="relative flex items-center gap-2.5">
+        <span
+          aria-hidden="true"
+          className="flex h-7 w-7 items-center justify-center rounded-[8px] bg-accent text-accent-fg"
+        >
+          <TbBriefcase2 className="h-4 w-4" />
+        </span>
+        <span
+          className="font-display text-lg font-semibold lowercase tracking-tight"
+          style={ACCENT_GRADIENT}
+        >
+          experience
+        </span>
+      </div>
+
+      <h3 className="relative mt-10 font-display text-[1.85rem] font-bold leading-[1.2] text-fg">
+        <span className="block">The roles,</span>
+        <span className="block">
+          the stack <span style={ACCENT_GRADIENT}>&amp;</span>
+        </span>
+        <span className="block font-accent italic" style={ACCENT_GRADIENT}>
+          what shipped.
+        </span>
+      </h3>
+
+      <FootRow cta="Explore" />
+    </CardShell>
+  )
+}
+
+const TALK_ABOUT = ['a role.', 'a project.', 'an idea.', 'the details.']
+/** Seconds a word sits still, and seconds the swap takes. */
+const WORD_HOLD = 2.2
+const WORD_SWAP = 0.7
+/** Height of both the clipping window and each word inside it — they have to
+ *  match for the slide-out to clear the frame. */
+const WORD_BOX = 'h-[2.6rem] leading-[2.6rem]'
+
+/**
+ * Card two — no arc, no mark. Its device is the headline itself, whose last
+ * word cycles on a loop.
+ *
+ * A single node, whose text is swapped while it sits outside the frame.
+ * Stacking one span per word and cross-animating them meant any timing fault
+ * could put two of them on screen at once; with one node that is impossible.
+ */
+function ContactCard() {
+  const wordRef = useRef<HTMLSpanElement>(null)
   const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (reducedMotion) return undefined
-    const parts = [bodyRef.current, faceRef.current].filter(Boolean)
-    const root = rootRef.current
-    if (!root || !parts.length) return undefined
+    const el = wordRef.current
+    if (!el) return undefined
 
+    // Kill anything already driving this node before building a new timeline,
+    // so a survivor from a previous mount can't run alongside the new one.
+    gsap.killTweensOf(el)
+
+    let index = 0
     const ctx = gsap.context(() => {
-      gsap.to(parts, {
-        rotation: 300,
-        svgOrigin: '0 0',
-        ease: 'none',
-        scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
+      // One element, whose text is swapped while it sits outside the frame.
+      // Stacking the four words and cross-animating them meant any timing
+      // fault — a stale timeline, a mis-set height — put two of them on
+      // screen together. With a single node there is nothing to overlap.
+      const tl = gsap.timeline({ repeat: -1 })
+      tl.to(el, {
+        yPercent: -110,
+        duration: WORD_SWAP / 2,
+        ease: 'power2.in',
+        delay: WORD_HOLD,
       })
+      tl.call(() => {
+        index = (index + 1) % TALK_ABOUT.length
+        el.textContent = TALK_ABOUT[index]
+        gsap.set(el, { yPercent: 110 })
+      })
+      tl.to(el, { yPercent: 0, duration: WORD_SWAP / 2, ease: 'power2.out' })
     })
-    return () => ctx.revert()
+
+    return () => {
+      ctx.revert()
+      // revert restores the node's first word; keep the markup honest
+      el.textContent = TALK_ABOUT[0]
+    }
   }, [reducedMotion])
 
   return (
-    <div ref={rootRef} aria-hidden="true" className="relative hidden shrink-0 md:block">
+    <CardShell href="/contact">
+      {/* one soft bloom behind the type instead of an arc, so this card reads
+          as lit from within rather than from below */}
       <span
-        className="absolute inset-[-30%] rounded-full opacity-25 blur-3xl"
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-1/4 -top-1/4 h-[75%] w-[110%] rounded-[50%] opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-30"
         style={{ backgroundColor: 'var(--color-accent)' }}
       />
-      <svg viewBox="-112 -112 224 232" className="relative h-40 w-40 lg:h-52 lg:w-52">
-        <Gear d={CLOSER_GEAR} rBore={44} bodyRef={bodyRef} faceRef={faceRef} />
-      </svg>
-    </div>
+
+      <p className="relative font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
+        Say hello
+      </p>
+
+      <h3 className="relative mt-10 font-display text-[1.85rem] font-bold leading-[1.2] text-fg">
+        <span className="block">Let’s talk</span>
+        <span className="block">about</span>
+        {/* The word is given the *same* height as the window it slides
+            through, so a 110% shift is guaranteed to clear the frame. */}
+        <span className={`relative block overflow-hidden ${WORD_BOX}`}>
+          <span
+            ref={wordRef}
+            className={`absolute left-0 top-0 block whitespace-nowrap font-accent italic ${WORD_BOX}`}
+            style={ACCENT_GRADIENT}
+          >
+            {TALK_ABOUT[0]}
+          </span>
+        </span>
+      </h3>
+
+      <p className="relative mt-5 max-w-[15rem] text-sm leading-relaxed text-fg-muted">
+        Send a message straight to my inbox — hiring, collaborating, or just talking shop.
+      </p>
+
+      <FootRow cta="Contact" />
+    </CardShell>
+  )
+}
+
+/** Card three — the product card. The screenshot is the payload, the way the
+ *  reference's third card leans on artwork rather than a headline. */
+function FoundrCard() {
+  return (
+    <CardShell href="https://foundr-xi.vercel.app/" external>
+      <div className="relative flex items-center gap-2.5">
+        <img src={foundrLogo} alt="" className="h-10 w-10 rounded-[11px] ring-1 ring-emerald-400/20" />
+        <span
+          className="font-display text-lg font-semibold lowercase tracking-tight"
+          style={GREEN_GRADIENT}
+        >
+          foundr
+        </span>
+      </div>
+
+      <p className="relative mt-8 max-w-[13rem] text-base leading-relaxed text-fg-muted">
+        I built <span className="font-semibold text-fg">Foundr</span> — a finance tracker that
+        shows <span className="font-semibold text-fg">solo founders</span> their runway, burn and
+        cash left, at a glance.
+      </p>
+
+      {/* Parked off the right edge at rest; on hover it slides in and tips its
+          far corner up toward the wordmark.
+
+          The transition list matters: Tailwind v4 emits `translate` and
+          `rotate` as their own CSS properties, leaving `transform` as `none`.
+          Transitioning `transform` therefore animates nothing and the move
+          snaps between states — these have to be named individually. */}
+      <img
+        src={foundrMac}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-10 right-0 w-[96%] max-w-none translate-x-[46%] rotate-[14deg] opacity-55 transition-[translate,rotate,opacity] duration-700 ease-out group-hover:translate-x-[12%] group-hover:-translate-y-3 group-hover:rotate-[-7deg] group-hover:opacity-100"
+      />
+      {/* keeps the foot row legible where it passes over the artwork */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24"
+        style={{ backgroundImage: 'linear-gradient(to top, var(--color-bg), transparent)' }}
+      />
+
+      <FootRow cta="Visit" />
+    </CardShell>
+  )
+}
+
+/** Card four — the way back. Its device is the signature, the site's own
+ *  mark, set huge and cropped by the card's edge. */
+function HomeCard() {
+  return (
+    <CardShell href="/">
+      <div className="relative flex items-center gap-2.5">
+        <span
+          aria-hidden="true"
+          className="flex h-7 w-7 items-center justify-center rounded-[8px] bg-accent text-accent-fg"
+        >
+          <TbHome2 className="h-4 w-4" />
+        </span>
+        <span
+          className="font-display text-lg font-semibold lowercase tracking-tight"
+          style={ACCENT_GRADIENT}
+        >
+          home
+        </span>
+      </div>
+
+      <h3 className="relative mt-10 font-display text-[1.85rem] font-bold leading-[1.2] text-fg">
+        <span className="block">Start again</span>
+        <span className="block font-accent italic" style={ACCENT_GRADIENT}>
+          from the top.
+        </span>
+      </h3>
+
+      <p className="relative mt-5 max-w-[15rem] text-sm leading-relaxed text-fg-muted">
+        The hero, the philosophy, the projects — the whole tour from the beginning.
+      </p>
+
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-6 -left-4 whitespace-nowrap font-signature text-[5.5rem] leading-none text-fg opacity-[0.12] transition-[translate,opacity] duration-700 ease-out group-hover:-translate-y-3 group-hover:opacity-[0.06]"
+      >
+        Devarsh
+      </span>
+
+      <FootRow cta="Home" />
+    </CardShell>
+  )
+}
+
+/**
+ * Ordered so that whichever route is filtered out, the remaining three still
+ * make a full row. Sliced to three for the routes that match nothing — the
+ * legal pages — which would otherwise wrap a fourth card onto its own line.
+ */
+const CARDS = [
+  { id: 'home', path: '/', node: <HomeCard /> },
+  { id: 'work', path: '/experience', node: <WorkCard /> },
+  { id: 'contact', path: '/contact', node: <ContactCard /> },
+  { id: 'foundr', path: null, node: <FoundrCard /> },
+]
+
+function Display({ children }: { children: ReactNode }) {
+  return (
+    <span className="font-display text-4xl font-black uppercase leading-none text-fg md:text-6xl">
+      {children}
+    </span>
   )
 }
 
@@ -160,14 +348,13 @@ function CloserGear() {
  * The block between the last section and the footer.
  *
  * Landing straight on a footer from the end of a page is a dead end — this
- * gives the reader somewhere to go next, then closes on a single line. Cards
- * for the current route filter themselves out, so the Work page never offers
- * a card back to Work.
+ * gives the reader somewhere to go next, then closes on a statement rather
+ * than another button. The card for the current route filters itself out, so
+ * the Work page never offers a card back to Work.
  */
 export function SubFooter() {
   const location = useLocation()
-  const { goTo } = useRouteTransition()
-  const cards = DESTINATIONS.filter((d) => d.external || d.href !== location.pathname)
+  const cards = CARDS.filter((c) => c.path !== location.pathname).slice(0, 3)
 
   return (
     // The preceding section already carries its own generous bottom padding,
@@ -175,41 +362,44 @@ export function SubFooter() {
     <section className="mx-auto w-full max-w-6xl px-6 pb-14 pt-6 md:px-10 md:pt-10">
       <div className="mb-12 text-center">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">Where next</p>
-        <h2 className="mt-4 font-display text-4xl font-black uppercase leading-none text-fg md:text-6xl">
-          More to see
+        <h2 className="mt-4">
+          <Display>More to see</Display>
+          <br />
+          <span
+            className="font-accent text-4xl italic leading-none md:text-6xl"
+            style={ACCENT_GRADIENT}
+          >
+            pick a direction.
+          </span>
         </h2>
-        <p className="mt-2 font-accent text-4xl italic leading-none text-accent md:text-6xl">
-          pick a direction.
-        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3 md:gap-8">
-        {cards.map((dest) => (
-          <DestinationCard key={dest.id} dest={dest} />
+        {cards.map((c) => (
+          <div key={c.id}>{c.node}</div>
         ))}
       </div>
 
-      {/* the closer */}
-      <div className="mt-20 flex flex-col items-center justify-between gap-8 md:mt-28 md:flex-row">
-        <div className="text-center md:text-left">
-          <h2 className="font-display text-6xl font-black uppercase leading-[0.9] text-fg md:text-8xl">
-            Let’s go<span className="text-accent">.</span>
-          </h2>
-          <p className="mt-4 font-accent text-2xl italic text-fg-muted md:text-3xl">
-            Tell me what you’re building.
+      {/* The closer: a statement, not another link out. */}
+      <div className="mt-20 flex flex-col items-center gap-10 md:mt-28 md:flex-row md:justify-between md:gap-16">
+        <div className="max-w-xl text-center md:text-left">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
+            That’s the tour
           </p>
-          <button
-            type="button"
-            data-cursor-hover
-            onClick={() => goTo('/contact')}
-            className="mt-7 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-accent-fg transition-transform duration-300 hover:-translate-y-0.5"
-          >
-            Get in Touch
-            <LuArrowUpRight className="h-4 w-4" />
-          </button>
+          <h2 className="mt-5 font-display text-5xl font-black uppercase leading-[0.92] text-fg md:text-7xl">
+            Built to be
+            <br />
+            <span className="font-accent lowercase italic" style={ACCENT_GRADIENT}>
+              lived in.
+            </span>
+          </h2>
+          <p className="mt-6 text-base leading-relaxed text-fg-muted">
+            Every transition, every easing curve, every empty state on this site was tuned by hand.
+            That’s the same care I bring to the products I build.
+          </p>
         </div>
 
-        <CloserGear />
+        <Orb className="h-56 w-56 shrink-0 md:h-72 md:w-72 lg:h-80 lg:w-80" />
       </div>
     </section>
   )

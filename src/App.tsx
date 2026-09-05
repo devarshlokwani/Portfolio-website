@@ -8,6 +8,7 @@ import { Nav } from '@/components/ui/Nav'
 import { Footer } from '@/components/ui/Footer'
 import { SubFooter } from '@/components/ui/SubFooter'
 import { IntroLoader } from '@/components/intro/IntroLoader'
+import { useHoverSync } from '@/hooks/useHoverSync'
 import { HomePage } from '@/pages/HomePage'
 import { ContactPage } from '@/pages/ContactPage'
 import { ExperiencePage } from '@/pages/ExperiencePage'
@@ -15,6 +16,9 @@ import { PrivacyPolicy } from '@/pages/PrivacyPolicy'
 import { TermsAndConditions } from '@/pages/TermsAndConditions'
 
 function App() {
+  // keeps :hover accurate when the page scrolls under a still cursor
+  useHoverSync()
+
   return (
     <AppProviders>
       <RouteTransitionProvider>

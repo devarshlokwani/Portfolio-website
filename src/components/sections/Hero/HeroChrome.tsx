@@ -7,6 +7,7 @@ import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
 import { SocialIcons } from '@/components/sections/Hero/SocialIcons'
 import { BorderGlow } from '@/components/ui/BorderGlow'
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
+import { ACCENT_GRADIENT } from '@/components/ui/gradients'
 
 interface HeroChromeProps {
   /** The two-line name area — the one piece of this chrome allowed to differ between Home and the Work page. */
@@ -64,14 +65,14 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroCh
           I design and build products that
         </p>
         <p className="font-accent text-4xl italic leading-[1.05] text-fg md:text-6xl">
-          ship, and actually work.
+          ship, and actually <span style={ACCENT_GRADIENT}>work.</span>
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
           <CtaLaunchLink
             href="#projects"
             label="View Projects"
             onNavigate={() => goTo('/', { hash: '#projects' })}
-            className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5"
+            className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5"
           />
           <BorderGlow className="hover:!border-transparent">
             <CtaLaunchLink
@@ -86,7 +87,7 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroCh
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-6 bottom-10 hidden items-center justify-between md:flex md:inset-x-10">
+      <div className="pointer-events-none absolute inset-x-6 bottom-10 hidden items-center justify-between md:flex md:inset-x-10 xl:inset-x-20 2xl:inset-x-40">
         <div className="flex items-center gap-2.5">
           <TbMapPin className="h-5 w-5 text-accent" />
           <div>

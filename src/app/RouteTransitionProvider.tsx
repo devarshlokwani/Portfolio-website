@@ -32,6 +32,13 @@ export function useRouteTransition() {
 // (moving toward -x), a larger positive shift at the bottom means the
 // bottom of the leading edge sits further right (less progressed) than the
 // top at any instant, so the top-right corner is the first thing on screen.
+/** Which launch mark each destination gets mid-wipe; anything absent falls
+ *  back to 'home'. */
+const ROUTE_DIRECTIONS: Record<string, TransitionDirection> = {
+  '/experience': 'work',
+  '/contact': 'contact',
+}
+
 const SKEW_DEG = 14
 // The panel is oversized relative to the clipping wrapper (which is exactly
 // viewport-sized) so the skewed corners still fully cover every edge at
@@ -146,11 +153,10 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      // Only the Work route gets its own icon — everything else (home, the
-      // hash-anchored sections, the legal pages) reads as "home" rather
-      // than trying to invent a third icon for pages that aren't really
-      // work content.
-      const direction: TransitionDirection = path === '/experience' ? 'work' : 'home'
+      // Each real destination has its own mark; everything else — home, the
+      // hash-anchored sections, the legal pages — falls back to the house
+      // rather than inventing an icon for a page that isn't its own place.
+      const direction: TransitionDirection = ROUTE_DIRECTIONS[path] ?? 'home'
       runGlobalWipe(direction, () => finishNavigate(path, opts?.hash))
     },
     [location.pathname, reducedMotion, finishNavigate, runGlobalWipe, lenisRef],

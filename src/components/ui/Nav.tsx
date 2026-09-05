@@ -20,6 +20,18 @@ const LINKS: LinkConfig[] = [
   { kind: 'route', to: '/experience', label: 'Work' },
 ]
 
+/**
+ * The nav is split into two pills: places on the home page, and separate
+ * routes. Mixed into one row there was nothing to tell a reader that three of
+ * these scroll and two of them leave the page.
+ *
+ * Each entry carries its position in `LINKS` so the scroll-spy and hover
+ * state, which are both index-based, keep working across the split.
+ */
+const NAV_GROUPS = (['hash', 'route'] as const).map((kind) =>
+  LINKS.map((link, index) => ({ link, index })).filter((entry) => entry.link.kind === kind),
+)
+
 export function Nav() {
   const lenisRef = useLenisInstance()
   const { goTo } = useRouteTransition()
@@ -166,21 +178,28 @@ export function Nav() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-end gap-4 px-6 py-5 md:px-10 md:py-6">
+    <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-end gap-4 px-6 py-5 md:px-10 md:py-6 xl:px-20 xl:py-10 2xl:px-40">
       {/* DL lives in the separate fixed CornerMark component on the far
           left; this nav is centered independently of that, and the theme
           toggle + hamburger stay in normal flow pushed to the right. */}
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex">
-        {LINKS.map((link, i) => (
-          <NavLink
-            key={link.label}
-            href={link.kind === 'hash' ? link.href : link.to}
-            label={link.label}
-            filled={activeIndex === i || hoverIndex === i}
-            onHoverStart={() => setHoverIndex(i)}
-            onHoverEnd={() => setHoverIndex((prev) => (prev === i ? null : prev))}
-            onNavigate={() => navigateTo(i, link)}
-          />
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2.5 md:flex">
+        {NAV_GROUPS.map((group, groupIndex) => (
+          <div
+            key={groupIndex}
+            className="flex items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md"
+          >
+            {group.map(({ link, index }) => (
+              <NavLink
+                key={link.label}
+                href={link.kind === 'hash' ? link.href : link.to}
+                label={link.label}
+                filled={activeIndex === index || hoverIndex === index}
+                onHoverStart={() => setHoverIndex(index)}
+                onHoverEnd={() => setHoverIndex((prev) => (prev === index ? null : prev))}
+                onNavigate={() => navigateTo(index, link)}
+              />
+            ))}
+          </div>
         ))}
       </nav>
 
@@ -194,11 +213,11 @@ export function Nav() {
         className="flex h-8 w-8 flex-col items-center justify-center gap-1.5 md:hidden"
       >
         <span
-          className="h-px w-5 bg-fg transition-transform duration-300"
+          className="h-px w-5 bg-fg transition-[transform,translate,rotate,scale] duration-300"
           style={{ transform: open ? 'translateY(3.5px) rotate(45deg)' : 'none' }}
         />
         <span
-          className="h-px w-5 bg-fg transition-transform duration-300"
+          className="h-px w-5 bg-fg transition-[transform,translate,rotate,scale] duration-300"
           style={{ transform: open ? 'translateY(-3.5px) rotate(-45deg)' : 'none' }}
         />
       </button>

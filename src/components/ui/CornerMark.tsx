@@ -30,7 +30,9 @@ export function CornerMark() {
         e.preventDefault()
         goTo('/', { hash: '#hero' })
       }}
-      className="fixed left-5 top-5 z-50 flex h-8 items-center overflow-hidden font-signature text-xl tracking-normal text-fg md:left-8 md:top-8"
+      // insets grow on wide screens so the mark tracks the page's margins
+      // instead of stranding itself in the far corner
+      className="fixed left-5 top-5 z-50 flex h-8 items-center overflow-hidden font-signature text-xl tracking-normal text-fg md:left-8 md:top-8 xl:left-20 xl:top-10 2xl:left-40"
       aria-label="Devarsh Lokwani — back to top"
     >
       <span className="relative block h-full w-[11.5rem]">

@@ -47,7 +47,7 @@ export function Contact() {
   }
 
   return (
-    <Section id="contact" label="05 — Contact">
+    <Section id="contact" label="Contact">
       <div className="grid gap-12 md:grid-cols-2 md:gap-16">
         <div>
           <h2 className="font-display text-3xl font-semibold text-fg md:text-5xl">
@@ -103,7 +103,7 @@ export function Contact() {
               icon={LuMail}
               disabled={status === 'submitting'}
               onLaunch={() => formRef.current?.requestSubmit()}
-              className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+              className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5 disabled:opacity-50"
             />
           </div>
         </form>

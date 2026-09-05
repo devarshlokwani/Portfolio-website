@@ -51,14 +51,14 @@ export function FoundrScreens() {
       <div className="group relative h-full w-full">
         {/* mobile dashboard — behind, left, resting 12% below the crop line */}
         <div
-          className="absolute bottom-0 left-[4%] aspect-[356/701] w-[42%] translate-y-[12%] transition-transform duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[-4deg]"
+          className="absolute bottom-0 left-[4%] aspect-[356/701] w-[42%] translate-y-[12%] transition-[transform,translate,rotate,scale] duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[-4deg]"
           style={{ transitionTimingFunction: BOUNCE_EASE }}
         >
           <img src={foundrPhone1} alt="Foundr dashboard on mobile" className="h-full w-full object-contain drop-shadow-xl" />
         </div>
         {/* mobile account view — behind, right, resting 12% below the crop line */}
         <div
-          className="absolute bottom-0 right-[4%] aspect-[364/685] w-[42%] translate-y-[12%] transition-transform delay-75 duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[4deg]"
+          className="absolute bottom-0 right-[4%] aspect-[364/685] w-[42%] translate-y-[12%] transition-[transform,translate,rotate,scale] delay-75 duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[4deg]"
           style={{ transitionTimingFunction: BOUNCE_EASE }}
         >
           <img
@@ -69,7 +69,7 @@ export function FoundrScreens() {
         </div>
         {/* laptop / landing page — in front, centered, resting 8% below the crop line */}
         <div
-          className="absolute bottom-0 left-1/2 aspect-[676/369] w-[92%] -translate-x-1/2 translate-y-[8%] transition-transform delay-150 duration-500 group-hover:-translate-x-1/2 group-hover:-translate-y-4 group-hover:scale-110"
+          className="absolute bottom-0 left-1/2 aspect-[676/369] w-[92%] -translate-x-1/2 translate-y-[8%] transition-[transform,translate,rotate,scale] delay-150 duration-500 group-hover:-translate-x-1/2 group-hover:-translate-y-4 group-hover:scale-110"
           style={{ transitionTimingFunction: BOUNCE_EASE }}
         >
           <img src={foundrMac} alt="Foundr landing page on desktop" className="h-full w-full object-contain drop-shadow-2xl" />

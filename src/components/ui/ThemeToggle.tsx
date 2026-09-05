@@ -69,7 +69,7 @@ export function ThemeToggle() {
       className="relative flex h-8 w-14 items-center rounded-full border border-border bg-surface px-1 transition-colors"
     >
       <span
-        className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-accent-fg transition-transform duration-300 ease-out"
+        className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-accent-fg transition-[transform,translate,rotate,scale] duration-300 ease-out"
         style={{ transform: isDark ? 'translateX(0)' : 'translateX(1.5rem)' }}
       >
         {isDark ? <MoonIcon /> : <SunIcon />}

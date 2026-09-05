@@ -96,7 +96,7 @@ export function WallEntryForm() {
           icon={LuPenLine}
           disabled={status === 'submitting'}
           onLaunch={() => formRef.current?.requestSubmit()}
-          className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+          className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5 disabled:opacity-50"
         />
       </div>
     </form>

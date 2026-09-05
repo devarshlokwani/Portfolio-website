@@ -1,15 +1,29 @@
 import { forwardRef, useImperativeHandle, useRef, type RefObject } from 'react'
-import { TbBriefcase2, TbHome2 } from 'react-icons/tb'
+import { TbBriefcase2, TbHome2, TbMail } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 
 import { gsap } from '@/lib/gsap'
 
-export type TransitionDirection = 'work' | 'home'
+export type TransitionDirection = 'work' | 'contact' | 'home'
+
+/**
+ * One icon per destination. `home` is also the fallback for anything without
+ * its own mark — the legal pages.
+ *
+ * Contact gets an envelope rather than a handset: the page is a message form
+ * and an email address, and a phone icon would promise a channel that isn't
+ * actually on offer. It also matches the mail icon the hero's "Get in Touch"
+ * button already uses.
+ */
+const ICONS: Record<TransitionDirection, IconType> = {
+  work: TbBriefcase2,
+  contact: TbMail,
+  home: TbHome2,
+}
 
 export interface TransitionLaunchIconHandle {
   /** Starts the pop-and-launch burst for whichever icon matches the
-   *  destination — briefcase for the Work route, house for everything
-   *  else (home, and the legal pages, which don't get their own icon). */
+   *  destination. */
   show: (direction: TransitionDirection) => void
   hide: () => void
 }
@@ -137,32 +151,35 @@ function Burst({
  * The content-aware launch mark shown centered in the viewport
  * mid-transition — see RouteTransitionProvider, which owns exactly when it
  * shows/hides relative to the sweeping wall's own position, and picks the
- * direction from the destination route. Two bursts (briefcase, house) sit
- * stacked in the same spot, each independently reset/animated by its own
- * useBurst() instance — show() plays only the one matching the current
- * navigation, so there's never a stale mid-flight animation on the other
- * one bleeding into the next transition.
+ * direction from the destination route.
+ *
+ * One burst per destination sits stacked in the same spot, each driven by its
+ * own useBurst() instance. show() plays the matching one and explicitly
+ * resets every other, so a burst left mid-flight by an interrupted navigation
+ * can never bleed into the next transition.
  */
 export const TransitionLaunchIcon = forwardRef<TransitionLaunchIconHandle>(function TransitionLaunchIcon(_props, ref) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const work = useBurst()
-  const home = useBurst()
+
+  // Called unconditionally and in a fixed order — one per key of ICONS.
+  const bursts: Record<TransitionDirection, ReturnType<typeof useBurst>> = {
+    work: useBurst(),
+    contact: useBurst(),
+    home: useBurst(),
+  }
+  const directions = Object.keys(ICONS) as TransitionDirection[]
 
   useImperativeHandle(ref, () => ({
     show: (direction) => {
       if (rootRef.current) gsap.set(rootRef.current, { visibility: 'visible' })
-      if (direction === 'work') {
-        home.reset()
-        work.play()
-      } else {
-        work.reset()
-        home.play()
-      }
+      directions.forEach((key) => {
+        if (key === direction) bursts[key].play()
+        else bursts[key].reset()
+      })
     },
     hide: () => {
       if (rootRef.current) gsap.set(rootRef.current, { visibility: 'hidden' })
-      work.reset()
-      home.reset()
+      directions.forEach((key) => bursts[key].reset())
     },
   }))
 
@@ -174,8 +191,15 @@ export const TransitionLaunchIcon = forwardRef<TransitionLaunchIconHandle>(funct
       className="pointer-events-none fixed inset-0 z-[301] flex items-center justify-center"
     >
       <div className="relative h-20 w-20 md:h-28 md:w-28">
-        <Burst Icon={TbBriefcase2} groupRef={work.groupRef} iconRef={work.iconRef} lineRefs={work.lineRefs} />
-        <Burst Icon={TbHome2} groupRef={home.groupRef} iconRef={home.iconRef} lineRefs={home.lineRefs} />
+        {directions.map((key) => (
+          <Burst
+            key={key}
+            Icon={ICONS[key]}
+            groupRef={bursts[key].groupRef}
+            iconRef={bursts[key].iconRef}
+            lineRefs={bursts[key].lineRefs}
+          />
+        ))}
       </div>
     </div>
   )

@@ -50,7 +50,7 @@ export function ProjectRow({ project, screens, defaultOpen = false }: ProjectRow
         className="flex w-full items-center gap-4 py-6 text-left"
       >
         <span
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border text-fg transition-transform duration-300 ${open ? 'rotate-45' : ''}`}
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border text-fg transition-[transform,translate,rotate,scale] duration-300 ${open ? 'rotate-45' : ''}`}
         >
           <LuArrowUpRight className="h-4 w-4" />
         </span>
@@ -101,7 +101,7 @@ export function ProjectRow({ project, screens, defaultOpen = false }: ProjectRow
                       href={project.links.live}
                       label="View"
                       external
-                      className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg transition-transform hover:-translate-y-0.5"
+                      className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5"
                     />
                   )}
                 </div>
