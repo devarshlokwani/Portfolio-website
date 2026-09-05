@@ -5,11 +5,11 @@ import { useLocation } from 'react-router-dom'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
 import { ACCENT_GRADIENT, GREEN_GRADIENT } from '@/components/ui/gradients'
-import { Orb } from '@/components/ui/Orb'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap } from '@/lib/gsap'
 import foundrLogo from '@/assets/foundr-logo.png'
 import foundrMac from '@/assets/foundr-mac.png'
+import portrait from '@/assets/portrait.jpg'
 
 /**
  * Near-black, not the lifted `surface` these started on. The cards should sit
@@ -345,6 +345,35 @@ function Display({ children }: { children: ReactNode }) {
 }
 
 /**
+ * The closer's portrait: the drawing from the hero, at the end of the page
+ * where the writing turns first-person.
+ *
+ * The glow behind it is a plain blurred disc rather than anything animated.
+ * A closing statement wants the eye to settle, and this sits directly beside
+ * the largest type on the page, so movement here would pull against it.
+ */
+function ClosingPortrait() {
+  return (
+    <div className="relative shrink-0">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 scale-125 rounded-full opacity-70 blur-3xl"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--color-accent) 55%, transparent), transparent 70%)',
+        }}
+      />
+      <img
+        src={portrait}
+        alt="Devarsh Lokwani"
+        loading="lazy"
+        className="h-56 w-56 rounded-full border border-border object-cover md:h-72 md:w-72 lg:h-80 lg:w-80"
+      />
+    </div>
+  )
+}
+
+/**
  * The block between the last section and the footer.
  *
  * Landing straight on a footer from the end of a page is a dead end, this
@@ -399,7 +428,7 @@ export function SubFooter() {
           </p>
         </div>
 
-        <Orb className="h-56 w-56 shrink-0 md:h-72 md:w-72 lg:h-80 lg:w-80" />
+        <ClosingPortrait />
       </div>
     </section>
   )

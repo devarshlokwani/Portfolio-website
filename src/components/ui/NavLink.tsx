@@ -11,6 +11,12 @@ interface NavLinkProps {
   /** Nav owns the actual scroll (and suppressing scroll-spy flicker while it
    *  runs) since it also owns activeIndex. This just tells it to go. */
   onNavigate: () => void
+  /**
+   * `outlined` gives the link its own border and full-strength label, so the
+   * route links read as buttons sitting beside the page links rather than as
+   * more of the same list. The fill animation is identical either way.
+   */
+  variant?: 'plain' | 'outlined'
 }
 
 // A circle anchored at the left-center, growing from a point to comfortably
@@ -40,7 +46,16 @@ const MIN_HOLD_MS = 110
  * and a separately-hovered link can both be filled at once. Each link owns
  * its own animation.
  */
-export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavigate }: NavLinkProps) {
+export function NavLink({
+  href,
+  label,
+  filled,
+  onHoverStart,
+  onHoverEnd,
+  onNavigate,
+  variant = 'plain',
+}: NavLinkProps) {
+  const outlined = variant === 'outlined'
   const fillRef = useRef<HTMLSpanElement>(null)
   const fillTextRef = useRef<HTMLSpanElement>(null)
   const defaultTextRef = useRef<HTMLSpanElement>(null)
@@ -230,7 +245,9 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       onClick={onClick}
-      className="relative isolate block overflow-hidden rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wide"
+      className={`relative isolate block overflow-hidden rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wide ${
+        outlined ? 'border border-border' : ''
+      }`}
     >
       <span aria-hidden="true" className="invisible block">
         {label}
@@ -238,7 +255,9 @@ export function NavLink({ href, label, filled, onHoverStart, onHoverEnd, onNavig
       <span
         ref={defaultTextRef}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 flex items-center justify-center text-fg-muted"
+        className={`pointer-events-none absolute inset-0 flex items-center justify-center ${
+          outlined ? 'text-fg' : 'text-fg-muted'
+        }`}
       >
         {label}
       </span>

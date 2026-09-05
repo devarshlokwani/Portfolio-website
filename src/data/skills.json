@@ -51,12 +51,12 @@
     {
       "name": "Data & AI",
       "items": [
-        { "id": "data-analysis", "label": "Data Analysis", "set": "tb", "icon": "TbChartHistogram", "color": "#FF5A3C" },
-        { "id": "ml", "label": "Machine Learning", "set": "tb", "icon": "TbRobot", "color": "#FF5A3C" },
-        { "id": "genai", "label": "GenAI & Prompting", "set": "si", "icon": "SiAnthropic", "color": "#D97757" },
         { "id": "pandas", "label": "Pandas", "set": "si", "icon": "SiPandas", "color": "#150458" },
         { "id": "numpy", "label": "NumPy", "set": "si", "icon": "SiNumpy", "color": "#4DABCF" },
-        { "id": "jupyter", "label": "Jupyter", "set": "si", "icon": "SiJupyter", "color": "#F37626" }
+        { "id": "jupyter", "label": "Jupyter", "set": "si", "icon": "SiJupyter", "color": "#F37626" },
+        { "id": "langchain", "label": "LangChain", "set": "si", "icon": "SiLangchain", "color": "var(--color-fg)" },
+        { "id": "claude", "label": "Claude", "set": "si", "icon": "SiClaude", "color": "#D97757" },
+        { "id": "higgsfield", "label": "Higgsfield", "set": "tb", "icon": "TbSparkles", "color": "var(--color-fg)" }
       ]
     }
   ]

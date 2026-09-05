@@ -21,15 +21,18 @@ const LINKS: LinkConfig[] = [
 ]
 
 /**
- * The nav is split into two pills: places on the home page, and separate
- * routes. Mixed into one row there was nothing to tell a reader that three of
- * these scroll and two of them leave the page.
+ * One pill, divided: places on the home page to the left of the rule, routes
+ * that leave it to the right. Mixed into a single undivided row there was
+ * nothing to tell a reader that three of these scroll and two navigate away.
  *
  * Each entry carries its position in `LINKS` so the scroll-spy and hover
- * state, which are both index-based, keep working across the split.
+ * state, which are both index-based, keep working across the division.
  */
-const NAV_GROUPS = (['hash', 'route'] as const).map((kind) =>
-  LINKS.map((link, index) => ({ link, index })).filter((entry) => entry.link.kind === kind),
+const PAGE_LINKS = LINKS.map((link, index) => ({ link, index })).filter(
+  (entry) => entry.link.kind === 'hash',
+)
+const ROUTE_LINKS = LINKS.map((link, index) => ({ link, index })).filter(
+  (entry) => entry.link.kind === 'route',
 )
 
 export function Nav() {
@@ -182,24 +185,32 @@ export function Nav() {
       {/* DL lives in the separate fixed CornerMark component on the far
           left; this nav is centered independently of that, and the theme
           toggle + hamburger stay in normal flow pushed to the right. */}
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2.5 md:flex">
-        {NAV_GROUPS.map((group, groupIndex) => (
-          <div
-            key={groupIndex}
-            className="flex items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md"
-          >
-            {group.map(({ link, index }) => (
-              <NavLink
-                key={link.label}
-                href={link.kind === 'hash' ? link.href : link.to}
-                label={link.label}
-                filled={activeIndex === index || hoverIndex === index}
-                onHoverStart={() => setHoverIndex(index)}
-                onHoverEnd={() => setHoverIndex((prev) => (prev === index ? null : prev))}
-                onNavigate={() => navigateTo(index, link)}
-              />
-            ))}
-          </div>
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex">
+        {PAGE_LINKS.map(({ link, index }) => (
+          <NavLink
+            key={link.label}
+            href={link.kind === 'hash' ? link.href : link.to}
+            label={link.label}
+            filled={activeIndex === index || hoverIndex === index}
+            onHoverStart={() => setHoverIndex(index)}
+            onHoverEnd={() => setHoverIndex((prev) => (prev === index ? null : prev))}
+            onNavigate={() => navigateTo(index, link)}
+          />
+        ))}
+
+        <span aria-hidden="true" className="mx-2 h-5 w-px shrink-0 bg-border" />
+
+        {ROUTE_LINKS.map(({ link, index }) => (
+          <NavLink
+            key={link.label}
+            href={link.kind === 'hash' ? link.href : link.to}
+            label={link.label}
+            variant="outlined"
+            filled={activeIndex === index || hoverIndex === index}
+            onHoverStart={() => setHoverIndex(index)}
+            onHoverEnd={() => setHoverIndex((prev) => (prev === index ? null : prev))}
+            onNavigate={() => navigateTo(index, link)}
+          />
         ))}
       </nav>
 

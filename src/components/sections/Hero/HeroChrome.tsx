@@ -1,6 +1,5 @@
 import type { ReactNode, Ref } from 'react'
-import { LuMail } from 'react-icons/lu'
-import { TbBriefcase2, TbMapPin } from 'react-icons/tb'
+import { TbBriefcase2, TbMapPin, TbStack2 } from 'react-icons/tb'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
 import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
@@ -21,6 +20,13 @@ interface HeroChromeProps {
   nameRef?: Ref<HTMLDivElement>
   metaRef?: Ref<HTMLDivElement>
   animateIn?: boolean
+  /**
+   * Replaces the default CTA pair. The Contact route swaps them out, since
+   * "View Projects" has no projects to point at from there. Anything passed
+   * here should keep the same two shapes (accent fill, then a BorderGlow
+   * outline) so the hero reads identically across routes.
+   */
+  actions?: ReactNode
 }
 
 /**
@@ -31,7 +37,7 @@ interface HeroChromeProps {
  * route swap: only the name changes, nothing else moves, resizes, or pops
  * in/out.
  */
-export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroChromeProps) {
+export function HeroChrome({ name, nameRef, metaRef, animateIn = false, actions }: HeroChromeProps) {
   const { goTo } = useRouteTransition()
 
   return (
@@ -68,22 +74,31 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false }: HeroCh
           ship, and actually <span style={ACCENT_GRADIENT}>work.</span>
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-          <CtaLaunchLink
-            href="#projects"
-            label="View Projects"
-            onNavigate={() => goTo('/', { hash: '#projects' })}
-            className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5"
-          />
-          <BorderGlow className="hover:!border-transparent">
-            <CtaLaunchLink
-              href="/contact"
-              label="Get in Touch"
-              icon={LuMail}
-              tone="fg"
-              onNavigate={() => goTo('/contact')}
-              className="rounded-full px-6 py-3 text-sm font-medium text-fg"
-            />
-          </BorderGlow>
+          {actions ?? (
+            <>
+              <CtaLaunchLink
+                href="#projects"
+                label="View Projects"
+                onNavigate={() => goTo('/', { hash: '#projects' })}
+                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5"
+              />
+              {/* Skills, not "Get in Touch". Contact is its own route with its
+                  own hero and its own pair of buttons now, so pointing at it
+                  from here sent people to a page whose first act was to ask
+                  the same question again. This pair stays on the page it
+                  belongs to: the work, then what it is built out of. */}
+              <BorderGlow className="hover:!border-transparent">
+                <CtaLaunchLink
+                  href="/#skills"
+                  label="Skills"
+                  icon={TbStack2}
+                  tone="fg"
+                  onNavigate={() => goTo('/', { hash: '#skills' })}
+                  className="rounded-full px-6 py-3 text-sm font-medium text-fg"
+                />
+              </BorderGlow>
+            </>
+          )}
         </div>
       </div>
 

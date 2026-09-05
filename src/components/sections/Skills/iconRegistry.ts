@@ -1,6 +1,6 @@
 import { FaAws } from 'react-icons/fa6'
 import {
-  SiAnthropic,
+  SiClaude,
   SiCss,
   SiDjango,
   SiExpress,
@@ -11,6 +11,7 @@ import {
   SiHtml5,
   SiJavascript,
   SiJupyter,
+  SiLangchain,
   SiMongodb,
   SiMysql,
   SiNodedotjs,
@@ -25,7 +26,7 @@ import {
   SiVercel,
   SiVite,
 } from 'react-icons/si'
-import { TbChartHistogram, TbRobot, TbSql } from 'react-icons/tb'
+import { TbSparkles, TbSql } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 
 // Explicit named imports (rather than `import *`) so bundlers can tree-shake
@@ -53,11 +54,11 @@ const ICONS: Record<string, IconType> = {
   SiRender,
   SiVite,
   SiFigma,
-  SiAnthropic,
+  SiClaude,
   SiJupyter,
+  SiLangchain,
   TbSql,
-  TbChartHistogram,
-  TbRobot,
+  TbSparkles,
   FaAws,
 }
 
