@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { SURFACE_SHEEN } from '@/components/ui/gradients'
 import { gsap } from '@/lib/gsap'
@@ -71,6 +71,24 @@ export function NavLink({
   const lastStartedAt = useRef(0)
   const pendingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  /**
+   * Puts back the two things only the click flourish ever touches.
+   *
+   * The fill's background colour and the on-fill label's vertical roll are
+   * animated by that timeline alone, and restored by its own last two steps.
+   * The hover animation below never sets either, so when it kills the
+   * flourish mid-flight (a click, then the pointer leaving before the roll
+   * finishes) GSAP froze both wherever they had got to and nothing ever put
+   * them back: the pill kept an inline accent background for good, and the
+   * label kept a vertical offset that was invisible only until the next fill
+   * set its opacity back to 1, at which point the text appeared outside the
+   * pill it belongs to.
+   */
+  const clearFlourish = useCallback(() => {
+    if (fillRef.current) gsap.set(fillRef.current, { clearProps: 'backgroundColor' })
+    if (fillTextRef.current) gsap.set(fillTextRef.current, { yPercent: 0 })
+  }, [])
+
   useEffect(() => {
     const fill = fillRef.current
     const fillText = fillTextRef.current
@@ -83,6 +101,10 @@ export function NavLink({
       appliedFilled.current = isFilled
       lastStartedAt.current = performance.now()
       timelineRef.current?.kill()
+      // Whatever the killed timeline was mid-way through, this animation is
+      // the one in charge now, and it only knows how to drive the fill and
+      // the horizontal slide.
+      clearFlourish()
       const tl = gsap.timeline()
       timelineRef.current = tl
 
@@ -107,6 +129,7 @@ export function NavLink({
     }
 
     if (!mounted.current) {
+      clearFlourish()
       gsap.set(fill, { clipPath: filled ? REVEALED_CLIP : HIDDEN_CLIP })
       gsap.set(fillText, { xPercent: filled ? 0 : -130, opacity: filled ? 1 : 0 })
       gsap.set(defaultText, { xPercent: filled ? 130 : 0, opacity: filled ? 0 : 1 })
@@ -140,7 +163,7 @@ export function NavLink({
         }
       }, MIN_HOLD_MS - elapsed)
     }
-  }, [filled])
+  }, [filled, clearFlourish])
 
   useEffect(
     () => () => {
@@ -163,7 +186,9 @@ export function NavLink({
     const defaultText = defaultTextRef.current
     if (fill && fillText && defaultText) {
       timelineRef.current?.kill()
-      const tl = gsap.timeline()
+      // Killed before it finishes, its last two steps never run, so it puts
+      // its own two properties back on the way out instead.
+      const tl = gsap.timeline({ onInterrupt: clearFlourish })
       timelineRef.current = tl
 
       // GSAP's color interpolation can't parse a raw `var(--x)` reference

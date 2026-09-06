@@ -65,8 +65,20 @@ export function Nav() {
   // just whichever one points at the page you are on, which is a fact about
   // the URL and needs no state at all.
   const routeIndex = LINKS.findIndex((l) => l.kind === 'route' && l.to === location.pathname)
+
+  /**
+   * Nothing is lit from here while a click is still on its way.
+   *
+   * A route click records its reading against the page it is heading to, so
+   * between the click and the location catching up the reading and the URL
+   * disagree. Falling back to the URL in that gap kept the link for the page
+   * being *left* lit, and since the wipe does not cover the nav for its first
+   * frames, both links were visibly on at once. The URL is only worth
+   * consulting when the two agree; while they disagree the clicked link
+   * already lights itself from its own click flourish.
+   */
   const activeIndex =
-    (spy.path === location.pathname ? spy.index : null) ?? (routeIndex === -1 ? null : routeIndex)
+    spy.path === location.pathname ? spy.index ?? (routeIndex === -1 ? null : routeIndex) : null
 
   /**
    * Records a reading against the page it was taken on. Memoised on the
