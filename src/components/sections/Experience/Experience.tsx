@@ -1,5 +1,6 @@
 import { ExperienceDetail } from '@/components/sections/Experience/ExperienceDetail'
 import { FlightPath } from '@/components/sections/Experience/FlightPath'
+import { AccentedTitle } from '@/components/ui/AccentedTitle'
 import { Section } from '@/components/ui/Section'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import experience from '@/data/experience.json'
@@ -7,7 +8,9 @@ import experience from '@/data/experience.json'
 const HEADING = (
   <>
     <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-fg-subtle">My Work</p>
-    <h2 className="mb-14 font-display text-3xl font-semibold text-fg md:text-5xl">Where I've worked</h2>
+    <h2 className="mb-10 font-display text-3xl font-semibold text-fg md:text-5xl">
+      <AccentedTitle title="Where I've worked" />
+    </h2>
   </>
 )
 
@@ -31,7 +34,11 @@ export function Experience() {
   )
 
   return (
-    <Section id="experience">
+    // Tighter at the top than the standard section rhythm: the scroll cue
+    // now sits immediately above this, and a full section's padding between
+    // the two left a dead screen between being told to scroll and seeing
+    // the thing that responds to it.
+    <Section id="experience" className="!pt-0 md:!pt-0">
       <div className="hidden md:block">
         {reducedMotion ? (
           <>

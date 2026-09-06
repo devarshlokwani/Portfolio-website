@@ -33,6 +33,10 @@ export function ExperienceHero() {
 
   return (
     <HeroChrome
+      // No buttons: "View Projects" and "Skills" both point away from the
+      // one thing this page exists to show, and the reader is already here.
+      // The scroll cue below the hero does the work they were doing.
+      actions={null}
       name={
         <>
           {/* Hero's name block is two lines tall (DEVARSH/LOKWANI); this one

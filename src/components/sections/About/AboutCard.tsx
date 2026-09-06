@@ -1,12 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { IconType } from 'react-icons'
 
-import { CornerCog } from '@/components/ui/CornerCog'
-
 interface AboutCardProps {
   icon: IconType
-  /** which edge the half-hidden gear hangs off, if this card gets one */
-  cog?: 'top' | 'left' | 'right'
   /** small tracked caps above the title, what this card is about */
   eyebrow: string
   /** display-face first line */
@@ -31,7 +27,6 @@ interface AboutCardProps {
  */
 export function AboutCard({
   icon: Icon,
-  cog,
   eyebrow,
   title,
   subtitle,
@@ -44,12 +39,12 @@ export function AboutCard({
   const titleSize = size === 'lg' ? 'text-3xl md:text-4xl' : 'text-2xl'
 
   return (
-    // The cog is a sibling painted *before* the card, so the card's opaque
-    // surface covers its buried half. That makes this wrapper the layout box
-    // (the grid item that stretches), and the card itself has to be told to
-    // fill it.
+    // The gears live in the gaps between the cards now, painted before this
+    // one so its opaque surface covers whatever falls behind it. That makes
+    // this wrapper the layout box (the grid item that stretches), and the
+    // card itself has to be told to fill it. `relative` on both is what
+    // keeps the card painting above the gear layer rather than under it.
     <div className="relative h-full">
-      {cog && <CornerCog placement={cog} />}
       <div style={style} className={`relative flex h-full flex-col gap-6 ${className}`}>
         <div className="flex items-center gap-3">
           <span

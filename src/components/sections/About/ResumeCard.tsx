@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { LuDownload, LuMail } from 'react-icons/lu'
 
-import { GearBadge } from '@/components/sections/About/GearBadge'
 import { BorderGlow } from '@/components/ui/BorderGlow'
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
+import { GearBadge } from '@/components/ui/GearBadge'
 import { ACCENT_GRADIENT } from '@/components/ui/gradients'
 import resumeUrl from '@/assets/resume/Devarsh_Lokwani_Resume.pdf'
 

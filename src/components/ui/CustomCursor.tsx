@@ -88,18 +88,48 @@ export function CustomCursor() {
      * True while something outside the page owns the pointer, and the native
      * arrow is showing because of it.
      *
-     * Two things do this. A cross-origin iframe: `cursor: none` doesn't
+     * Three things do this. A cross-origin iframe: `cursor: none` doesn't
      * reach inside one and no pointermove reaches back out, so the native
-     * arrow appears in there while ours freezes at the boundary. And the
+     * arrow appears in there while ours freezes at the boundary. The
      * right-click menu, which is drawn by the operating system over the
      * page: the browser puts the real cursor back for it without telling
      * the page anything, so ours was left sitting frozen underneath it,
-     * which is what made two cursors visible at once.
+     * which is what made two cursors visible at once. And dragging a
+     * selection, which starts a real drag: the browser takes the pointer to
+     * draw its own drag cursor and the drag image, stops sending pointer
+     * events until the drop, and ignores `cursor: none` for the duration.
      *
-     * Both are the same situation, so both are handled the same way: hand
-     * the cursor over, and take it back on the next real movement.
+     * All three are the same situation, so all three are handled the same
+     * way: hand the cursor over, and take it back on the next real
+     * movement.
      */
     let handedOff = false
+    /**
+     * Where the pointer was standing when the handover happened.
+     *
+     * `pointerover` is not proof the pointer has come back. Right-clicking
+     * fires one the moment the menu opens, from the selection under a
+     * pointer that has not moved a pixel, and taking the cursor back on it
+     * put ours straight back under the open menu next to the real one. So
+     * the crossing only counts if it carries a position that is not the one
+     * we handed over at, which a genuine return from a frame always does.
+     */
+    let heldAtX = 0
+    let heldAtY = 0
+    /**
+     * True while the page is carrying a live text selection.
+     *
+     * Unlike the others this one is not undone by movement, so it needs its
+     * own latch rather than riding on `handedOff` alone. Highlighting puts
+     * the browser's own furniture on screen: the I-beam while the drag is
+     * running, and after it the selection mini menu, which is browser chrome
+     * rather than page content and so never sees `cursor: none`. Moving onto
+     * that menu showed the real cursor on it while ours sat on the page
+     * beside it. For as long as the selection stands, the browser's cursor
+     * is the right one to be showing, and ours is taken back when the
+     * selection goes.
+     */
+    let selectionHeld = false
 
     const enable = () => {
       if (mouseActive) return
@@ -130,12 +160,17 @@ export function CustomCursor() {
     const suspend = () => {
       if (handedOff) return
       handedOff = true
+      heldAtX = lastX
+      heldAtY = lastY
       gsap.killTweensOf(root)
       gsap.set(root, { opacity: 0 })
       document.documentElement.classList.remove('custom-cursor-active')
     }
 
     const resume = (x: number, y: number) => {
+      // A standing selection outranks every other reason to come back: it is
+      // the one handover that movement must not undo.
+      if (selectionHeld) return
       // Both checks before anything is cleared. Clearing the flag and then
       // bailing on the second condition threw away the only record that the
       // pointer was ever in a frame, so the next resume had nothing to act
@@ -187,10 +222,37 @@ export function CustomCursor() {
     // cursor on top of it.
     const onContextMenu = () => suspend()
 
+    // Highlighting text, and everything the browser puts on screen for as
+    // long as the highlight stands. Fires steadily while the drag runs, so
+    // it only acts on the change.
+    const onSelectionChange = () => {
+      const held = Boolean(document.getSelection()?.isCollapsed === false)
+      if (held === selectionHeld) return
+      selectionHeld = held
+      if (held) suspend()
+      // The selection is usually cleared by a click, so the last position a
+      // move reported is where the pointer actually is. Anywhere it is not,
+      // the next move corrects it in a frame.
+      else resume(lastX, lastY)
+    }
+
+    // Picking up a selection and dragging it. `cursor` is not honoured
+    // during a drag, so the native arrow is on screen whatever we do, and
+    // pointermove stops until the drop, so ours would sit frozen wherever
+    // the drag began. Handing over is the only way there is one cursor.
+    const onDragStart = () => suspend()
+    // `dragend` fires on the source whether the drop landed on the page or
+    // outside it, and carries a real position, so the arrow comes back where
+    // the pointer actually is rather than waiting for the next movement.
+    const onDragEnd = (e: DragEvent) => resume(e.clientX, e.clientY)
+
     const onDown = (e: PointerEvent) => {
       // Dismissing the menu with a click restores the cursor a beat earlier
-      // than waiting for the movement that follows.
-      if (e.pointerType === 'mouse') resume(e.clientX, e.clientY)
+      // than waiting for the movement that follows. The right button is the
+      // exception: it is what opens the menu in the first place, and on
+      // Windows the menu arrives on the release, so resuming here would
+      // undo the handover a moment before it is needed.
+      if (e.pointerType === 'mouse' && e.button !== 2) resume(e.clientX, e.clientY)
       if (e.pointerType === 'touch') {
         disable()
         return
@@ -239,8 +301,11 @@ export function CustomCursor() {
       if (e.pointerType !== 'mouse') return
       // Coming back out of a frame, this lands a beat before the move that
       // follows it, and it carries a real position, so the arrow is already
-      // in the right place by the time it is visible.
-      if (handedOff) resume(e.clientX, e.clientY)
+      // in the right place by the time it is visible. Only if the position
+      // has actually changed, though: see `heldAtX`.
+      if (handedOff && (e.clientX !== heldAtX || e.clientY !== heldAtY)) {
+        resume(e.clientX, e.clientY)
+      }
       syncHoverState(e.clientX, e.clientY)
     }
     /** Is a point inside any iframe currently on the page? */
@@ -367,6 +432,10 @@ export function CustomCursor() {
     document.addEventListener('pointerout', onOut)
     document.addEventListener('mouseleave', onLeaveWindow)
     window.addEventListener('contextmenu', onContextMenu)
+    document.addEventListener('selectionchange', onSelectionChange)
+    window.addEventListener('dragstart', onDragStart)
+    window.addEventListener('dragend', onDragEnd)
+    window.addEventListener('drop', onDragEnd)
     window.addEventListener('blur', onBlur)
 
     return () => {
@@ -379,6 +448,10 @@ export function CustomCursor() {
       document.removeEventListener('pointerout', onOut)
       document.removeEventListener('mouseleave', onLeaveWindow)
       window.removeEventListener('contextmenu', onContextMenu)
+      document.removeEventListener('selectionchange', onSelectionChange)
+      window.removeEventListener('dragstart', onDragStart)
+      window.removeEventListener('dragend', onDragEnd)
+      window.removeEventListener('drop', onDragEnd)
       window.removeEventListener('blur', onBlur)
     }
   }, [reducedMotion])

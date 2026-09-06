@@ -205,7 +205,10 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
 
   return (
     <div ref={pinRef} className="relative flex h-screen w-full flex-col overflow-hidden">
-      <div className="shrink-0 pt-28 md:pt-32">{heading}</div>
+      {/* Clears the nav and no more. It used to reserve nearly twice this,
+          which read as a dead screen between the scroll cue above and the
+          heading that answers it. */}
+      <div className="shrink-0 pt-14 md:pt-16">{heading}</div>
 
       <div ref={canvasRef} className="relative flex-1 overflow-hidden">
         {/* Fixed backdrop: the paper itself and the landscape drawn on it.

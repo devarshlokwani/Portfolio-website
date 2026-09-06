@@ -20,7 +20,6 @@ export function PhilosophyCard({
     <AboutCard
       style={style}
       className={className}
-      cog="right"
       icon={LuMousePointer2}
       eyebrow="UI Philosophy"
       title="Detail,"

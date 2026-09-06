@@ -25,8 +25,11 @@ interface HeroChromeProps {
    * "View Projects" has no projects to point at from there. Anything passed
    * here should keep the same two shapes (accent fill, then a BorderGlow
    * outline) so the hero reads identically across routes.
+   *
+   * Pass `null` for no buttons at all, which the Work route does: neither of
+   * the defaults leads anywhere useful from a page that is already the work.
    */
-  actions?: ReactNode
+  actions?: ReactNode | null
 }
 
 /**
@@ -39,6 +42,38 @@ interface HeroChromeProps {
  */
 export function HeroChrome({ name, nameRef, metaRef, animateIn = false, actions }: HeroChromeProps) {
   const { goTo } = useRouteTransition()
+
+  // Checked against `undefined`, not with `??`: the Work route passes an
+  // explicit `null` to have no buttons at all, and `??` would read that as
+  // "not given" and put the default pair straight back.
+  const resolvedActions =
+    actions === undefined ? (
+        <>
+          <CtaLaunchLink
+            href="#projects"
+            label="View Projects"
+            onNavigate={() => goTo('/', { hash: '#projects' })}
+            className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5"
+          />
+          {/* Skills, not "Get in Touch". Contact is its own route with its
+              own hero and its own pair of buttons now, so pointing at it
+              from here sent people to a page whose first act was to ask
+              the same question again. This pair stays on the page it
+              belongs to: the work, then what it is built out of. */}
+          <BorderGlow className="hover:!border-transparent">
+            <CtaLaunchLink
+              href="/#skills"
+              label="Skills"
+              icon={TbStack2}
+              tone="fg"
+              onNavigate={() => goTo('/', { hash: '#skills' })}
+              className="rounded-full px-6 py-3 text-sm font-medium text-fg"
+            />
+          </BorderGlow>
+        </>
+    ) : (
+      actions
+    )
 
   return (
     <section
@@ -73,33 +108,11 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false, actions 
         <p className="font-accent text-4xl italic leading-[1.05] text-fg md:text-6xl">
           ship, and actually <span style={ACCENT_GRADIENT}>work.</span>
         </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-          {actions ?? (
-            <>
-              <CtaLaunchLink
-                href="#projects"
-                label="View Projects"
-                onNavigate={() => goTo('/', { hash: '#projects' })}
-                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5"
-              />
-              {/* Skills, not "Get in Touch". Contact is its own route with its
-                  own hero and its own pair of buttons now, so pointing at it
-                  from here sent people to a page whose first act was to ask
-                  the same question again. This pair stays on the page it
-                  belongs to: the work, then what it is built out of. */}
-              <BorderGlow className="hover:!border-transparent">
-                <CtaLaunchLink
-                  href="/#skills"
-                  label="Skills"
-                  icon={TbStack2}
-                  tone="fg"
-                  onNavigate={() => goTo('/', { hash: '#skills' })}
-                  className="rounded-full px-6 py-3 text-sm font-medium text-fg"
-                />
-              </BorderGlow>
-            </>
-          )}
-        </div>
+        {resolvedActions && (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+            {resolvedActions}
+          </div>
+        )}
       </div>
 
       <div className="pointer-events-none absolute inset-x-6 bottom-10 hidden items-center justify-between md:flex md:inset-x-10 xl:inset-x-20 2xl:inset-x-40">
