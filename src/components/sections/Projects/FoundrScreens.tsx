@@ -1,6 +1,6 @@
-import foundrMac from '@/assets/foundr-mac.png'
-import foundrPhone1 from '@/assets/foundr-phone-1.png'
-import foundrPhone2 from '@/assets/foundr-phone-2.png'
+import foundrMac from '@/assets/foundr-mac.webp'
+import foundrPhone1 from '@/assets/foundr-phone-1.webp'
+import foundrPhone2 from '@/assets/foundr-phone-2.webp'
 
 // Foundr's own dark-green brand tone (matches the "F" badge in FoundrLink
 // and the app's own RUNWAY card), the showcase canvas behind the device

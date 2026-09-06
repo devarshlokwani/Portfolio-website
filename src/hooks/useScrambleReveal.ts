@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { gsap } from '@/lib/gsap'
 import { SCRAMBLE_CHARS } from '@/lib/scrambleChars'
@@ -24,14 +24,15 @@ export function useScrambleReveal(
   { trigger, duration = 0.8, delay = 0, speed = 0.35, revealDelay = 0.1, onDone }: ScrambleRevealOptions,
 ) {
   const [text, setText] = useState(target)
-  const dummyRef = useRef<HTMLSpanElement | null>(null)
-  if (!dummyRef.current) dummyRef.current = document.createElement('span')
 
   useEffect(() => {
     if (!trigger) return undefined
 
-    const el = dummyRef.current!
-    el.textContent = ''
+    // Made here rather than held in a ref across renders. It is only ever
+    // read inside this effect, and the effect already had to blank it on
+    // every run, so a fresh detached span each time is the same thing with
+    // nothing to reset and nothing touched during render.
+    const el = document.createElement('span')
     const tween = gsap.to(el, {
       duration,
       delay,

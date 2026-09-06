@@ -24,6 +24,10 @@ interface GlyphReloadOptions {
 const GROUP_START_OFFSETS = [0, 0.15, 0.25]
 const GROUP_DURATION_SCALE = [1, 0.85, 0.7]
 
+/** One shared empty array, so "nothing is sliding" is a stable value and
+ *  does not re-render every consumer on every pass. */
+const NONE: GlyphTransition[] = []
+
 /**
  * Occasionally "reloads" a cluster of characters in `target`, like a
  * magazine swap: each one's old glyph slides out to one side while a fresh
@@ -38,10 +42,22 @@ export function useGlyphReload(
   target: string,
   { enabled, minInterval = 4.5, maxInterval = 10, baseDuration = 0.4 }: GlyphReloadOptions,
 ) {
-  const [transitions, setTransitions] = useState<GlyphTransition[]>([])
+  /**
+   * The live slide progress, tagged with the word it was measured against.
+   *
+   * A transition is a character index, which means nothing once the word
+   * changes: a reading taken on the old one would land on whatever letter
+   * happens to sit at that position now. Carrying the word alongside makes a
+   * stale reading simply not count, which clears it during render instead of
+   * through an effect whose first act is to write state.
+   */
+  const [reload, setReload] = useState<{ word: string; list: GlyphTransition[] }>({
+    word: target,
+    list: NONE,
+  })
+  const transitions = enabled && reload.word === target ? reload.list : NONE
 
   useEffect(() => {
-    setTransitions([])
     if (!enabled) return undefined
 
     const eligible = Array.from(target).reduce<number[]>((acc, c, i) => (c === ' ' ? acc : [...acc, i]), [])
@@ -49,7 +65,12 @@ export function useGlyphReload(
     const progressMap = new Map<number, number>()
 
     const syncState = () => {
-      setTransitions(Array.from(progressMap.entries()).map(([index, progress]) => ({ index, progress })))
+      setReload({
+        word: target,
+        list: progressMap.size
+          ? Array.from(progressMap.entries()).map(([index, progress]) => ({ index, progress }))
+          : NONE,
+      })
     }
 
     const scheduleNext = () => {

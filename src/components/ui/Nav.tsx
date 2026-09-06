@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
-import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { useRouteTransition } from '@/app/routeTransition'
 import { SURFACE_SHEEN } from '@/components/ui/gradients'
 import { NavLink } from '@/components/ui/NavLink'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
@@ -44,8 +44,47 @@ export function Nav() {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  /**
+   * The highlighted link, tagged with the route it was decided on.
+   *
+   * Coming back to '/' from a route link otherwise leaves that route's index
+   * in place, because nothing re-evaluates it until a section's own
+   * intersection fires, which never happens at all when landing at the top
+   * of the page above every observed section. Carrying the path alongside
+   * the index means a reading from a different page simply does not count,
+   * which resets the highlight during render rather than through an effect
+   * that writes state the moment it runs.
+   */
+  const [spy, setSpy] = useState<{ path: string; index: number | null }>({
+    path: location.pathname,
+    index: null,
+  })
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
+
+  // On any route other than home there is no scroll-spy: the active link is
+  // just whichever one points at the page you are on, which is a fact about
+  // the URL and needs no state at all.
+  const routeIndex = LINKS.findIndex((l) => l.kind === 'route' && l.to === location.pathname)
+  const activeIndex =
+    (spy.path === location.pathname ? spy.index : null) ?? (routeIndex === -1 ? null : routeIndex)
+
+  /**
+   * Records a reading against the page it was taken on. Memoised on the
+   * path it defaults to, so the scroll-spy effect below can depend on it
+   * without being torn down and rebuilt on every render.
+   */
+  const setActiveIndex = useCallback(
+    (
+      next: number | null | ((prev: number | null) => number | null),
+      path = location.pathname,
+    ) => {
+      setSpy((prev) => ({
+        path,
+        index: typeof next === 'function' ? next(prev.path === path ? prev.index : null) : next,
+      }))
+    },
+    [location.pathname],
+  )
 
   // A nav-triggered smooth scroll passes through every section between here
   // and the target, and each one crossing the scroll-spy's center threshold
@@ -57,21 +96,11 @@ export function Nav() {
   const suppressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Scroll-spy only applies on the home route, where the hash-linked
-  // sections actually live in the DOM. On any other route the nav's active
-  // link is just whichever one points at the current route.
+  // sections actually live in the DOM. Everywhere else `activeIndex` above
+  // already reads the answer straight off the URL, so there is nothing to
+  // observe and nothing to reset.
   useEffect(() => {
-    if (location.pathname !== '/') {
-      const routeIndex = LINKS.findIndex((l) => l.kind === 'route' && l.to === location.pathname)
-      setActiveIndex(routeIndex === -1 ? null : routeIndex)
-      return undefined
-    }
-
-    // Coming back to '/' from a route link (e.g. clicking the corner mark
-    // while "Work" is active) otherwise leaves that route's stale index in
-    // place: nothing here re-evaluates it until a section's own
-    // intersection fires, which doesn't happen at all if landing at the
-    // very top of the page, above every observed section.
-    setActiveIndex(null)
+    if (location.pathname !== '/') return undefined
 
     const sections = LINKS.map((l) => (l.kind === 'hash' ? document.querySelector<HTMLElement>(l.href) : null))
 
@@ -115,7 +144,7 @@ export function Nav() {
 
     sections.forEach((s) => s && observer.observe(s))
     return () => observer.disconnect()
-  }, [location.pathname])
+  }, [location.pathname, setActiveIndex])
 
   useEffect(() => {
     return () => {
@@ -124,18 +153,23 @@ export function Nav() {
   }, [])
 
   const navigateTo = (index: number, link: LinkConfig) => {
-    setActiveIndex(index)
-
+    // A click that navigates records its reading against the page it is
+    // going to, not the one it is leaving, so the highlight is already right
+    // when the destination mounts instead of being thrown away as a reading
+    // from somewhere else.
     if (link.kind === 'route') {
+      setActiveIndex(index, link.to)
       goTo(link.to)
       return
     }
 
     if (location.pathname !== '/') {
+      setActiveIndex(index, '/')
       goTo('/', { hash: link.href })
       return
     }
 
+    setActiveIndex(index)
     suppressSpyRef.current = true
     if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current)
 

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { useRouteTransition } from '@/app/routeTransition'
 import { gsap } from '@/lib/gsap'
 
 const SHORT = 'DL'

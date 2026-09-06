@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { LuGithub, LuLinkedin, LuMail } from 'react-icons/lu'
 
-import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { useRouteTransition } from '@/app/routeTransition'
 
 interface FooterLink {
   label: string

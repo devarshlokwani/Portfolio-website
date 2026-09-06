@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Cal, { getCalApi } from '@calcom/embed-react'
 import { LuChevronDown } from 'react-icons/lu'
 
-import portrait from '@/assets/portrait.jpg'
+import portrait from '@/assets/portrait.webp'
 import { CogLoader } from '@/components/ui/CogLoader'
 import { useTheme } from '@/hooks/useTheme'
 
@@ -217,8 +217,11 @@ export function BookingPanel() {
   // calendar, so the embed is keyed on it below and rebuilds instead.
   useEffect(() => {
     let cancelled = false
-    setReady(false)
-    setConfigured(null)
+
+    // `configured` is deliberately not cleared here. It holds the theme it
+    // was configured for, so the moment `theme` changes it no longer matches
+    // and the embed below unmounts on its own; blanking it first said the
+    // same thing twice.
 
     // A namespace per theme. Cal applies a namespace's UI config once, when
     // its first frame boots, and ignores later calls on the same one, so
@@ -252,6 +255,11 @@ export function BookingPanel() {
 
     return () => {
       cancelled = true
+      // The wait comes back on the way out rather than on the way in. A
+      // theme change tears this down before the next run starts, so the
+      // loader is up from the same instant either way, and on first mount
+      // there is nothing to clear because `ready` starts false.
+      setReady(false)
     }
   }, [theme])
 

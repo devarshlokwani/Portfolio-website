@@ -8,13 +8,36 @@
       name="description"
       content="Devarsh Lokwani, graduate software engineer and full-stack developer building end-to-end web and mobile products with React, TypeScript, and Node.js."
     />
+    <meta name="theme-color" content="#0a0a0c" />
+
+    <!-- Absolute URLs, filled in at build time from VITE_SITE_URL. Link
+         scrapers do not resolve a relative og:image against the page they
+         found it on, so a path alone leaves the preview blank, and there is
+         no hostname written down here to go stale when the domain changes. -->
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:site_name" content="Devarsh Lokwani" />
     <meta property="og:title" content="Devarsh Lokwani | Software Engineer" />
     <meta
       property="og:description"
       content="Graduate software engineer and full-stack developer. React, TypeScript, Node.js."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="%VITE_SITE_URL%/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1424" />
+    <meta property="og:image:height" content="752" />
+    <meta property="og:image:alt" content="Devarsh Lokwani, graduate software engineer, Sydney" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Devarsh Lokwani | Software Engineer" />
+    <meta
+      name="twitter:description"
+      content="Graduate software engineer and full-stack developer. React, TypeScript, Node.js."
+    />
+    <meta name="twitter:image" content="%VITE_SITE_URL%/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Devarsh Lokwani, graduate software engineer, Sydney" />
+
     <title>Devarsh Lokwani | Software Engineer</title>
     <script>
       // Applied before paint to avoid a flash of the wrong theme.

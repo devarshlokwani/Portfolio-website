@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { LuMapPin } from 'react-icons/lu'
 
-import { Gear, gearPath } from '@/components/ui/Gear'
+import { Gear } from '@/components/ui/Gear'
+import { gearPath } from '@/components/ui/gearGeometry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap } from '@/lib/gsap'
 import { buildLandPoints } from '@/lib/worldLand'

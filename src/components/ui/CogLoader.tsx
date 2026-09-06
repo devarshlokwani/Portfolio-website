@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-import { Gear, gearPath } from '@/components/ui/Gear'
+import { Gear } from '@/components/ui/Gear'
+import { gearPath } from '@/components/ui/gearGeometry'
 import { gsap } from '@/lib/gsap'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 

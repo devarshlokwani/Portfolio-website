@@ -1,6 +1,7 @@
 import type { IconType } from 'react-icons'
 
-import { SpeedLaunchVisual, useSpeedLaunch } from '@/components/ui/speedLaunch'
+import { SpeedLaunchVisual } from '@/components/ui/speedLaunch'
+import { useSpeedLaunch } from '@/components/ui/useSpeedLaunch'
 
 interface CtaLaunchLinkProps {
   href: string

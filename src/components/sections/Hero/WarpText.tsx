@@ -403,11 +403,11 @@ export function WarpText({
     const container = containerRef.current
     if (!container) return undefined
 
+    // `renderer` and `gl` are declared apart from their assignment because it
+    // happens inside the try below. The texture, program and mesh are built
+    // straight through, so they are declared where they are made.
     let renderer: Renderer
     let gl: OGLRenderingContext
-    let program: Program
-    let mesh: Mesh
-    let texture: Texture
     let raf = 0
     let disposed = false
     let contextLost = false
@@ -444,7 +444,7 @@ export function WarpText({
     canvas.setAttribute('aria-hidden', 'true')
     container.appendChild(canvas)
 
-    texture = new Texture(gl, {
+    const texture = new Texture(gl, {
       generateMipmaps: false,
       minFilter: gl.LINEAR,
       magFilter: gl.LINEAR,
@@ -453,7 +453,7 @@ export function WarpText({
     })
 
     const geometry = new Triangle(gl)
-    program = new Program(gl, {
+    const program = new Program(gl, {
       vertex,
       fragment,
       transparent: true,
@@ -475,7 +475,7 @@ export function WarpText({
         uMotion: { value: reduceMotion ? 0 : 1 },
       },
     })
-    mesh = new Mesh(gl, { geometry, program })
+    const mesh = new Mesh(gl, { geometry, program })
 
     const renderOnce = () => {
       if (disposed || contextLost) return

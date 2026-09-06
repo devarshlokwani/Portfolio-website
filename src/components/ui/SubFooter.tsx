@@ -3,14 +3,14 @@ import { LuArrowRight } from 'react-icons/lu'
 import { TbBriefcase2, TbHome2 } from 'react-icons/tb'
 import { useLocation } from 'react-router-dom'
 
-import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { useRouteTransition } from '@/app/routeTransition'
 import { CornerCog } from '@/components/ui/CornerCog'
 import { ACCENT_GRADIENT, cardSheen, GREEN_GRADIENT } from '@/components/ui/gradients'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap } from '@/lib/gsap'
-import foundrLogo from '@/assets/foundr-logo.png'
-import foundrMac from '@/assets/foundr-mac.png'
-import portrait from '@/assets/portrait.jpg'
+import foundrLogo from '@/assets/foundr-logo.webp'
+import foundrMac from '@/assets/foundr-mac.webp'
+import portrait from '@/assets/portrait.webp'
 
 /**
  * Near-black, not the lifted `surface` these started on. The cards should sit

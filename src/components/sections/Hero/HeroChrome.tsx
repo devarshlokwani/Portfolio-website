@@ -1,7 +1,7 @@
 import type { ReactNode, Ref } from 'react'
 import { TbBriefcase2, TbMapPin, TbStack2 } from 'react-icons/tb'
 
-import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { useRouteTransition } from '@/app/routeTransition'
 import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
 import { SocialIcons } from '@/components/sections/Hero/SocialIcons'
 import { BorderGlow } from '@/components/ui/BorderGlow'

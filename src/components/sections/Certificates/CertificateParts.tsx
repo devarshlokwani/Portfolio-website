@@ -1,6 +1,6 @@
 import { LuArrowUpRight } from 'react-icons/lu'
 
-import { gearPath } from '@/components/ui/Gear'
+import { gearPath } from '@/components/ui/gearGeometry'
 import { TechTag } from '@/components/ui/TechTag'
 import {
   badgeMarkFor,

@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+import { RouteTransitionContext, type GoToOptions } from '@/app/routeTransition'
 import {
   TransitionLaunchIcon,
   type TransitionDirection,
@@ -9,23 +10,6 @@ import {
 import { useLenisInstance } from '@/hooks/useLenisInstance'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
-
-interface GoToOptions {
-  /** scroll to this hash on the destination page once it's mounted */
-  hash?: string
-}
-
-interface RouteTransitionContextValue {
-  goTo: (path: string, opts?: GoToOptions) => void
-}
-
-const RouteTransitionContext = createContext<RouteTransitionContextValue | null>(null)
-
-export function useRouteTransition() {
-  const ctx = useContext(RouteTransitionContext)
-  if (!ctx) throw new Error('useRouteTransition must be used within a RouteTransitionProvider')
-  return ctx
-}
 
 // Positive skew shifts a point's x by +y*tan(angle) in the panel's local
 // space (y growing downward): since the panel sweeps in from the right
@@ -79,20 +63,29 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
   // The destination route may still be a frame or two from having mounted
   // its hash targets when this runs right after navigate(), so poll briefly
   // rather than assuming a single fixed delay is always enough.
+  //
+  // The recursion lives in a named function declared inside the callback
+  // rather than in the callback calling itself. Referring to a `const` from
+  // within its own initialiser works at runtime, since the closure only
+  // resolves when it is called, but it reads as a use-before-declaration and
+  // is one refactor away from being one.
   const landOnDestination = useCallback(
     (hash?: string, attemptsLeft = 15) => {
-      if (hash) {
-        const el = document.querySelector(hash)
-        if (el instanceof HTMLElement) {
-          lenisRef.current?.scrollTo(el, { immediate: true, offset: -100 })
-          return
+      const land = (remaining: number) => {
+        if (hash) {
+          const el = document.querySelector(hash)
+          if (el instanceof HTMLElement) {
+            lenisRef.current?.scrollTo(el, { immediate: true, offset: -100 })
+            return
+          }
+          if (remaining > 0) {
+            requestAnimationFrame(() => land(remaining - 1))
+            return
+          }
         }
-        if (attemptsLeft > 0) {
-          requestAnimationFrame(() => landOnDestination(hash, attemptsLeft - 1))
-          return
-        }
+        lenisRef.current?.scrollTo(0, { immediate: true })
       }
-      lenisRef.current?.scrollTo(0, { immediate: true })
+      land(attemptsLeft)
     },
     [lenisRef],
   )
