@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
 import { CornerCog } from '@/components/ui/CornerCog'
-import { ACCENT_GRADIENT, GREEN_GRADIENT } from '@/components/ui/gradients'
+import { ACCENT_GRADIENT, cardSheen, GREEN_GRADIENT } from '@/components/ui/gradients'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap } from '@/lib/gsap'
 import foundrLogo from '@/assets/foundr-logo.png'
@@ -17,10 +17,7 @@ import portrait from '@/assets/portrait.jpg'
  * *in* the page rather than on top of it, a visibly lighter panel reads as a
  * grey box pasted onto black, which is the opposite of the submerged look.
  */
-const CARD_SURFACE: CSSProperties = {
-  backgroundImage:
-    'linear-gradient(158deg, color-mix(in srgb, var(--color-bg) 90%, #fff), var(--color-bg) 62%)',
-}
+const CARD_SURFACE: CSSProperties = cardSheen('var(--color-bg)')
 
 function CardShell({
   href,

@@ -38,6 +38,8 @@ const ROUTE_DIRECTIONS: Record<string, TransitionDirection> = {
   '/experience': 'work',
   '/contact': 'contact',
   '/certificates': 'certificates',
+  '/privacy': 'privacy',
+  '/terms': 'terms',
 }
 
 /** How long to allow an incoming route to finish laying out. */

@@ -346,99 +346,136 @@ interface SceneParts {
 }
 
 /**
- * A ridgeline with the detail that separates a mountain range from a bare
- * zigzag: a jagged snowline under the high summits, fold lines running down
- * the faces to give the peaks volume, and hatching along one flank so each
- * peak reads as having a lit side and a shaded side.
+ * One mountain range.
+ *
+ * Built as a run of separate massifs rather than a single zigzag. A zigzag
+ * gives every peak the same two straight flanks and the same height, which
+ * is what made the old ranges read as a row of identical triangles; here
+ * each massif gets its own width, its own summit height, and a shoulder
+ * partway up each flank, so the skyline breaks up the way a real range does.
+ * The saddles between them sit at varying depths so the range has near and
+ * far shoulders rather than one flat baseline.
+ *
+ * Detail is deliberately sparse. The old version fanned five fold lines out
+ * of every summit down to the base, which turned each peak into a spider and
+ * the range into a thicket. A peak needs two ridges running off the summit
+ * and a little shading on one flank to read as solid; anything more competes
+ * with the silhouette that is doing the actual work.
  */
 function buildRidge(
   width: number,
   baseY: number,
   peak: number,
-  step: number,
+  span: number,
   rng: () => number,
   snowline: number,
 ): Ridge {
-  const pts: [number, number][] = [[-60, baseY]]
-  let x = -60
-  let up = true
-  while (x < width + 60) {
-    x += step * (0.6 + rng() * 0.75)
-    const y = up ? baseY - peak * (0.58 + rng() * 0.42) : baseY - peak * (0.1 + rng() * 0.26)
-    pts.push([x, y])
-    up = !up
+  const wobble = () => (rng() - 0.5) * 2.4
+  const pts: [number, number][] = []
+  const summits: { x: number; y: number; half: number; h: number }[] = []
+
+  let x = -span
+  pts.push([x, baseY])
+
+  while (x < width + span) {
+    const half = span * (0.4 + rng() * 0.4)
+    const h = peak * (0.46 + rng() * 0.54)
+    const sx = x + half
+    const sy = baseY - h
+
+    // a shoulder partway up the near flank, so the climb is not one line
+    const lt = 0.42 + rng() * 0.22
+    pts.push([x + half * lt + wobble(), baseY - h * lt * 0.82 + wobble()])
+    pts.push([sx + wobble(), sy + wobble()])
+
+    // the far flank drops with a shoulder of its own, at a different height
+    const rt = 0.34 + rng() * 0.26
+    pts.push([sx + half * rt + wobble(), sy + h * rt * 0.9 + wobble()])
+
+    // saddles vary, so the feet of the range are not a straight line
+    x = sx + half * (0.85 + rng() * 0.55)
+    pts.push([x + wobble(), baseY - peak * (0.04 + rng() * 0.18) + wobble()])
+
+    summits.push({ x: sx, y: sy, half, h })
   }
-  pts.push([width + 60, baseY])
 
   let d = `M${pts[0][0]},${pts[0][1]}`
   for (let i = 1; i < pts.length; i++) d += ` L${pts[i][0]},${pts[i][1]}`
-  d += ` L${width + 60},${baseY + 60} L-60,${baseY + 60} Z`
+  // filled well below its own base, so this range cleanly buries the feet of
+  // whatever stands behind it instead of tangling with it
+  d += ` L${width + span},${baseY + peak + 420} L${-span},${baseY + peak + 420} Z`
 
   const snow: string[] = []
   const folds: string[] = []
   const hatch: string[] = []
 
-  for (let i = 1; i < pts.length - 1; i++) {
-    const [px, py] = pts[i]
-    const drop = baseY - py
-    if (drop < peak * 0.4) continue
+  for (const { x: sx, y: sy, half, h } of summits) {
+    if (h < peak * 0.34) continue
 
-    // snow only on the genuinely high summits
-    if (drop > peak * snowline) {
-      const w = drop * 0.3
-      snow.push(
-        `M${px - w},${py + w * 0.9} L${px - w * 0.62},${py + w * 0.34} ` +
-          `L${px - w * 0.3},${py + w * 0.66} L${px - w * 0.04},${py + w * 0.18} ` +
-          `L${px + w * 0.28},${py + w * 0.6} L${px + w * 0.58},${py + w * 0.3} ` +
-          `L${px + w},${py + w * 0.95}`,
-      )
+    // Snow follows the two flanks down from the summit and closes with a
+    // ragged edge across, rather than sitting on the peak as a loose scribble.
+    if (h > peak * snowline) {
+      const w = half * 0.38
+      const drop = h * 0.22
+      let cap = `M${sx - w},${sy + drop}`
+      const steps = 5
+      for (let k = 1; k <= steps; k++) {
+        const t = k / steps
+        const cx = sx - w + w * 2 * t
+        const dip = k % 2 === 0 ? drop * 0.42 : drop * 0.86
+        cap += ` L${cx},${sy + drop * 0.18 + dip * (0.4 + rng() * 0.5)}`
+      }
+      snow.push(cap)
     }
 
-    // the two main faces, plus shorter gullies that stop partway down
-    folds.push(`M${px},${py} L${px + drop * 0.36},${baseY}`)
-    folds.push(`M${px},${py} L${px - drop * 0.32},${baseY}`)
-    folds.push(`M${px + drop * 0.08},${py + drop * 0.26} L${px + drop * 0.25},${baseY}`)
-    folds.push(`M${px - drop * 0.07},${py + drop * 0.34} L${px - drop * 0.2},${baseY}`)
-    folds.push(`M${px + drop * 0.16},${py + drop * 0.5} L${px + drop * 0.3},${baseY}`)
+    // two ridges off the summit, stopped well short of the base: a ridge
+    // read all the way down closes the silhouette and flattens the peak
+    folds.push(`M${sx},${sy} L${sx - half * 0.42},${sy + h * 0.72}`)
+    folds.push(`M${sx},${sy} L${sx + half * 0.34},${sy + h * 0.6}`)
+    if (rng() > 0.45) {
+      folds.push(`M${sx + half * 0.1},${sy + h * 0.3} L${sx + half * 0.26},${sy + h * 0.78}`)
+    }
 
-    // shading strokes down the right flank
-    for (let k = 1; k <= 4; k++) {
-      const t = k / 5.2
-      const sx = px + drop * 0.19 * t
-      const sy = py + drop * t
-      hatch.push(`M${sx},${sy} L${sx + drop * 0.11},${sy + drop * 0.1}`)
+    // short strokes across the shaded flank, mid-height only
+    const strokes = 3 + Math.floor(rng() * 2)
+    for (let k = 0; k < strokes; k++) {
+      const t = 0.34 + (k / strokes) * 0.42
+      const hx = sx + half * 0.24 * t * 2
+      const hy = sy + h * t
+      hatch.push(`M${hx},${hy} L${hx + half * 0.11},${hy + h * 0.11}`)
     }
   }
+
   return { d, snow, folds, hatch }
 }
 
 /**
- * Soft rolling ground. Being filled with paper it cleanly cuts off whatever
- * stands behind it, and it hands back a crest lookup so farmland and tree
- * clumps can be seated *on* the slope instead of floating over it.
+ * Soft rolling ground, built from a few sine waves laid over each other
+ * rather than a chain of quadratic bumps.
+ *
+ * The chained version could only ever produce one hump per step, all of much
+ * the same size, and its curve flattened out so far that the hills rendered
+ * as an almost straight line: the farmland seated on them looked like it was
+ * floating on blank paper. Summing a long wave, a slow envelope and a short
+ * ripple gives ground that genuinely rolls, and lets the crest be read back
+ * exactly rather than interpolated between stored samples.
  */
-function buildHills(width: number, baseY: number, amp: number, step: number, rng: () => number): Hills {
-  const samples: [number, number][] = []
-  let d = `M-60,${baseY}`
-  for (let x = -60; x < width + 60; x += step) {
-    const h = amp * (0.35 + rng() * 0.65)
-    d += ` Q${x + step / 2},${baseY - h} ${x + step},${baseY - h * 0.28}`
-    samples.push([x + step / 2, baseY - h * 0.78], [x + step, baseY - h * 0.28])
-  }
-  d += ` L${width + 60},${baseY + 460} L-60,${baseY + 460} Z`
+function buildHills(width: number, baseY: number, amp: number, wavelength: number, rng: () => number): Hills {
+  const p1 = rng() * Math.PI * 2
+  const p2 = rng() * Math.PI * 2
+  const p3 = rng() * Math.PI * 2
+  const tau = Math.PI * 2
 
   const crestAt = (x: number) => {
-    if (!samples.length) return baseY
-    for (let i = 0; i < samples.length - 1; i++) {
-      const [ax, ay] = samples[i]
-      const [bx, by] = samples[i + 1]
-      if (x >= ax && x <= bx) {
-        const t = (x - ax) / (bx - ax || 1)
-        return ay + (by - ay) * t
-      }
-    }
-    return samples[samples.length - 1][1]
+    const long = Math.sin((x / wavelength) * tau + p1)
+    const envelope = 0.68 + 0.32 * Math.sin((x / (wavelength * 2.6)) * tau + p2)
+    const ripple = Math.sin((x / (wavelength * 0.38)) * tau + p3)
+    return baseY - amp * (0.5 + 0.5 * long) * envelope - amp * 0.16 * ripple
   }
+
+  let d = `M${-80},${crestAt(-80)}`
+  for (let x = -80 + 14; x < width + 80; x += 14) d += ` L${x},${crestAt(x)}`
+  d += ` L${width + 80},${baseY + 520} L${-80},${baseY + 520} Z`
 
   return { d, crestAt }
 }
@@ -446,186 +483,226 @@ function buildHills(width: number, baseY: number, amp: number, step: number, rng
 function buildScene(width: number, height: number): SceneParts {
   const rng = makeRng(20260903)
 
-  // depth bands, back to front
-  const backBase = height * 0.2
-  const farBase = height * 0.27
-  const midBase = height * 0.355
-  const forestY = height * 0.4
-  const hillFarBase = height * 0.52
-  const hillNearBase = height * 0.645
-  const villageY = height * 0.775
-  const fieldY = height * 0.885
-  const roadY = height * 0.95
+  /* Bands, back to front. The ranges are stacked so each one's summits break
+     the skyline of the one behind it rather than sitting alongside it, which
+     is what turns three separate ridgelines into one range with depth. */
+  const backBase = height * 0.4
+  const midBase = height * 0.47
+  const frontBase = height * 0.53
+  const forestY = height * 0.555
+  const hillFarBase = height * 0.62
+  const hillNearBase = height * 0.72
+  const villageY = height * 0.815
+  const fieldY = height * 0.9
+  const roadY = height * 0.955
 
-  // three ranges: the farthest is barely there, and each nearer one is drawn
-  // filled so it stands in front rather than tangling with the one behind
+  /* Far range tall and pale, front range low and firmer: distance is carried
+     by how much of each one you can see, not by opacity alone. */
   const ridges = [
-    { ridge: buildRidge(width, backBase, height * 0.16, 205, rng, 0.66), opacity: 0.1, width: 1.2 },
-    { ridge: buildRidge(width, farBase, height * 0.235, 155, rng, 0.7), opacity: 0.17, width: 1.4 },
-    { ridge: buildRidge(width, midBase, height * 0.16, 118, rng, 0.78), opacity: 0.25, width: 1.5 },
+    { ridge: buildRidge(width, backBase, height * 0.36, 560, rng, 0.58), opacity: 0.2, width: 1.4 },
+    { ridge: buildRidge(width, midBase, height * 0.25, 395, rng, 0.72), opacity: 0.28, width: 1.5 },
+    { ridge: buildRidge(width, frontBase, height * 0.13, 290, rng, 1.2), opacity: 0.36, width: 1.6 },
   ]
 
-  // --- forest belt tucked under the ranges ---
+  /* Forest along the foot of the front range, in stands with clearings
+     between them. Evenly spaced clumps at one height read as a stamped
+     border; the gaps are what make it a treeline. */
   const forest: Placement[] = []
-  for (let x = -20; x < width + 40; x += 100 + rng() * 125) {
-    const n = 4 + Math.floor(rng() * 6)
-    for (let i = 0; i < n; i++) {
-      forest.push({
-        kind: 'pine',
-        x: x + (i - n / 2) * (10 + rng() * 5),
-        y: forestY + (rng() - 0.5) * 12,
-        s: 0.7 + rng() * 0.45,
-      })
+  for (let x = -30; x < width + 60; ) {
+    if (rng() > 0.24) {
+      const n = 3 + Math.floor(rng() * 7)
+      const drift = (rng() - 0.5) * 16
+      for (let i = 0; i < n; i++) {
+        forest.push({
+          kind: 'pine',
+          x: x + i * (9 + rng() * 7),
+          y: forestY + drift + (rng() - 0.5) * 9,
+          s: 0.62 + rng() * 0.5,
+        })
+      }
+      x += n * 12 + 30 + rng() * 90
+    } else {
+      x += 120 + rng() * 200
     }
   }
 
-  const hillFar = buildHills(width, hillFarBase, height * 0.075, 240, rng)
-  const hillNear = buildHills(width, hillNearBase, height * 0.07, 300, rng)
+  const hillFar = buildHills(width, hillFarBase, height * 0.115, 620, rng)
+  const hillNear = buildHills(width, hillNearBase, height * 0.095, 780, rng)
 
-  // --- the middle distance: patchwork farmland, copses, water and tracks,
-  //     which is what keeps this band from reading as blank paper ---
+  /* The middle distance: patchwork farmland, copses, water and tracks, which
+     is what keeps this band from reading as blank paper. */
   const patchLane = new Lane()
   const patches: SceneParts['patches'] = []
-  for (let x = 20; x < width - 60; x += 105 + rng() * 95) {
-    const w = 60 + rng() * 85
-    if (!patchLane.claim(x + w / 2, w / 2, 8)) continue
+  for (let x = 30; x < width - 80; x += 120 + rng() * 150) {
+    const w = 55 + rng() * 90
+    if (!patchLane.claim(x + w / 2, w / 2, 10)) continue
     patches.push({
+      // seated just under the crest, so a plot reads as lying on the slope
       x,
-      y: hillFar.crestAt(x) + 14 + rng() * 30,
+      y: hillFar.crestAt(x + w / 2) + 10 + rng() * 22,
       w,
-      h: 20 + rng() * 16,
-      lean: (rng() > 0.5 ? 1 : -1) * (10 + rng() * 16),
+      h: 16 + rng() * 15,
+      lean: (rng() > 0.5 ? 1 : -1) * (9 + rng() * 15),
       rows: 2 + Math.floor(rng() * 3),
     })
   }
 
+  const clumpLane = new Lane()
   const clumps: Placement[] = []
-  for (let x = 70; x < width; x += 175 + rng() * 190) {
+  for (let x = 60; x < width; x += 140 + rng() * 210) {
     const n = 2 + Math.floor(rng() * 4)
-    const base = hillFar.crestAt(x) + 6 + rng() * 16
+    if (!clumpLane.claim(x, n * 5 + 6, 12)) continue
+    const base = hillFar.crestAt(x) + 5 + rng() * 14
     for (let i = 0; i < n; i++) {
       clumps.push({
-        kind: rng() > 0.72 ? 'broadleaf' : 'pine',
+        kind: rng() > 0.7 ? 'broadleaf' : 'pine',
         x: x + (i - n / 2) * 9,
-        y: base + (rng() - 0.5) * 6,
-        s: 0.4 + rng() * 0.22,
+        y: base + (rng() - 0.5) * 5,
+        s: 0.4 + rng() * 0.24,
       })
     }
   }
 
+  /* Water sits in the dips of the near hills, never on a crest, which is
+     where the old placement kept putting it. */
   const lakes: SceneParts['lakes'] = []
-  for (let x = 520; x < width; x += 1250 + rng() * 700) {
-    lakes.push({
-      x,
-      y: hillNear.crestAt(x) + 26 + rng() * 18,
-      w: 130 + rng() * 90,
-      h: 20 + rng() * 12,
-    })
+  const lakeLane = new Lane()
+  for (let x = 420; x < width; x += 900 + rng() * 700) {
+    let best = x
+    let lowest = -Infinity
+    for (let probe = x - 180; probe < x + 180; probe += 20) {
+      const c = hillNear.crestAt(probe)
+      if (c > lowest) {
+        lowest = c
+        best = probe
+      }
+    }
+    const w = 110 + rng() * 80
+    const h = 15 + rng() * 8
+    if (!lakeLane.claim(best, w / 2, 40)) continue
+    // Held clear of the village: water drawn across a street of houses
+    // reads as a mistake rather than as a lake behind them.
+    const y = Math.min(lowest + 14 + rng() * 10, villageY - 34 - h)
+    lakes.push({ x: best, y, w, h })
   }
 
   const hedges: string[] = []
-  for (let x = -40; x < width; x += 145 + rng() * 150) {
-    const y = hillNear.crestAt(x) + 10 + rng() * 34
-    const w = 70 + rng() * 120
-    const bow = 5 + rng() * 11
+  for (let x = -40; x < width; x += 130 + rng() * 170) {
+    const y = hillNear.crestAt(x) + 12 + rng() * 30
+    const w = 60 + rng() * 120
+    const bow = 4 + rng() * 10
     hedges.push(`M${x},${y} Q${x + w / 2},${y - bow} ${x + w},${y}`)
   }
 
-  // faint cart tracks wandering down out of the hills toward the valley
   const tracks: string[] = []
-  for (let x = 300; x < width; x += 620 + rng() * 480) {
-    const y0 = hillFar.crestAt(x) + 20
-    const sway = 40 + rng() * 50
+  for (let x = 340; x < width; x += 700 + rng() * 520) {
+    const y0 = hillFar.crestAt(x) + 16
+    const sway = 40 + rng() * 55
     tracks.push(
       `M${x},${y0} C${x + sway},${y0 + (villageY - y0) * 0.35} ` +
-        `${x - sway},${y0 + (villageY - y0) * 0.65} ${x + sway * 0.3},${villageY - 12}`,
+        `${x - sway},${y0 + (villageY - y0) * 0.65} ${x + sway * 0.3},${villageY - 14}`,
     )
   }
 
   const birds: SceneParts['birds'] = []
-  for (let x = 120; x < width; x += 380 + rng() * 420) {
-    const by = height * (0.12 + rng() * 0.13)
+  for (let x = 140; x < width; x += 420 + rng() * 480) {
+    const by = height * (0.1 + rng() * 0.12)
     const flock = 2 + Math.floor(rng() * 3)
     for (let i = 0; i < flock; i++) {
-      birds.push({
-        x: x + i * (16 + rng() * 12),
-        y: by + (rng() - 0.5) * 22,
-        s: 0.7 + rng() * 0.5,
-      })
+      birds.push({ x: x + i * (15 + rng() * 12), y: by + (rng() - 0.5) * 20, s: 0.65 + rng() * 0.5 })
     }
   }
 
-  // --- the valley, laid out through lanes so nothing lands on anything ---
+  /* The valley, laid out through lanes so nothing lands on anything. */
   const buildLane = new Lane()
   const farmLane = new Lane()
   const village: Placement[] = []
   const fields: SceneParts['fields'] = []
   const paddocks: SceneParts['paddocks'] = []
 
-  // villages first: they get priority on the building lane
-  for (let x = 260; x < width - 160; x += 700 + rng() * 320) {
-    const plan: { kind: Placement['kind']; dx: number; half: number; s: number }[] = [
-      { kind: 'barn', dx: -150, half: 24, s: 0.9 },
-      { kind: 'house', dx: -72, half: 18, s: 1.05 },
-      { kind: 'church', dx: 0, half: 22, s: 1 },
-      { kind: 'house', dx: 68, half: 17, s: 0.95 },
-      { kind: 'hut', dx: 132, half: 20, s: 0.9 },
-      { kind: 'hut', dx: 190, half: 17, s: 0.75 },
-    ]
-    for (const b of plan) {
+  /* Villages first: they get priority on the building lane. Two plans, so a
+     second hamlet is not a copy of the first one further along the valley. */
+  const plans: { kind: Placement['kind']; dx: number; half: number; s: number }[][] = [
+    [
+      { kind: 'barn', dx: -148, half: 24, s: 0.92 },
+      { kind: 'house', dx: -74, half: 18, s: 1.02 },
+      { kind: 'church', dx: 4, half: 22, s: 1 },
+      { kind: 'house', dx: 74, half: 17, s: 0.92 },
+      { kind: 'hut', dx: 136, half: 20, s: 0.86 },
+    ],
+    [
+      { kind: 'hut', dx: -136, half: 18, s: 0.8 },
+      { kind: 'house', dx: -66, half: 18, s: 0.98 },
+      { kind: 'barn', dx: 16, half: 24, s: 0.86 },
+      { kind: 'house', dx: 96, half: 17, s: 1.06 },
+      { kind: 'hut', dx: 158, half: 17, s: 0.74 },
+    ],
+  ]
+  let plan = 0
+  for (let x = 280; x < width - 200; x += 470 + rng() * 300) {
+    for (const b of plans[plan % plans.length]) {
       const bx = x + b.dx
       if (bx < 0 || bx > width) continue
       // a shallow, consistent stagger reads as a street line; random
       // vertical scatter reads as buildings sliding down a hill
-      const y = villageY + (b.kind === 'barn' || b.kind === 'hut' ? 10 : 0)
-      if (buildLane.claim(bx, b.half, 10)) {
-        village.push({ kind: b.kind, x: bx, y, s: b.s })
-      }
+      const y = villageY + (b.kind === 'barn' || b.kind === 'hut' ? 9 : 0)
+      if (buildLane.claim(bx, b.half, 11)) village.push({ kind: b.kind, x: bx, y, s: b.s })
     }
+    plan++
   }
 
   // windmills stand out on open ground between villages
-  for (let x = 150; x < width; x += 340 + rng() * 220) {
-    if (buildLane.claim(x, 26, 26)) {
-      village.push({ kind: 'windmill', x, y: villageY + 6, s: 0.9 + rng() * 0.3 })
+  for (let x = 190; x < width; x += 520 + rng() * 320) {
+    if (buildLane.claim(x, 26, 34)) {
+      village.push({ kind: 'windmill', x, y: villageY + 6, s: 0.92 + rng() * 0.26 })
     }
   }
 
+  // outlying farmsteads: a lone house or barn well away from the hamlets
+  for (let x = 120; x < width; x += 250 + rng() * 210) {
+    if (!buildLane.claim(x, 22, 24)) continue
+    village.push({ kind: rng() > 0.5 ? 'house' : 'barn', x, y: villageY + 6, s: 0.72 + rng() * 0.18 })
+  }
+
   // shelter trees fill whatever building-lane gaps are left
-  for (let x = 60; x < width; x += 100 + rng() * 110) {
-    if (buildLane.claim(x, 12, 8)) {
+  for (let x = 60; x < width; x += 90 + rng() * 120) {
+    if (buildLane.claim(x, 12, 9)) {
       village.push({
         kind: rng() > 0.5 ? 'broadleaf' : 'pine',
         x,
         y: villageY - 4,
-        s: 0.85 + rng() * 0.4,
+        s: 0.8 + rng() * 0.45,
       })
     }
   }
 
-  // farmland sits in its own band below the village, above the road
-  for (let x = 200; x < width - 120; x += 270 + rng() * 180) {
-    const w = 150 + rng() * 110
-    if (rng() > 0.34) {
-      if (!farmLane.claim(x, w / 2 + 14, 18)) continue
+  /* Farmland below the village. Plots vary in width and lean, and every so
+     often the generator leaves one open, so the band is not wall-to-wall
+     crops from one end of the valley to the other. */
+  for (let x = 180; x < width - 120; x += 215 + rng() * 190) {
+    const roll = rng()
+    if (roll > 0.86) continue
+    if (roll > 0.3) {
+      const w = 120 + rng() * 150
+      if (!farmLane.claim(x, w / 2 + 16, 22)) continue
       fields.push({
         x,
-        y: fieldY + (rng() - 0.5) * 12,
+        y: fieldY + (rng() - 0.5) * 14,
         w,
-        h: 42 + rng() * 22,
-        skew: (rng() > 0.5 ? 1 : -1) * (12 + rng() * 12),
-        rows: 5 + Math.floor(rng() * 3),
+        h: 34 + rng() * 30,
+        skew: (rng() > 0.5 ? 1 : -1) * (10 + rng() * 16),
+        rows: 4 + Math.floor(rng() * 4),
       })
     } else {
-      const pw = 130 + rng() * 60
-      if (!farmLane.claim(x, pw / 2 + 14, 18)) continue
+      const pw = 120 + rng() * 70
+      if (!farmLane.claim(x, pw / 2 + 16, 22)) continue
       const cow = rng() > 0.5
       paddocks.push({
         x: x - pw / 2,
         y: fieldY,
         w: pw,
         stock: Array.from({ length: 2 + Math.floor(rng() * 2) }, (_, i) => ({
-          x: 26 + i * (34 + rng() * 22),
+          x: 24 + i * (32 + rng() * 24),
           s: 0.85 + rng() * 0.25,
           cow,
         })).filter((st) => st.x < pw - 22),
@@ -633,16 +710,16 @@ function buildScene(width: number, height: number): SceneParts {
     }
   }
 
-  // --- undergrowth, split between the village verge and the roadside so it
-  //     never ends up standing in the middle of a crop ---
+  /* Undergrowth, split between the village verge and the roadside so it
+     never ends up standing in the middle of a crop. */
   const grass: Placement[] = []
-  for (let x = 40; x < width; x += 80 + rng() * 100) {
+  for (let x = 40; x < width; x += 75 + rng() * 110) {
     const verge = rng() > 0.5
     grass.push({
       kind: 'grass',
       x,
-      y: verge ? villageY + 24 + rng() * 16 : roadY + 14 + rng() * 22,
-      s: 0.75 + rng() * 0.45,
+      y: verge ? villageY + 26 + rng() * 14 : roadY + 12 + rng() * 20,
+      s: 0.7 + rng() * 0.5,
     })
   }
 
@@ -660,11 +737,11 @@ function buildScene(width: number, height: number): SceneParts {
 
   // --- rivers come down out of the ranges and cross the valley ---
   const rivers: SceneParts['rivers'] = []
-  for (let x = 900; x < width; x += 1500 + rng() * 500) {
+  for (let x = 1000; x < width; x += 1600 + rng() * 500) {
     const sway = 55 + rng() * 45
     const mk = (o: number) =>
-      `M${x + o},${midBase} C${x - sway + o},${height * 0.55} ${x + sway + o},${height * 0.72} ${x - sway * 0.4 + o},${height}`
-    rivers.push({ d1: mk(0), d2: mk(46) })
+      `M${x + o},${frontBase} C${x - sway + o},${height * 0.62} ${x + sway + o},${height * 0.74} ${x - sway * 0.35 + o},${villageY - 16}`
+    rivers.push({ d1: mk(0), d2: mk(32) })
   }
 
   return {
@@ -793,24 +870,24 @@ export function SceneryBackdrop({ width, height }: { width: number; height: numb
       ))}
 
       {/* birds up in the open sky */}
-      <g {...STROKE} stroke={INK} opacity={0.22}>
+      <g {...STROKE} stroke={INK} opacity={0.26}>
         {scene.birds.map((b, i) => (
           <Bird key={i} x={b.x} y={b.y} s={b.s} />
         ))}
       </g>
 
       {/* forest belt */}
-      <g {...STROKE} stroke={INK} strokeWidth={1.6} opacity={0.28}>
+      <g {...STROKE} stroke={INK} strokeWidth={1.6} opacity={0.34}>
         {scene.forest.map((p, i) => renderPlacement(p, i, mill, millIndex))}
       </g>
 
       {/* upper rolling ground: filled, so it cuts off the forest behind it */}
-      <g {...STROKE} stroke={INK} strokeWidth={1.4} opacity={0.2}>
+      <g {...STROKE} stroke={INK} strokeWidth={1.5} opacity={0.26}>
         <path d={scene.hillFar.d} fill={PAPER} />
       </g>
 
       {/* distant farmland and copses seated on that slope */}
-      <g {...STROKE} stroke={INK} strokeWidth={1.2} opacity={0.19}>
+      <g {...STROKE} stroke={INK} strokeWidth={1.25} opacity={0.24}>
         {scene.patches.map((p, i) => (
           <Patch key={`pt-${i}`} {...p} />
         ))}
@@ -818,18 +895,18 @@ export function SceneryBackdrop({ width, height }: { width: number; height: numb
       </g>
 
       {/* cart tracks wandering down toward the valley */}
-      <g {...STROKE} stroke={INK} strokeWidth={1.1} opacity={0.15}>
+      <g {...STROKE} stroke={INK} strokeWidth={1.15} opacity={0.19}>
         {scene.tracks.map((d, i) => (
           <path key={i} d={d} />
         ))}
       </g>
 
       {/* lower rolling ground */}
-      <g {...STROKE} stroke={INK} strokeWidth={1.5} opacity={0.24}>
+      <g {...STROKE} stroke={INK} strokeWidth={1.6} opacity={0.3}>
         <path d={scene.hillNear.d} fill={PAPER} />
       </g>
 
-      <g {...STROKE} stroke={INK} strokeWidth={1.3} opacity={0.2}>
+      <g {...STROKE} stroke={INK} strokeWidth={1.35} opacity={0.26}>
         {scene.lakes.map((l, i) => (
           <Lake key={`l-${i}`} {...l} />
         ))}
@@ -841,7 +918,7 @@ export function SceneryBackdrop({ width, height }: { width: number; height: numb
       </g>
 
       {/* rivers, behind the settled ground they run through */}
-      <g {...STROKE} stroke={INK} strokeWidth={1.8} opacity={0.3}>
+      <g {...STROKE} stroke={INK} strokeWidth={1.7} opacity={0.26}>
         {scene.rivers.map((r, i) => (
           <g key={i}>
             <path d={r.d1} />

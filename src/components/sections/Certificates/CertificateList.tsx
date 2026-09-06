@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { LuArrowUpRight } from 'react-icons/lu'
 
 import {
-  AccentedTitle,
   CertificateScan,
   CredentialId,
   IssuerLine,
@@ -10,6 +9,7 @@ import {
   SkillPills,
   VerifyLink,
 } from '@/components/sections/Certificates/CertificateParts'
+import { AccentedTitle } from '@/components/ui/AccentedTitle'
 import {
   CERTIFICATES,
   hasScan,

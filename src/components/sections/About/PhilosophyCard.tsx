@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { LuMousePointer2 } from 'react-icons/lu'
 
 import { AboutCard } from '@/components/sections/About/AboutCard'
@@ -8,9 +9,16 @@ import { PhilosophyTabs } from '@/components/sections/About/PhilosophyTabs'
  * plus the one thing they don't get: a tab row whose selection fills from
  * the bottom up.
  */
-export function PhilosophyCard({ className = '' }: { className?: string }) {
+export function PhilosophyCard({
+  className = '',
+  style,
+}: {
+  className?: string
+  style?: CSSProperties
+}) {
   return (
     <AboutCard
+      style={style}
       className={className}
       cog="right"
       icon={LuMousePointer2}

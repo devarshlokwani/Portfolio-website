@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react'
 
 import {
-  AccentedTitle,
   CertificateScan,
   CredentialId,
   IssuerLine,
@@ -10,6 +9,7 @@ import {
   VerifyLink,
 } from '@/components/sections/Certificates/CertificateParts'
 import { CERTIFICATES, type Certificate } from '@/components/sections/Certificates/certificateData'
+import { AccentedTitle } from '@/components/ui/AccentedTitle'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 /**

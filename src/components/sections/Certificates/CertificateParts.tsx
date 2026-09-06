@@ -8,7 +8,6 @@ import {
   scanFor,
   type Certificate,
 } from '@/components/sections/Certificates/certificateData'
-import { ACCENT_GRADIENT } from '@/components/ui/gradients'
 
 /**
  * The seal is the site's own gear, run at a high tooth count with a shallow
@@ -171,25 +170,5 @@ export function VerifyLink({ url }: { url: string }) {
       Verify
       <LuArrowUpRight className="h-3.5 w-3.5" />
     </a>
-  )
-}
-
-/**
- * The title with its last word in the accent gradient, the same treatment
- * the hero's tagline and the sub-footer's headlines wear.
- *
- * Splitting on the final space rather than styling a fixed word keeps it
- * working for every title in the file, from "Claude 101" to the four-word
- * job simulations, and a single-word title simply comes out fully accented.
- */
-export function AccentedTitle({ title }: { title: string }) {
-  const cut = title.trimEnd().lastIndexOf(' ')
-  if (cut === -1) return <span style={ACCENT_GRADIENT}>{title}</span>
-
-  return (
-    <>
-      {title.slice(0, cut + 1)}
-      <span style={ACCENT_GRADIENT}>{title.slice(cut + 1)}</span>
-    </>
   )
 }

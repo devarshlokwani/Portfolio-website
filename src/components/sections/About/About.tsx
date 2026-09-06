@@ -2,6 +2,9 @@ import { LuGraduationCap, LuLayers } from 'react-icons/lu'
 
 import { AboutCard } from '@/components/sections/About/AboutCard'
 import { PhilosophyCard } from '@/components/sections/About/PhilosophyCard'
+import { ResumeCard } from '@/components/sections/About/ResumeCard'
+import { CornerCog } from '@/components/ui/CornerCog'
+import { cardSheen } from '@/components/ui/gradients'
 import { Section } from '@/components/ui/Section'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 
@@ -11,6 +14,14 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 // card. (`backdrop-blur` went with it: there's nothing to see through now.)
 //
 const CARD = 'rounded-2xl border border-border bg-surface p-6 md:p-8'
+
+/**
+ * The same lift the sub-footer's cards wear, measured from this card's own
+ * ground rather than the page's: flat `surface` read as a slab next to them.
+ * Held to 8 rather than the sub-footer's 10, because `surface` starts higher
+ * than the page colour and the same step off it lands too pale.
+ */
+const CARD_SURFACE = cardSheen('var(--color-surface)', 8)
 
 export function About() {
   return (
@@ -22,6 +33,7 @@ export function About() {
       <div className="flex flex-col gap-6 md:gap-20">
         <AboutCard
           className={CARD}
+          style={CARD_SURFACE}
           size="lg"
           cog="top"
           icon={LuGraduationCap}
@@ -40,6 +52,7 @@ export function About() {
         <div className="grid gap-6 md:grid-cols-2 md:gap-10">
           <AboutCard
             className={CARD}
+            style={CARD_SURFACE}
             cog="left"
             icon={LuLayers}
             eyebrow="What I've Shipped"
@@ -54,7 +67,19 @@ export function About() {
             </p>
           </AboutCard>
 
-          <PhilosophyCard className={CARD} />
+          <PhilosophyCard className={CARD} style={CARD_SURFACE} />
+        </div>
+
+        {/* Full width under the pair, so it closes the section rather than
+            reading as a third card in that row. Its cog hangs off the bottom
+            edge, the one edge the cards above leave free, and like theirs it
+            is a sibling painted before the card so the card's opaque surface
+            buries half of it. */}
+        <div className="relative">
+          <CornerCog placement="bottom" />
+          <div className="relative">
+            <ResumeCard className={CARD} style={CARD_SURFACE} />
+          </div>
         </div>
       </div>
     </Section>

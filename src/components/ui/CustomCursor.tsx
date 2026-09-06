@@ -84,11 +84,22 @@ export function CustomCursor() {
     // once events stop arriving.
     let stepX = 0
     let stepY = 0
-    // A cross-origin iframe owns its own cursor: `cursor: none` doesn't reach
-    // inside it and no pointermove reaches back out, so the native arrow
-    // appears in there while ours freezes at the boundary. Rather than fight
-    // that, hand the cursor over for as long as the pointer is inside one.
-    let overFrame = false
+    /**
+     * True while something outside the page owns the pointer, and the native
+     * arrow is showing because of it.
+     *
+     * Two things do this. A cross-origin iframe: `cursor: none` doesn't
+     * reach inside one and no pointermove reaches back out, so the native
+     * arrow appears in there while ours freezes at the boundary. And the
+     * right-click menu, which is drawn by the operating system over the
+     * page: the browser puts the real cursor back for it without telling
+     * the page anything, so ours was left sitting frozen underneath it,
+     * which is what made two cursors visible at once.
+     *
+     * Both are the same situation, so both are handled the same way: hand
+     * the cursor over, and take it back on the next real movement.
+     */
+    let handedOff = false
 
     const enable = () => {
       if (mouseActive) return
@@ -117,17 +128,20 @@ export function CustomCursor() {
     // frame's own native cursor appears the instant the pointer crosses in,
     // any fade at all is read as two cursors at once.
     const suspend = () => {
-      if (overFrame) return
-      overFrame = true
+      if (handedOff) return
+      handedOff = true
       gsap.killTweensOf(root)
       gsap.set(root, { opacity: 0 })
       document.documentElement.classList.remove('custom-cursor-active')
     }
 
     const resume = (x: number, y: number) => {
-      if (!overFrame) return
-      overFrame = false
-      if (!mouseActive) return
+      // Both checks before anything is cleared. Clearing the flag and then
+      // bailing on the second condition threw away the only record that the
+      // pointer was ever in a frame, so the next resume had nothing to act
+      // on and the arrow stayed hidden.
+      if (!handedOff || !mouseActive) return
+      handedOff = false
       // Position first: without the snap it eases in from wherever it froze
       // on the way in, which reads as the cursor flying across the page to
       // catch up with a pointer that is already somewhere else.
@@ -153,7 +167,7 @@ export function CustomCursor() {
       armIdleCheck()
       // Movement only reaches us while the pointer is outside every iframe,
       // so any move at all is the signal that it has come back out.
-      if (overFrame) resume(e.clientX, e.clientY)
+      if (handedOff) resume(e.clientX, e.clientY)
       syncHoverState(e.clientX, e.clientY)
       if (!mouseActive) {
         // Primed the same way as `resume`, and for the same reason: the
@@ -169,7 +183,14 @@ export function CustomCursor() {
       moveY(e.clientY)
     }
 
+    // The menu is about to be drawn over the page by the OS, with the real
+    // cursor on top of it.
+    const onContextMenu = () => suspend()
+
     const onDown = (e: PointerEvent) => {
+      // Dismissing the menu with a click restores the cursor a beat earlier
+      // than waiting for the movement that follows.
+      if (e.pointerType === 'mouse') resume(e.clientX, e.clientY)
       if (e.pointerType === 'touch') {
         disable()
         return
@@ -219,7 +240,7 @@ export function CustomCursor() {
       // Coming back out of a frame, this lands a beat before the move that
       // follows it, and it carries a real position, so the arrow is already
       // in the right place by the time it is visible.
-      if (overFrame) resume(e.clientX, e.clientY)
+      if (handedOff) resume(e.clientX, e.clientY)
       syncHoverState(e.clientX, e.clientY)
     }
     /** Is a point inside any iframe currently on the page? */
@@ -273,7 +294,7 @@ export function CustomCursor() {
     const IDLE_MS = 26
 
     const sweepFrames = () => {
-      if (overFrame || !mouseActive) return
+      if (handedOff || !mouseActive) return
 
       // How much further one more step of the same size could have carried
       // it, plus a few pixels for a pointer that had all but stopped.
@@ -313,7 +334,18 @@ export function CustomCursor() {
     // No separate mouseenter handler needed: onMove's !mouseActive branch
     // already re-primes position instantly (via gsap.set, not an eased
     // tween) the moment a real pointermove arrives after re-entering.
-    const onLeaveWindow = () => disable()
+    const onLeaveWindow = () => {
+      // Crossing into a cross-origin frame fires this too, and that is not
+      // the pointer leaving the window. Disabling there put the cursor into
+      // a state only a real mouse move could lift, so scrolling the frame
+      // out from under a parked pointer left no cursor at all. `suspend`
+      // already owns the frame case, and it is the one that can be undone.
+      if (pointInFrame(lastX, lastY)) {
+        suspend()
+        return
+      }
+      disable()
+    }
     // Clicking into an iframe moves focus without firing pointerover out
     // here, so the blur is the only signal that the pointer went in.
     const onBlur = () => {
@@ -334,6 +366,7 @@ export function CustomCursor() {
     document.addEventListener('pointerover', onOver)
     document.addEventListener('pointerout', onOut)
     document.addEventListener('mouseleave', onLeaveWindow)
+    window.addEventListener('contextmenu', onContextMenu)
     window.addEventListener('blur', onBlur)
 
     return () => {
@@ -345,6 +378,7 @@ export function CustomCursor() {
       document.removeEventListener('pointerover', onOver)
       document.removeEventListener('pointerout', onOut)
       document.removeEventListener('mouseleave', onLeaveWindow)
+      window.removeEventListener('contextmenu', onContextMenu)
       window.removeEventListener('blur', onBlur)
     }
   }, [reducedMotion])

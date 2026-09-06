@@ -52,9 +52,9 @@ export function useHoverSync() {
       reported = e.target as Element
     }
 
-    const send = (target: Element, type: string, related: Element | null) => {
+    const send = (target: Element, type: string, related: Element | null, bubbles: boolean) => {
       const init: PointerEventInit = {
-        bubbles: true,
+        bubbles,
         cancelable: false,
         composed: true,
         clientX: pointerX,
@@ -69,6 +69,43 @@ export function useHoverSync() {
       target.dispatchEvent(new MouseEvent(type.replace('pointer', 'mouse'), init))
     }
 
+    const ancestry = (el: Element | null) => {
+      const chain: Element[] = []
+      for (let node = el; node; node = node.parentElement) chain.push(node)
+      return chain
+    }
+
+    /**
+     * The non-bubbling half of the handover.
+     *
+     * `over` and `out` bubble, so one of each is enough for React, which
+     * derives enter and leave from them at the root. A listener attached
+     * straight to an element with `addEventListener('pointerleave', ...)`
+     * gets neither, because enter and leave do not bubble: the browser
+     * fires them individually on every element being left and entered.
+     * Doing the same here is what makes those listeners work as well, and
+     * the shared ancestor is the boundary, since anything above it was
+     * never left in the first place.
+     */
+    const sendCrossing = (from: Element | null, to: Element | null) => {
+      const fromChain = ancestry(from)
+      const toChain = ancestry(to)
+      const shared = fromChain.find((el) => toChain.includes(el)) ?? null
+
+      for (const el of fromChain) {
+        if (el === shared) break
+        if (el.isConnected) send(el, 'pointerleave', to, false)
+      }
+
+      const entered: Element[] = []
+      for (const el of toChain) {
+        if (el === shared) break
+        entered.push(el)
+      }
+      // Outermost first, the order the browser uses.
+      for (const el of entered.reverse()) send(el, 'pointerenter', from, false)
+    }
+
     const sync = () => {
       if (pointerX < 0 || nudging) return
       const actual = document.elementFromPoint(pointerX, pointerY)
@@ -79,8 +116,9 @@ export function useHoverSync() {
 
       // Order matters: everything leaving is told first, so a handler
       // reacting to the new target cannot be undone by the old one's exit.
-      if (from?.isConnected) send(from, 'pointerout', actual)
-      if (actual) send(actual, 'pointerover', from)
+      if (from?.isConnected) send(from, 'pointerout', actual, true)
+      if (actual) send(actual, 'pointerover', from, true)
+      sendCrossing(from, actual)
 
       // And the nudge that re-runs the browser's own hit test, for `:hover`.
       cancelAnimationFrame(restore)

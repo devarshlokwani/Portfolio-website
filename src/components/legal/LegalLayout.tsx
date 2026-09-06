@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import { AccentedTitle } from '@/components/ui/AccentedTitle'
+
 interface LegalLayoutProps {
   title: string
   lastUpdated: string
@@ -14,7 +16,9 @@ interface LegalLayoutProps {
 export function LegalLayout({ title, lastUpdated, children }: LegalLayoutProps) {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 pb-24 pt-32 md:px-10 md:pt-36">
-      <h1 className="font-display text-4xl font-semibold text-fg md:text-5xl">{title}</h1>
+      <h1 className="font-display text-4xl font-semibold text-fg md:text-5xl">
+        <AccentedTitle title={title} />
+      </h1>
       <p className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-fg-subtle">
         Last updated {lastUpdated}
       </p>

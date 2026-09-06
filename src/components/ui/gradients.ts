@@ -37,3 +37,29 @@ export const SURFACE_SHEEN: CSSProperties = {
   backgroundImage:
     'linear-gradient(180deg, color-mix(in srgb, var(--color-fg) 9%, transparent), transparent 58%)',
 }
+
+/**
+ * The faint diagonal lift that keeps a card from reading as a flat slab.
+ *
+ * Light falling across the panel from the top left, fading out well before
+ * halfway: enough to give the surface a direction, not enough to be seen as
+ * a gradient in its own right. Both stops are opaque, so a card wearing this
+ * still hides whatever is layered behind it, which is what the About cards
+ * need of their cogs.
+ *
+ * Taken as a function of the base colour rather than a fixed pair of colours
+ * because the cards that use it do not share one: the sub-footer's sit on
+ * the page colour and About's on the lifted surface. Same treatment, each
+ * measured from its own ground.
+ *
+ * The lift is toward the theme's foreground rather than white, which is what
+ * makes it survive the light theme. Mixing white into a card that is already
+ * white changes nothing, so the treatment simply vanished there; mixing in
+ * the foreground lightens a dark card and shades a light one, which is the
+ * same idea either way round.
+ */
+export function cardSheen(base: string, lift = 10): CSSProperties {
+  return {
+    backgroundImage: `linear-gradient(158deg, color-mix(in srgb, ${base} ${100 - lift}%, var(--color-fg)), ${base} 62%)`,
+  }
+}

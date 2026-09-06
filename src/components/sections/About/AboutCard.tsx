@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { IconType } from 'react-icons'
 
 import { CornerCog } from '@/components/ui/CornerCog'
@@ -19,6 +19,7 @@ interface AboutCardProps {
   /** the full-width card carries a larger title than the two half-width ones */
   size?: 'md' | 'lg'
   className?: string
+  style?: CSSProperties
 }
 
 /**
@@ -38,6 +39,7 @@ export function AboutCard({
   footer,
   size = 'md',
   className = '',
+  style,
 }: AboutCardProps) {
   const titleSize = size === 'lg' ? 'text-3xl md:text-4xl' : 'text-2xl'
 
@@ -48,7 +50,7 @@ export function AboutCard({
     // fill it.
     <div className="relative h-full">
       {cog && <CornerCog placement={cog} />}
-      <div className={`relative flex h-full flex-col gap-6 ${className}`}>
+      <div style={style} className={`relative flex h-full flex-col gap-6 ${className}`}>
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"

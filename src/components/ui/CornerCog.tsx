@@ -12,12 +12,13 @@ const GEAR = gearPath({ teeth: 12, rTip: 100, rRoot: 78, rBore: R_BORE })
  *  well back: present and clearly orange, but furniture. */
 const COG_OPACITY = 0.55
 
-type Placement = 'top' | 'left' | 'right' | 'top-right'
+type Placement = 'top' | 'bottom' | 'left' | 'right' | 'top-right'
 
 /** Half the cog hangs off the edge it's anchored to; the other half is
  *  covered by the card, which is what sets the 50/50 split. */
 const ANCHOR: Record<Placement, string> = {
   top: 'left-1/2 top-0 -translate-x-1/2 -translate-y-1/2',
+  bottom: 'left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2',
   left: 'left-0 top-1/2 -translate-x-1/2 -translate-y-1/2',
   right: 'right-0 top-1/2 translate-x-1/2 -translate-y-1/2',
   'top-right': 'right-0 top-0 translate-x-1/3 -translate-y-1/3',
@@ -30,7 +31,13 @@ const TURNS = 0.75
 
 /** Neighbouring cogs counter-rotate, which reads as a linked mechanism
  *  rather than unrelated parts all drifting the same way. */
-const SPIN: Record<Placement, number> = { top: 1, left: -1, right: 1, 'top-right': 1 }
+const SPIN: Record<Placement, number> = {
+  top: 1,
+  bottom: -1,
+  left: -1,
+  right: 1,
+  'top-right': 1,
+}
 
 /**
  * A gear sitting half-hidden behind the corner or edge of a card.
