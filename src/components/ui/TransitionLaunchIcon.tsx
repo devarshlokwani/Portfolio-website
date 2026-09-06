@@ -1,10 +1,10 @@
 import { forwardRef, useImperativeHandle, useRef, type RefObject } from 'react'
-import { TbBriefcase2, TbHome2, TbMail } from 'react-icons/tb'
+import { TbBriefcase2, TbHome2, TbMail, TbRosetteDiscountCheck } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 
 import { gsap } from '@/lib/gsap'
 
-export type TransitionDirection = 'work' | 'contact' | 'home'
+export type TransitionDirection = 'work' | 'contact' | 'certificates' | 'home'
 
 /**
  * One icon per destination. `home` is also the fallback for anything without
@@ -18,6 +18,7 @@ export type TransitionDirection = 'work' | 'contact' | 'home'
 const ICONS: Record<TransitionDirection, IconType> = {
   work: TbBriefcase2,
   contact: TbMail,
+  certificates: TbRosetteDiscountCheck,
   home: TbHome2,
 }
 
@@ -165,6 +166,7 @@ export const TransitionLaunchIcon = forwardRef<TransitionLaunchIconHandle>(funct
   const bursts: Record<TransitionDirection, ReturnType<typeof useBurst>> = {
     work: useBurst(),
     contact: useBurst(),
+    certificates: useBurst(),
     home: useBurst(),
   }
   const directions = Object.keys(ICONS) as TransitionDirection[]

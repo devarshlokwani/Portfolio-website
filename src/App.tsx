@@ -10,6 +10,7 @@ import { SubFooter } from '@/components/ui/SubFooter'
 import { IntroLoader } from '@/components/intro/IntroLoader'
 import { useHoverSync } from '@/hooks/useHoverSync'
 import { HomePage } from '@/pages/HomePage'
+import { CertificatesPage } from '@/pages/CertificatesPage'
 import { ContactPage } from '@/pages/ContactPage'
 import { ExperiencePage } from '@/pages/ExperiencePage'
 import { PrivacyPolicy } from '@/pages/PrivacyPolicy'
@@ -30,6 +31,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/experience" element={<ExperiencePage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           {/* any unknown path (typos, old bookmarks, etc.) lands on Home instead of rendering blank */}

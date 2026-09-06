@@ -1,11 +1,14 @@
 import type { IconType } from 'react-icons'
+import { FaAws } from 'react-icons/fa6'
 import {
+  SiClaude,
   SiDjango,
   SiExpress,
   SiFigma,
   SiGit,
   SiGreensock,
   SiJupyter,
+  SiLangchain,
   SiLit,
   SiMongodb,
   SiMysql,
@@ -53,4 +56,7 @@ export const TECH_ICONS: Record<string, TechIconEntry> = {
   Figma: { icon: SiFigma, color: '#F24E1E' },
   Git: { icon: SiGit, color: '#F05032' },
   'REST APIs': { icon: TbApi, color: 'var(--color-fg-muted)' },
+  AWS: { icon: FaAws, color: '#FF9900' },
+  LangChain: { icon: SiLangchain, color: 'var(--color-fg)' },
+  Claude: { icon: SiClaude, color: '#D97757' },
 }

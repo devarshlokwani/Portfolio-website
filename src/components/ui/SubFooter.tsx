@@ -4,6 +4,7 @@ import { TbBriefcase2, TbHome2 } from 'react-icons/tb'
 import { useLocation } from 'react-router-dom'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { CornerCog } from '@/components/ui/CornerCog'
 import { ACCENT_GRADIENT, GREEN_GRADIENT } from '@/components/ui/gradients'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { gsap } from '@/lib/gsap'
@@ -403,10 +404,31 @@ export function SubFooter() {
         </h2>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 md:gap-8">
-        {cards.map((c) => (
-          <div key={c.id}>{c.node}</div>
-        ))}
+      {/* Two gears in the gutters between the cards. Same trick the About
+          cards use: they are siblings *before* the grid, so the cards' own
+          opaque surfaces do the covering and only the strip of tooth that
+          falls in the gap shows. They sit at different heights and turn
+          opposite ways, which reads as one linked mechanism running behind
+          the row rather than two ornaments. */}
+      <div className="relative">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <CornerCog
+            placement="left"
+            anchor="left-1/3 top-[26%] -translate-x-1/2 -translate-y-1/2"
+            className="h-56 w-56 lg:h-64 lg:w-64"
+          />
+          <CornerCog
+            placement="right"
+            anchor="left-2/3 top-[68%] -translate-x-1/2 -translate-y-1/2"
+            className="h-56 w-56 lg:h-64 lg:w-64"
+          />
+        </div>
+
+        <div className="relative grid gap-6 md:grid-cols-3 md:gap-8">
+          {cards.map((c) => (
+            <div key={c.id}>{c.node}</div>
+          ))}
+        </div>
       </div>
 
       {/* The closer: a statement, not another link out. */}

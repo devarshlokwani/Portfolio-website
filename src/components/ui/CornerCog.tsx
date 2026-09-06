@@ -49,9 +49,16 @@ const SPIN: Record<Placement, number> = { top: 1, left: -1, right: 1, 'top-right
  */
 export function CornerCog({
   placement,
+  anchor,
   className = 'h-40 w-40 lg:h-48 lg:w-48',
 }: {
   placement: Placement
+  /**
+   * Position utilities replacing the placement's own preset. For spots the
+   * presets do not describe, such as the gutter between two cards rather
+   * than the edge of one. `placement` still sets the direction of spin.
+   */
+  anchor?: string
   /** size utilities: the footer's cog is smaller than the About cards' */
   className?: string
 }) {
@@ -84,7 +91,7 @@ export function CornerCog({
       ref={svgRef}
       aria-hidden="true"
       viewBox="-112 -112 224 232"
-      className={`pointer-events-none absolute hidden md:block ${className} ${ANCHOR[placement]}`}
+      className={`pointer-events-none absolute hidden md:block ${className} ${anchor ?? ANCHOR[placement]}`}
       style={{ opacity: COG_OPACITY }}
     >
       <Gear d={GEAR} rBore={R_BORE} bodyRef={bodyRef} faceRef={faceRef} />

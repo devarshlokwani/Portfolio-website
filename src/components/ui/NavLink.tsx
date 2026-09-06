@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 
+import { SURFACE_SHEEN } from '@/components/ui/gradients'
 import { gsap } from '@/lib/gsap'
 
 interface NavLinkProps {
@@ -245,8 +246,12 @@ export function NavLink({
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       onClick={onClick}
+      // The sheen only goes on the outlined variant. On a plain link there
+      // is no border for the light to catch, so it would just read as a
+      // grey smudge behind the label.
+      style={outlined ? SURFACE_SHEEN : undefined}
       className={`relative isolate block overflow-hidden rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wide ${
-        outlined ? 'border border-border' : ''
+        outlined ? 'border border-border bg-surface/60' : ''
       }`}
     >
       <span aria-hidden="true" className="invisible block">

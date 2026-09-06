@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import { useRouteTransition } from '@/app/RouteTransitionProvider'
+import { SURFACE_SHEEN } from '@/components/ui/gradients'
 import { NavLink } from '@/components/ui/NavLink'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useLenisInstance } from '@/hooks/useLenisInstance'
@@ -18,6 +19,7 @@ const LINKS: LinkConfig[] = [
   { kind: 'hash', href: '#projects', label: 'Projects' },
   { kind: 'route', to: '/contact', label: 'Contact' },
   { kind: 'route', to: '/experience', label: 'Work' },
+  { kind: 'route', to: '/certificates', label: 'Certs' },
 ]
 
 /**
@@ -185,7 +187,10 @@ export function Nav() {
       {/* DL lives in the separate fixed CornerMark component on the far
           left; this nav is centered independently of that, and the theme
           toggle + hamburger stay in normal flow pushed to the right. */}
-      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex">
+      <nav
+        style={SURFACE_SHEEN}
+        className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface/70 p-1 backdrop-blur-md md:flex"
+      >
         {PAGE_LINKS.map(({ link, index }) => (
           <NavLink
             key={link.label}

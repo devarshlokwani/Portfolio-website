@@ -11,13 +11,26 @@ interface FooterLink {
   external?: boolean
 }
 
-const GENERAL_LINKS: FooterLink[] = [
+/**
+ * Split by where a link actually goes, not lumped under one "General"
+ * heading. Four of these scroll to a place on the home page and two load a
+ * page of their own, and a single flat list gave a reader no way to tell
+ * which was which until they clicked.
+ *
+ * "Sections" against "Pages" is the whole distinction in two words: one
+ * moves you down a page, the other loads a new one.
+ */
+const HOME_LINKS: FooterLink[] = [
   { label: 'Home', href: '#hero', hash: true },
   { label: 'About', href: '#about', hash: true },
   { label: 'Skills', href: '#skills', hash: true },
   { label: 'Projects', href: '#projects', hash: true },
-  { label: 'Contact', href: '/contact' },
+]
+
+const PAGE_LINKS: FooterLink[] = [
   { label: 'Work', href: '/experience' },
+  { label: 'Certificates', href: '/certificates' },
+  { label: 'Contact', href: '/contact' },
 ]
 
 const APP_LINKS: FooterLink[] = [{ label: 'Foundr', href: 'https://foundr-xi.vercel.app/', external: true }]
@@ -100,8 +113,9 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 sm:gap-8">
-            <FooterColumn title="General" links={GENERAL_LINKS} />
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8">
+            <FooterColumn title="Sections" links={HOME_LINKS} />
+            <FooterColumn title="Pages" links={PAGE_LINKS} />
             <FooterColumn title="Apps" links={APP_LINKS} />
             <FooterColumn title="Legal" links={LEGAL_LINKS} />
           </div>

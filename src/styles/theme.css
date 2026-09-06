@@ -6,6 +6,9 @@
 
 :root {
   color-scheme: dark;
+  /* Logos lifted from certificates are black ink on transparency, so on
+     a dark page they have to be flipped to read at all. */
+  --logo-filter: invert(1);
 
   --color-bg: #0a0a0c;
   --color-bg-elevated: #121216;
@@ -31,6 +34,7 @@
 
 :root[data-theme='light'] {
   color-scheme: light;
+  --logo-filter: none;
 
   --color-bg: #f7f5f0;
   --color-bg-elevated: #ffffff;

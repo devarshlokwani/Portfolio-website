@@ -1,0 +1,138 @@
+{
+  "_note": "Real certificates, most recent first. Titles, dates and verification codes are transcribed from the certificates themselves. The five Forage job simulations are attributed to the company that sponsored each one (Citi, Deloitte, Lloyds, CBRE), which the certificate shows only as a logo. Skills on each row are the practical tasks the certificate names, or the subject named in its title where it lists none. The scan for each row is the PDF in src/assets/certificates named after its id; see the README there.",
+  "items": [
+    {
+      "id": "aws-cloud-practitioner-essentials",
+      "title": "AWS Cloud Practitioner Essentials",
+      "issuer": "AWS Training & Certification",
+      "issued": "Jul 2026",
+      "credentialId": "",
+      "url": "",
+      "skills": [
+        "AWS"
+      ]
+    },
+    {
+      "id": "amazon-bedrock-getting-started",
+      "title": "Amazon Bedrock Getting Started",
+      "issuer": "AWS Training & Certification",
+      "issued": "Jul 2026",
+      "credentialId": "",
+      "url": "",
+      "skills": [
+        "AWS",
+        "Bedrock"
+      ]
+    },
+    {
+      "id": "citi-software-development",
+      "title": "Technology Software Development Job Simulation",
+      "issuer": "Citi",
+      "issued": "Jul 2026",
+      "credentialId": "cWC5bpZ4yDJtpWhdF",
+      "url": "https://www.theforage.com/completion-certificates/8eNRcRqBZM9HLvwGw/2jxESPvorR7fmypXj_8eNRcRqBZM9HLvwGw_692e57214c1c75fbe0ea59a5_1783155809714_completion_certificate.pdf",
+      "skills": [
+        "State diagrams",
+        "Feature proposal",
+        "Querying web data",
+        "Data visualisation"
+      ]
+    },
+    {
+      "id": "coursera-prompt-engineering",
+      "title": "Prompt Engineering for ChatGPT",
+      "issuer": "Vanderbilt University",
+      "issued": "Jul 2026",
+      "credentialId": "WNRJTT6C58TN",
+      "url": "https://www.coursera.org/account/accomplishments/verify/WNRJTT6C58TN",
+      "skills": [
+        "Prompt engineering"
+      ]
+    },
+    {
+      "id": "deloitte-data-analytics",
+      "title": "Data Analytics Job Simulation",
+      "issuer": "Deloitte Australia",
+      "issued": "Jul 2026",
+      "credentialId": "MQWdyN56P2EBR4ayX",
+      "url": "https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_692e57214c1c75fbe0ea59a5_1783075697666_completion_certificate.pdf",
+      "skills": [
+        "Data analysis",
+        "Forensic technology"
+      ]
+    },
+    {
+      "id": "deloitte-technology",
+      "title": "Technology Job Simulation",
+      "issuer": "Deloitte Australia",
+      "issued": "Jul 2026",
+      "credentialId": "NpEQAjNre7J4b6nEZ",
+      "url": "https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/udmxiyHeqYQLkTPvf_9PBTqmSxAf6zZTseP_692e57214c1c75fbe0ea59a5_1783089026867_completion_certificate.pdf",
+      "skills": [
+        "Coding",
+        "Development"
+      ]
+    },
+    {
+      "id": "langchain-langsmith-fleet",
+      "title": "Quickstart: LangSmith Fleet",
+      "issuer": "LangChain Academy",
+      "issued": "May 2026",
+      "credentialId": "7j8wqscnry",
+      "url": "https://academy.langchain.com/certificates/7j8wqscnry",
+      "skills": [
+        "LangChain",
+        "LangSmith"
+      ]
+    },
+    {
+      "id": "anthropic-ai-fluency",
+      "title": "AI Fluency: Framework & Foundations",
+      "issuer": "Anthropic Education",
+      "issued": "Mar 2026",
+      "credentialId": "scfqcp3r9dg5",
+      "url": "https://verify.skilljar.com/c/scfqcp3r9dg5",
+      "skills": [
+        "Claude"
+      ]
+    },
+    {
+      "id": "anthropic-claude-101",
+      "title": "Claude 101",
+      "issuer": "Anthropic Education",
+      "issued": "Mar 2026",
+      "credentialId": "9jgynhegmy6p",
+      "url": "https://verify.skilljar.com/c/9jgynhegmy6p",
+      "skills": [
+        "Claude"
+      ]
+    },
+    {
+      "id": "lloyds-ux-design",
+      "title": "UX Design Introduction Job Simulation",
+      "issuer": "Lloyds Banking Group",
+      "issued": "Mar 2026",
+      "credentialId": "r9QD63pY8jesJEhMJ",
+      "url": "https://www.theforage.com/completion-certificates/Zbnc2o4ok6kD2NEXx/N65hfzBKXRiATv6yd_Zbnc2o4ok6kD2NEXx_692e57214c1c75fbe0ea59a5_1772715998111_completion_certificate.pdf",
+      "skills": [
+        "Competitive analysis",
+        "Customer research",
+        "User research",
+        "Survey design"
+      ]
+    },
+    {
+      "id": "cbre-project-management",
+      "title": "Project Management Job Simulation",
+      "issuer": "CBRE",
+      "issued": "Mar 2026",
+      "credentialId": "Ae6dDSSrejN4FauWM",
+      "url": "https://www.theforage.com/completion-certificates/PDmHHPmLyCgdQWzdt/STkypM8iMfn4Gk9BF_PDmHHPmLyCgdQWzdt_692e57214c1c75fbe0ea59a5_1772685992618_completion_certificate.pdf",
+      "skills": [
+        "Planning",
+        "Executing",
+        "Monitoring"
+      ]
+    }
+  ]
+}

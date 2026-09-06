@@ -7,6 +7,45 @@ const INTERACTIVE_SELECTOR =
   'a, button, input, textarea, select, [role="button"], [data-cursor-hover]'
 
 /**
+ * The dark greyscale ring with "VIEW MORE" curving around it, shared by
+ * every badge variant. Each instance needs its own textPath ids, so the id
+ * is passed in rather than generated here.
+ */
+function BadgeRing({ id }: { id: string }) {
+  return (
+    <svg className="cursor-icon-badge__ring" viewBox="0 0 96 96">
+      <circle className="cursor-icon-badge__ring-bg" cx="48" cy="48" r="47" />
+      <defs>
+        {/* Short arcs centered exactly on the top and bottom points
+            (not full semicircles: a semicircle left "VIEW MORE"
+            centered via startOffset but still stretching most of the
+            way around to the sides, reading as a left/right split
+            rather than top/bottom): traced in opposite directions so
+            each label's "up" faces outward and reads upright, rather
+            than the bottom copy coming out upside down. */}
+        <path id={`${id}-top`} d="M 19.7,24.2 A 37,37 0 0 1 76.3,24.2" />
+        <path id={`${id}-bottom`} d="M 76.3,71.8 A 37,37 0 0 1 19.7,71.8" />
+      </defs>
+      <text className="cursor-icon-badge__ring-text" textAnchor="middle">
+        <textPath href={`#${id}-top`} startOffset="50%">
+          VIEW MORE
+        </textPath>
+      </text>
+      <text className="cursor-icon-badge__ring-text" textAnchor="middle">
+        <textPath href={`#${id}-bottom`} startOffset="50%">
+          VIEW MORE
+        </textPath>
+      </text>
+      {/* Separator dots at 3 and 9 o'clock, equal distance from both
+          labels, in the gaps left and right between the top and
+          bottom arcs, for a finished, intentional-looking break. */}
+      <circle className="cursor-icon-badge__ring-dot" cx="85" cy="48" r="3" />
+      <circle className="cursor-icon-badge__ring-dot" cx="11" cy="48" r="3" />
+    </svg>
+  )
+}
+
+/**
  * Custom cursor: a redesigned arrow glyph that replaces the native pointer,
  * with a two-tone fg-fill/bg-stroke so it stays legible over any content in
  * either theme. Tracks the pointer with a very short eased glide (smooth,
@@ -22,6 +61,7 @@ const INTERACTIVE_SELECTOR =
 export function CustomCursor() {
   const rootRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLDivElement>(null)
+  const markRef = useRef<HTMLImageElement>(null)
   const reducedMotion = useReducedMotion()
   const ringTextPathId = useId()
 
@@ -114,6 +154,7 @@ export function CustomCursor() {
       // Movement only reaches us while the pointer is outside every iframe,
       // so any move at all is the signal that it has come back out.
       if (overFrame) resume(e.clientX, e.clientY)
+      syncHoverState(e.clientX, e.clientY)
       if (!mouseActive) {
         // Primed the same way as `resume`, and for the same reason: the
         // pointer may have left the window on one side and come back on the
@@ -137,20 +178,49 @@ export function CustomCursor() {
     }
     const onUp = () => root.classList.remove('cursor--down')
 
+    /**
+     * Recomputes the cursor's hover state from scratch, from whatever is
+     * under the pointer right now.
+     *
+     * This used to add a class on `pointerover` and remove it on
+     * `pointerout`, which only holds if those events arrive in perfect
+     * pairs. They do not. Moving between two children of the same card
+     * fires an out and an in for a boundary the reader never crossed, so
+     * the state was torn down and rebuilt for a frame, which is what the
+     * flicker was; and an out that never arrives, because its element was
+     * unmounted or the pointer left through a gap, leaves the state stuck
+     * on with nothing to clear it.
+     *
+     * Deriving the answer instead of accumulating it cannot do either.
+     */
+    const syncHoverState = (x: number, y: number) => {
+      const el = document.elementFromPoint(x, y)
+      root.classList.toggle('cursor--hover', Boolean(el?.closest?.(INTERACTIVE_SELECTOR)))
+
+      const iconTarget = el?.closest?.<HTMLElement>('[data-cursor-icon]') ?? null
+      const wanted = iconTarget ? `cursor--icon-${iconTarget.dataset.cursorIcon}` : null
+
+      for (const cls of [...root.classList]) {
+        if (cls.startsWith('cursor--icon-') && cls !== wanted) root.classList.remove(cls)
+      }
+
+      if (!wanted) return
+      const mark = iconTarget?.dataset.cursorMark
+      // Swapped in before the badge is shown, so the previous hover's logo
+      // never flashes in the new one.
+      if (mark && markRef.current && markRef.current.getAttribute('src') !== mark) {
+        markRef.current.src = mark
+      }
+      root.classList.add(wanted)
+    }
+
     const onOver = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return
       // Coming back out of a frame, this lands a beat before the move that
       // follows it, and it carries a real position, so the arrow is already
       // in the right place by the time it is visible.
       if (overFrame) resume(e.clientX, e.clientY)
-      const target = e.target as Element
-      if (target?.closest?.(INTERACTIVE_SELECTOR)) {
-        root.classList.add('cursor--hover')
-      }
-      const iconTarget = target?.closest?.<HTMLElement>('[data-cursor-icon]')
-      if (iconTarget) {
-        root.classList.add(`cursor--icon-${iconTarget.dataset.cursorIcon}`)
-      }
+      syncHoverState(e.clientX, e.clientY)
     }
     /** Is a point inside any iframe currently on the page? */
     // Hit-tests a point down through shadow roots. Cal's embed puts its
@@ -238,14 +308,7 @@ export function CustomCursor() {
       // Kept as the fast path: where a browser does report the crossing, the
       // handover happens on the event rather than waiting out the sweep.
       if (pointInFrame(e.clientX, e.clientY)) suspend()
-      const target = e.target as Element
-      if (target?.closest?.(INTERACTIVE_SELECTOR)) {
-        root.classList.remove('cursor--hover')
-      }
-      const iconTarget = target?.closest?.<HTMLElement>('[data-cursor-icon]')
-      if (iconTarget) {
-        root.classList.remove(`cursor--icon-${iconTarget.dataset.cursorIcon}`)
-      }
+      syncHoverState(e.clientX, e.clientY)
     }
     // No separate mouseenter handler needed: onMove's !mouseActive branch
     // already re-primes position instantly (via gsap.set, not an eased
@@ -300,36 +363,18 @@ export function CustomCursor() {
             centered behind, the green "F" disc, with "VIEW MORE" curving
             around the band between them. */}
         <div className="cursor-icon-badge cursor-icon-badge--foundr">
-          <svg className="cursor-icon-badge__ring" viewBox="0 0 96 96">
-            <circle className="cursor-icon-badge__ring-bg" cx="48" cy="48" r="47" />
-            <defs>
-              {/* Short arcs centered exactly on the top and bottom points
-                  (not full semicircles: a semicircle left "VIEW MORE"
-                  centered via startOffset but still stretching most of the
-                  way around to the sides, reading as a left/right split
-                  rather than top/bottom): traced in opposite directions so
-                  each label's "up" faces outward and reads upright, rather
-                  than the bottom copy coming out upside down. */}
-              <path id={`${ringTextPathId}-top`} d="M 19.7,24.2 A 37,37 0 0 1 76.3,24.2" />
-              <path id={`${ringTextPathId}-bottom`} d="M 76.3,71.8 A 37,37 0 0 1 19.7,71.8" />
-            </defs>
-            <text className="cursor-icon-badge__ring-text" textAnchor="middle">
-              <textPath href={`#${ringTextPathId}-top`} startOffset="50%">
-                VIEW MORE
-              </textPath>
-            </text>
-            <text className="cursor-icon-badge__ring-text" textAnchor="middle">
-              <textPath href={`#${ringTextPathId}-bottom`} startOffset="50%">
-                VIEW MORE
-              </textPath>
-            </text>
-            {/* Separator dots at 3 and 9 o'clock, equal distance from both
-                labels, in the gaps left and right between the top and
-                bottom arcs, for a finished, intentional-looking break. */}
-            <circle className="cursor-icon-badge__ring-dot" cx="85" cy="48" r="3" />
-            <circle className="cursor-icon-badge__ring-dot" cx="11" cy="48" r="3" />
-          </svg>
+          <BadgeRing id={ringTextPathId} />
           <span className="cursor-icon-badge__mark">F</span>
+        </div>
+
+        {/* The same badge, with the mark left blank until hover fills it in.
+            Anything carrying data-cursor-icon="mark" also carries a
+            data-cursor-mark image, which is what lands here, so a wall of
+            certificates shows each issuer's own logo rather than one shared
+            glyph standing in for all of them. */}
+        <div className="cursor-icon-badge cursor-icon-badge--mark">
+          <BadgeRing id={`${ringTextPathId}-mark`} />
+          <img ref={markRef} className="cursor-icon-badge__logo" alt="" />
         </div>
       </div>
     </div>

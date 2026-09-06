@@ -23,3 +23,17 @@ export const GREEN_GRADIENT: CSSProperties = {
   backgroundClip: 'text',
   color: 'transparent',
 }
+
+/**
+ * The faint top-down sheen on the nav pill and the buttons inside it.
+ *
+ * It is light catching a raised edge, not a colour: a wash of the theme's
+ * own foreground that fades out before halfway down, so the pill reads as
+ * having a lit top edge rather than as a grey box with a gradient in it.
+ * Deliberately weak. At any real strength it stops looking like light and
+ * starts looking like a second surface colour.
+ */
+export const SURFACE_SHEEN: CSSProperties = {
+  backgroundImage:
+    'linear-gradient(180deg, color-mix(in srgb, var(--color-fg) 9%, transparent), transparent 58%)',
+}

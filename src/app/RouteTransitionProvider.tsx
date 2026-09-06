@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useRef, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
@@ -37,7 +37,11 @@ export function useRouteTransition() {
 const ROUTE_DIRECTIONS: Record<string, TransitionDirection> = {
   '/experience': 'work',
   '/contact': 'contact',
+  '/certificates': 'certificates',
 }
+
+/** How long to allow an incoming route to finish laying out. */
+const SETTLE_MS = 450
 
 const SKEW_DEG = 14
 // The panel is oversized relative to the clipping wrapper (which is exactly
@@ -91,12 +95,55 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
     [lenisRef],
   )
 
+  /**
+   * Every scroll-driven animation on the page is anchored to positions
+   * ScrollTrigger measured once. A route swap replaces the whole document
+   * under them, and the single refresh below fires one frame after
+   * `navigate`, before the incoming route has laid out: images and fonts
+   * land later and move everything again.
+   *
+   * The symptom was the sub-footer's gears, which live outside the router
+   * and so survive the swap: their triggers kept the old page's start and
+   * end, which the new page's scroll range never reaches, and they simply
+   * stopped turning.
+   *
+   * Watching the document's own height catches all of it, the swap and
+   * whatever settles afterwards, and costs nothing while the page is still.
+   */
+  useEffect(() => {
+    let frame = 0
+    let lastHeight = document.documentElement.scrollHeight
+
+    const observer = new ResizeObserver(() => {
+      const height = document.documentElement.scrollHeight
+      if (height === lastHeight) return
+      lastHeight = height
+      // Coalesced: a settling page fires this many times in a row, and a
+      // refresh per notification would measure mid-reflow anyway.
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => ScrollTrigger.refresh())
+    })
+
+    observer.observe(document.body)
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(frame)
+    }
+  }, [])
+
   const finishNavigate = useCallback(
     (path: string, hash?: string) => {
       navigate(path)
       requestAnimationFrame(() => {
         landOnDestination(hash)
         ScrollTrigger.refresh()
+        // Again once the incoming route has settled. The refresh above runs
+        // a single frame after `navigate`, which is early enough that a
+        // route whose height happens to match the outgoing one leaves every
+        // trigger holding the old page's measurements, with nothing later
+        // to correct them: the height never changes, so the observer above
+        // never fires either.
+        window.setTimeout(() => ScrollTrigger.refresh(), SETTLE_MS)
       })
     },
     [navigate, landOnDestination],

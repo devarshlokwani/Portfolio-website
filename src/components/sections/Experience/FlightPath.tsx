@@ -174,6 +174,16 @@ export function FlightPath({ jobs, heading }: FlightPathProps) {
           start: 'top top',
           end: `+=${travel}`,
           pin: true,
+          // Refreshed before every other trigger on the page. Pinning adds
+          // a spacer worth a whole extra screenful of scroll, so anything
+          // below this section sits at a different offset once the pin is
+          // in place, and ScrollTrigger measures in refresh order. The
+          // sub-footer's gears are created first (they live outside the
+          // router and survive the route swap), so without this they were
+          // measured against a layout with no spacer in it and ended up
+          // anchored roughly two thousand pixels above where they actually
+          // are, which left them frozen at the end of their range.
+          refreshPriority: 1,
           // Section's own scroll-reveal leaves a leftover GSAP transform on
           // the ancestor <section> once it settles (GSAP animates `y` via
           // transform and doesn't strip it after), which would otherwise

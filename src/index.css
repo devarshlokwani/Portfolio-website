@@ -151,8 +151,9 @@ body {
 /* Icon-swap cursor: hovering an element carrying data-cursor-icon="X"
    fades the default arrow out and this badge in, positioned centered on
    the same tracked point (the arrow's own transform-origin is its top-left
-   corner, not centered, so this needs its own centering offset). Currently
-   only the "foundr" variant exists. */
+   corner, not centered, so this needs its own centering offset). Two
+   variants: "foundr", whose mark is fixed, and "mark", whose logo is set
+   from the hovered element's data-cursor-mark. */
 .cursor-icon-badge {
   position: absolute;
   top: 50%;
@@ -224,14 +225,43 @@ body {
   }
 }
 
-.cursor--icon-foundr .cursor-arrow {
+.cursor--icon-foundr .cursor-arrow,
+.cursor--icon-mark .cursor-arrow {
   opacity: 0;
   transform: scale(0.6);
 }
 
-.cursor--icon-foundr .cursor-icon-badge--foundr {
+.cursor--icon-foundr .cursor-icon-badge--foundr,
+.cursor--icon-mark .cursor-icon-badge--mark {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+/* The logo variant's centre: a pale disc rather than a brand colour, since
+   the logos dropped into it are black ink on transparency and there is one
+   per issuer. Padded so a wide wordmark still has air around it inside the
+   ring. */
+/* The logo variant's centre: a pale disc rather than a brand colour, since
+   the logos dropped into it are black ink on transparency and there is one
+   per issuer. Circular, and the same size as the Foundr badge's mark, so
+   the two read as the same object wearing different faces.
+
+   A wordmark much wider than it is tall has to shrink to fit a circle. The
+   answer is a square mark for that issuer in `logos/marks/`, not a wider
+   badge: widening it pushed the artwork over the ring and turned a circle
+   into a capsule. */
+.cursor-icon-badge__logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 60px;
+  width: 60px;
+  padding: 8px;
+  border-radius: 9999px;
+  background: #f4f3ef;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.35);
 }
 
 /* Theme toggle circular reveal: the toggle drives a clip-path grow on the
