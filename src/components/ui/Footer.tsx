@@ -55,7 +55,16 @@ const ICON_LINKS = [
   { label: 'Email', href: EMAIL_HREF, icon: LuMail, glow: '#34a853' },
 ]
 
-function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
+function FooterColumn({
+  title,
+  links,
+  below,
+}: {
+  title: string
+  links: FooterLink[]
+  /** Anything that belongs to this group rather than to the footer at large. */
+  below?: ReactNode
+}) {
   const { goTo } = useRouteTransition()
 
   return (
@@ -82,14 +91,43 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
                       }
                     : undefined
               }
-              className="text-sm font-medium text-fg transition-colors hover:text-accent"
+                // The Legal labels are two words each and were breaking across
+              // lines in a narrow column, which read as four links rather than
+              // two. The column below is sized to hold the longest of them.
+              className="whitespace-nowrap text-sm font-medium text-fg transition-colors hover:text-accent"
             >
               {link.label}
             </a>
           </li>
         ))}
       </ul>
+      {below}
     </div>
+  )
+}
+
+/**
+ * The DMCA badge, under the Legal column where it belongs with the policy
+ * links rather than floating beside the copyright line.
+ *
+ * Served from this origin rather than from DMCA's CDN, and without their
+ * badge-helper script. Both would have put a third-party request on every
+ * page of a site that otherwise makes none, and handed every visitor's IP
+ * address to them before the page had finished loading. The link is what the
+ * badge is for; the hosting was never the point.
+ */
+function DmcaBadge() {
+  return (
+    <a
+      href="https://www.dmca.com/Protection/Status.aspx?ID=576a0ee9-2945-49b2-b406-2a97016a4ab7"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-cursor-hover
+      title="DMCA.com Protection Status"
+      className="mt-5 inline-block opacity-60 transition-opacity duration-300 hover:opacity-100"
+    >
+      <img src={dmcaBadge} alt="DMCA.com Protection Status" width={121} height={24} />
+    </a>
   )
 }
 
@@ -105,7 +143,7 @@ export function Footer() {
   return (
     <footer className="mx-auto w-full max-w-6xl px-6 pb-10 pt-4 md:px-10 md:pb-14">
       <div className="rounded-3xl border border-border bg-surface px-8 py-10 md:px-12 md:py-14">
-        <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-16">
+        <div className="grid gap-10 md:grid-cols-[0.9fr_1.25fr] md:gap-12">
           <div>
             <Signature>Devarsh Lokwani</Signature>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
@@ -115,35 +153,26 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8">
+          {/* Four across only from `lg`. At `md` the footer splits into two
+              halves, and four columns inside the narrower of them left the
+              content-sized Legal track nothing to give the other three, which
+              pushed the page into horizontal scroll. Two rows of two is the
+              honest fit until there is room.
+
+              The last track is content-sized rather than an equal quarter, so
+              "Terms & Conditions" gets the width it needs and the three
+              shorter columns share what is left. */}
+          <div className="grid grid-cols-2 gap-6 lg:[grid-template-columns:repeat(3,1fr)_max-content] lg:gap-8">
             <FooterColumn title="Sections" links={HOME_LINKS} />
             <FooterColumn title="Pages" links={PAGE_LINKS} />
             <FooterColumn title="Apps" links={APP_LINKS} />
-            <FooterColumn title="Legal" links={LEGAL_LINKS} />
+            <FooterColumn title="Legal" links={LEGAL_LINKS} below={<DmcaBadge />} />
           </div>
         </div>
       </div>
 
       <div className="mt-6 flex flex-col-reverse items-center gap-4 border-t border-border pt-6 font-mono text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between md:mt-8">
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
-          <p>© {new Date().getFullYear()} Devarsh Lokwani. All rights reserved.</p>
-          {/* Served from this origin rather than from DMCA's CDN, and without
-              their badge-helper script. Both would have put a third-party
-              request on every page of a site that otherwise makes none, and
-              handed every visitor's IP address to them before the page had
-              finished loading. The link is what the badge is for; the hosting
-              was never the point. */}
-          <a
-            href="https://www.dmca.com/Protection/Status.aspx?ID=576a0ee9-2945-49b2-b406-2a97016a4ab7"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor-hover
-            title="DMCA.com Protection Status"
-            className="shrink-0 opacity-60 transition-opacity duration-300 hover:opacity-100"
-          >
-            <img src={dmcaBadge} alt="DMCA.com Protection Status" width={121} height={24} />
-          </a>
-        </div>
+        <p>© {new Date().getFullYear()} Devarsh Lokwani. All rights reserved.</p>
         <div className="flex items-center gap-5">
           {ICON_LINKS.map(({ label, href, icon: Icon, glow }) => (
             <a
