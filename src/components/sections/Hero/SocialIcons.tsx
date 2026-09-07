@@ -1,5 +1,6 @@
 import type { IconType } from 'react-icons'
 import { LuGithub, LuLinkedin, LuMail } from 'react-icons/lu'
+import { EMAIL_HREF } from '@/lib/contact'
 
 interface SocialLink {
   label: string
@@ -28,7 +29,7 @@ const LINKS: SocialLink[] = [
   },
   {
     label: 'Email',
-    href: 'mailto:devarshlokwani480@gmail.com',
+    href: EMAIL_HREF,
     icon: LuMail,
     glow: '#34a853',
   },

@@ -6,8 +6,7 @@ import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
 import { GearBadge } from '@/components/ui/GearBadge'
 import { ACCENT_GRADIENT } from '@/components/ui/gradients'
 import resumeUrl from '@/assets/resume/Devarsh_Lokwani_Resume.pdf'
-
-const EMAIL = 'devarshlokwani480@gmail.com'
+import { EMAIL } from '@/lib/contact'
 
 /** What the file is called once it lands in someone's downloads folder. */
 const FILE_NAME = 'Devarsh-Lokwani-Resume.pdf'

@@ -1,8 +1,9 @@
 import { LegalLayout } from '@/components/legal/LegalLayout'
+import { EMAIL, EMAIL_HREF } from '@/lib/contact'
 
 export function TermsAndConditions() {
   return (
-    <LegalLayout title="Terms & Conditions" lastUpdated="30 August 2026">
+    <LegalLayout title="Terms & Conditions" lastUpdated="7 September 2026">
       <section>
         <h2>Acceptance</h2>
         <p>
@@ -15,11 +16,38 @@ export function TermsAndConditions() {
       <section>
         <h2>Content ownership</h2>
         <p>
-          The design, writing, and code that make up this site belong to Devarsh Lokwani, except
-          where a specific project or piece of work is explicitly licensed otherwise (for example,
-          open-source repositories linked from the Projects section, which carry their own
-          licenses). Project write-ups describe real work Devarsh has done; screenshots and demos
-          are representative of that work at the time they were published.
+          The design, writing, code, illustrations, and hand-drawn artwork that make up this site
+          belong to Devarsh Lokwani, and are protected by copyright from the moment they were
+          created. No registration is needed for that to be true. The exception is work that is
+          explicitly licensed otherwise, such as the open-source repositories linked from the
+          Projects section, which carry their own licenses and are governed by those.
+        </p>
+        <p>
+          Project write-ups describe real work Devarsh has done. Screenshots and demos are
+          representative of that work at the time they were published.
+        </p>
+        <p>
+          <strong className="text-fg">What you're welcome to do.</strong> Read it, share a link to
+          it, and quote a short passage with attribution and a link back. Referencing the work in
+          a normal way, the way one site links to another, needs no permission at all.
+        </p>
+        <p>
+          <strong className="text-fg">What needs asking first.</strong> Republishing pages or
+          substantial parts of them, reusing the writing as your own, lifting the artwork or
+          illustrations, or copying the site's design and code to build your own portfolio.
+          Passing any of this off as your own work is the thing this section exists to be clear
+          about. Ask and the answer is often yes: <a href={EMAIL_HREF}>{EMAIL}</a>.
+        </p>
+        <p>
+          <strong className="text-fg">Third-party marks.</strong> Company names and logos shown on
+          the Certificates page identify the organisation that issued a certificate Devarsh holds.
+          They remain the property of their respective owners and are used only to identify the
+          issuer. Nothing here implies endorsement, sponsorship, or affiliation.
+        </p>
+        <p>
+          If you believe something on this site infringes your copyright, write to{' '}
+          <a href={EMAIL_HREF}>{EMAIL}</a> with enough detail to identify the material and it will
+          be looked at promptly.
         </p>
       </section>
 
@@ -65,7 +93,7 @@ export function TermsAndConditions() {
       <section>
         <h2>Contact</h2>
         <p>
-          Questions about these terms: <a href="mailto:devarshlokwani480@gmail.com">devarshlokwani480@gmail.com</a>.
+          Questions about these terms: <a href={EMAIL_HREF}>{EMAIL}</a>.
         </p>
       </section>
     </LegalLayout>

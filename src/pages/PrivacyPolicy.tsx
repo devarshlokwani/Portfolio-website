@@ -1,4 +1,5 @@
 import { LegalLayout } from '@/components/legal/LegalLayout'
+import { EMAIL, EMAIL_HREF } from '@/lib/contact'
 
 export function PrivacyPolicy() {
   return (
@@ -105,7 +106,7 @@ export function PrivacyPolicy() {
         <p>
           Want a guestbook entry removed, or want to know exactly what's been submitted under your
           name? Email{' '}
-          <a href="mailto:devarshlokwani480@gmail.com">devarshlokwani480@gmail.com</a> and it'll be
+          <a href={EMAIL_HREF}>{EMAIL}</a> and it'll be
           sorted out directly, with no formal process needed for a site this size.
         </p>
       </section>
@@ -121,7 +122,7 @@ export function PrivacyPolicy() {
       <section>
         <h2>Contact</h2>
         <p>
-          Questions about this policy: <a href="mailto:devarshlokwani480@gmail.com">devarshlokwani480@gmail.com</a>.
+          Questions about this policy: <a href={EMAIL_HREF}>{EMAIL}</a>.
         </p>
       </section>
     </LegalLayout>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { LuGithub, LuLinkedin, LuMail } from 'react-icons/lu'
 
 import { useRouteTransition } from '@/app/routeTransition'
+import { EMAIL_HREF } from '@/lib/contact'
 
 interface FooterLink {
   label: string
@@ -50,7 +51,7 @@ const ICON_LINKS = [
     icon: LuLinkedin,
     glow: '#0a66c2',
   },
-  { label: 'Email', href: 'mailto:devarshlokwani480@gmail.com', icon: LuMail, glow: '#34a853' },
+  { label: 'Email', href: EMAIL_HREF, icon: LuMail, glow: '#34a853' },
 ]
 
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
