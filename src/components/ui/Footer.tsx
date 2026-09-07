@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { LuGithub, LuLinkedin, LuMail } from 'react-icons/lu'
+import { useLocation } from 'react-router-dom'
 
 import { useRouteTransition } from '@/app/routeTransition'
 import dmcaBadge from '@/assets/dmca-badge.png'
@@ -106,25 +107,43 @@ function FooterColumn({
   )
 }
 
+const DMCA_STATUS_URL =
+  'https://www.dmca.com/Protection/Status.aspx?ID=576a0ee9-2945-49b2-b406-2a97016a4ab7'
+
 /**
  * The DMCA badge, under the Legal column where it belongs with the policy
  * links rather than floating beside the copyright line.
  *
- * Served from this origin rather than from DMCA's CDN, and without their
- * badge-helper script. Both would have put a third-party request on every
- * page of a site that otherwise makes none, and handed every visitor's IP
- * address to them before the page had finished loading. The link is what the
- * badge is for; the hosting was never the point.
+ * The image is served from this origin rather than from DMCA's CDN, and
+ * their badge-helper script is not loaded. Both would have put a third-party
+ * request on every page of a site that otherwise makes none, and handed every
+ * visitor's IP address to them before the page had finished loading.
+ *
+ * That script did exactly one thing worth keeping: append the current page's
+ * URL to the link as `refurl`, which is how DMCA.com learns which page to
+ * scan. Dropping it outright left their record with no URL at all and the
+ * protection status stuck at unavailable, so the one line is reproduced here
+ * instead. `useLocation` rather than reading `window` during render, so the
+ * value follows a route change; unencoded to match their own script, since
+ * that is the shape their end is built to receive.
+ *
+ * `dmca-badge` is the class their crawler looks for when it checks the page.
  */
 function DmcaBadge() {
+  const location = useLocation()
+  const href =
+    typeof window === 'undefined'
+      ? DMCA_STATUS_URL
+      : `${DMCA_STATUS_URL}&refurl=${window.location.origin}${location.pathname}`
+
   return (
     <a
-      href="https://www.dmca.com/Protection/Status.aspx?ID=576a0ee9-2945-49b2-b406-2a97016a4ab7"
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       data-cursor-hover
       title="DMCA.com Protection Status"
-      className="mt-5 inline-block opacity-60 transition-opacity duration-300 hover:opacity-100"
+      className="dmca-badge mt-5 inline-block opacity-60 transition-opacity duration-300 hover:opacity-100"
     >
       <img src={dmcaBadge} alt="DMCA.com Protection Status" width={121} height={24} />
     </a>
