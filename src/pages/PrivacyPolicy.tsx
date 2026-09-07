@@ -87,9 +87,11 @@ export function PrivacyPolicy() {
       <section>
         <h2>Third-party links</h2>
         <p>
-          The site links out to places like GitHub, LinkedIn, and Foundr. Once you follow one of
-          those links, you're on a site Devarsh doesn't control, governed by that site's own
-          privacy policy.
+          The site links out to places like GitHub, LinkedIn, Foundr, and the DMCA.com status
+          page behind the badge in the footer. Once you follow one of those links, you're on a
+          site Devarsh doesn't control, governed by that site's own privacy policy. The badge
+          image itself is served from this domain, not from DMCA.com, so it loads without
+          telling them you were here.
         </p>
       </section>
 

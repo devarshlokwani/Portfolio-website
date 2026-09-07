@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { LuGithub, LuLinkedin, LuMail } from 'react-icons/lu'
 
 import { useRouteTransition } from '@/app/routeTransition'
+import dmcaBadge from '@/assets/dmca-badge.png'
 import { EMAIL_HREF } from '@/lib/contact'
 
 interface FooterLink {
@@ -124,7 +125,25 @@ export function Footer() {
       </div>
 
       <div className="mt-6 flex flex-col-reverse items-center gap-4 border-t border-border pt-6 font-mono text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between md:mt-8">
-        <p>© {new Date().getFullYear()} Devarsh Lokwani. All rights reserved.</p>
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
+          <p>© {new Date().getFullYear()} Devarsh Lokwani. All rights reserved.</p>
+          {/* Served from this origin rather than from DMCA's CDN, and without
+              their badge-helper script. Both would have put a third-party
+              request on every page of a site that otherwise makes none, and
+              handed every visitor's IP address to them before the page had
+              finished loading. The link is what the badge is for; the hosting
+              was never the point. */}
+          <a
+            href="https://www.dmca.com/Protection/Status.aspx?ID=576a0ee9-2945-49b2-b406-2a97016a4ab7"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor-hover
+            title="DMCA.com Protection Status"
+            className="shrink-0 opacity-60 transition-opacity duration-300 hover:opacity-100"
+          >
+            <img src={dmcaBadge} alt="DMCA.com Protection Status" width={121} height={24} />
+          </a>
+        </div>
         <div className="flex items-center gap-5">
           {ICON_LINKS.map(({ label, href, icon: Icon, glow }) => (
             <a

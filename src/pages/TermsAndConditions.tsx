@@ -49,6 +49,12 @@ export function TermsAndConditions() {
           <a href={EMAIL_HREF}>{EMAIL}</a> with enough detail to identify the material and it will
           be looked at promptly.
         </p>
+        <p>
+          The site is registered with DMCA.com, and the badge in the footer links to that record.
+          It does not create or replace any of the rights above, which exist automatically. Where
+          content from this site is found republished elsewhere, a takedown notice will be sent to
+          the host or platform concerned.
+        </p>
       </section>
 
       <section>
