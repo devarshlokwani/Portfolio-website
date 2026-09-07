@@ -22,7 +22,8 @@ export function TechTag({ name, iconClassName = 'h-3 w-3 shrink-0' }: TechTagPro
 
   return (
     <>
-      {Icon && <Icon className={iconClassName} style={{ color: entry.color }} />}
+      {/* Sits directly beside the name it stands for: decoration, not content. */}
+      {Icon && <Icon aria-hidden="true" className={iconClassName} style={{ color: entry.color }} />}
       {name}
     </>
   )

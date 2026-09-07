@@ -35,21 +35,41 @@ goes straight to its error state.
 Formspree also keeps an allowed-domains list. Add the production domain there or
 submissions from it are rejected even with a correct ID.
 
-### `VITE_SITE_URL` — leave it empty
+### `VITE_SITE_URL` — set this on the host
 
 The site's own address, used for the canonical link, the Open Graph and Twitter
 tags, and the URLs inside `sitemap.xml` and `robots.txt`.
 
-Leave it blank in both places. `scripts/site-url.mjs` resolves it in this order:
+Set it to **`https://devarshlokwani.com`** (no trailing slash) in Vercel's
+environment variables. Leave it blank locally, where the fallback is what you want.
+
+`scripts/site-url.mjs` resolves it in this order:
 
 1. `VITE_SITE_URL`, if set
 2. `VERCEL_PROJECT_PRODUCTION_URL`, which Vercel provides to the build
 3. `http://localhost:5173`
 
-So a Vercel build gets the real hostname on its own, and a local build gets
-localhost, without either being written down. Only set it explicitly if you deploy
-somewhere that isn't Vercel, or you put a custom domain in front. **Never set it to
-localhost on a host** — that ships localhost URLs into your public link previews.
+**Do not rely on step 2 once a custom domain is attached.** It is documented to
+prefer a custom domain but was observed still reporting the project's
+`*.vercel.app` name, which shipped a canonical link and a sitemap full of URLs
+pointing at a hostname that only redirects. A canonical that points somewhere that
+redirects elsewhere is a contradictory signal to a search engine, and a sitemap of
+redirects gets flagged in Search Console rather than indexed. Naming the domain
+explicitly costs one field and removes the ambiguity entirely.
+
+**Never set it to localhost on a host** — that ships localhost URLs into your
+public link previews.
+
+Environment variables are read at **build** time, not request time, so changing
+this only takes effect on the next deployment. After changing it, redeploy and then
+confirm with:
+
+```bash
+curl -s https://devarshlokwani.com/ | grep -o '<link rel="canonical"[^>]*>'
+curl -s https://devarshlokwani.com/robots.txt
+```
+
+Both should name the custom domain.
 
 ### The rest — leave empty
 
@@ -117,8 +137,13 @@ WhatsApp and iMessage silently show no image at all.
 
 ## Deploying
 
-Vercel, from the `main` branch. `vercel.json` already carries the SPA rewrite that
-makes `/certificates` and friends resolve on a direct visit.
+Live at **https://devarshlokwani.com**, on Vercel, from the `main` branch. The
+domain is registered at Cloudflare and points at Vercel; `www` and the project's
+original `*.vercel.app` name both 308-redirect to the apex, so there is one
+canonical hostname and no duplicate content.
+
+`vercel.json` already carries the SPA rewrite that makes `/certificates` and
+friends resolve on a direct visit.
 
 **On the import screen:**
 
@@ -135,12 +160,14 @@ Do not replace the build command with `vite build`. `npm run build` chains
 type check and ships without `sitemap.xml` or `robots.txt`.
 
 Vercel reads the nine keys in `.env.example` and offers them as environment
-variables. Fill in `VITE_FORMSPREE_ID` and leave the other eight empty.
+variables. Fill in `VITE_FORMSPREE_ID` and `VITE_SITE_URL`, and leave the other
+seven empty.
 
 **After the first deploy:**
 
-1. View source on the live page. `og:image` should be an absolute
-   `https://…/og-image.jpg` — not localhost, and not a literal `%VITE_SITE_URL%`.
+1. View source on the live page. The canonical link and `og:image` should both
+   name **devarshlokwani.com** — not localhost, not the `*.vercel.app` name, and
+   not a literal `%VITE_SITE_URL%`.
 2. Type `/certificates` into the address bar rather than clicking through. This is
    the one thing local preview cannot prove: it exercises the rewrite. A 404 means
    `vercel.json` was not picked up.

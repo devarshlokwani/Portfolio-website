@@ -2,7 +2,7 @@ import { LegalLayout } from '@/components/legal/LegalLayout'
 
 export function PrivacyPolicy() {
   return (
-    <LegalLayout title="Privacy Policy" lastUpdated="30 August 2026">
+    <LegalLayout title="Privacy Policy" lastUpdated="7 September 2026">
       <section>
         <h2>Overview</h2>
         <p>
@@ -29,26 +29,57 @@ export function PrivacyPolicy() {
           submissions in a short window. It isn't linked to any other information about you.
         </p>
         <p>
+          <strong className="text-fg">Booking calendar.</strong> The Contact page can show a
+          booking calendar provided by Cal.com. It does not load on its own: it stays behind a
+          button until you ask for it, because loading it opens a connection to Cal.com, which
+          can then see your IP address, set its own cookies in your browser, and report errors
+          to its own monitoring provider. None of that happens unless you press the button. If
+          you book a time, the details you give go to Cal.com and are governed by their privacy
+          policy. You can skip the embed entirely and open Cal.com directly instead.
+        </p>
+        <p>
+          <strong className="text-fg">Hosting.</strong> The site is served by Vercel, which like
+          any web host records standard request information such as your IP address and browser
+          type in its server logs. That is a by-product of serving the page, not something this
+          site collects or looks at.
+        </p>
+        <p>
           Nothing else is collected. There's no account system, no payment processing, and no
-          form on this site asks for anything beyond what's described above.
+          form on this site asks for anything beyond what's described above. Fonts and images
+          are served from this site's own domain, not from a third-party CDN, so simply reading
+          a page does not announce your visit to anyone else.
         </p>
       </section>
 
       <section>
         <h2>Cookies &amp; local storage</h2>
         <p>
-          The site stores a couple of small preferences directly in your browser: your dark/light
-          theme choice, and whether you've already seen the intro animation, so they persist
-          between visits. Both stay on your device, are never transmitted anywhere, and exist
-          purely to make the site work the way you left it.
+          <strong className="text-fg">This site sets no cookies at all.</strong> It stores a
+          couple of small preferences directly in your browser instead: your dark/light theme
+          choice, and whether you've already seen the intro animation, so they persist between
+          visits. Both stay on your device, are never transmitted anywhere, and exist purely to
+          make the site work the way you left it.
+        </p>
+        <p>
+          The one exception is the booking calendar described above. If you choose to load it,
+          Cal.com sets a small number of its own cookies for security and session purposes. That
+          is why it is behind a button: nothing third-party touches your browser until you decide
+          it should.
+        </p>
+        <p>
+          Because of that, there is no cookie banner. A banner exists to ask permission before
+          non-essential cookies are set, and this site does not set any. Rather than ask you to
+          dismiss a notice about tracking that isn't happening, the tracking simply isn't there.
         </p>
       </section>
 
       <section>
         <h2>Analytics &amp; tracking</h2>
         <p>
-          This site does not use Google Analytics, advertising pixels, or any other third-party
-          tracking or analytics service.
+          This site does not use Google Analytics, advertising pixels, heat mapping, session
+          recording, or any other third-party tracking or analytics service. There is no way for
+          this site to tell you apart from any other visitor, and no record is kept of who has
+          been here.
         </p>
       </section>
 

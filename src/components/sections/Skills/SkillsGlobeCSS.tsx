@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { SkillNode, type SkillItem, type SkillNodeState } from '@/components/sections/Skills/SkillNode'
 import {
@@ -105,8 +105,59 @@ interface SkillsGlobeCSSProps {
   activeCategory?: string | null
 }
 
+/** The globe's own drawing size, before any fitting. */
+const BOX = 380
+const BOX_MD = 480
+
+/** How far past the box the outermost node labels reach, as a multiplier. */
+const LABEL_ALLOWANCE = 1.08
+
+/**
+ * How much of its natural size the globe can actually have here.
+ *
+ * Every node is positioned in absolute pixels off `RADIUS`, so the box cannot
+ * simply be given a percentage width: the sphere would keep its old radius
+ * inside a smaller frame and spill out of it. Scaling the whole thing keeps
+ * the geometry exactly as drawn and just makes it smaller, and measuring the
+ * parent rather than the viewport means it also fits inside whatever padding
+ * and grid column it happens to land in.
+ */
+function useFittedScale(box: number) {
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return undefined
+    const fit = () => {
+      const available = el.getBoundingClientRect().width
+      // Fitted against a little more than the box, because the node labels
+      // hang past its edge: sized to the box alone, the outermost names were
+      // sliced in half by the wrapper's clip.
+      if (available > 0) setScale(Math.min(1, available / (box * LABEL_ALLOWANCE)))
+    }
+    fit()
+    const observer = new ResizeObserver(fit)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [box])
+
+  return { wrapRef, scale }
+}
+
 export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  // Below `md` the globe is drawn at BOX; from `md` up the class list swaps it
+  // to BOX_MD, and the fit is measured against whichever is in play.
+  const [box, setBox] = useState(BOX)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)')
+    const sync = () => setBox(mq.matches ? BOX_MD : BOX)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+  const { wrapRef, scale } = useFittedScale(box)
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([])
   const ringRefs = useRef<(HTMLDivElement | null)[]>([])
   const starRefs = useRef<(SVGPathElement | null)[]>([])
@@ -254,6 +305,20 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
   }
 
   return (
+    // The wrapper is what the page lays out: full width, and only as tall as
+    // the scaled globe, so shrinking the sphere closes the gap under it
+    // instead of leaving the original box's worth of empty space behind.
+    <div
+      ref={wrapRef}
+      // `min-w-0` is what makes the measurement mean anything. A grid or flex
+      // item defaults to `min-width: auto`, so the fixed-size globe inside was
+      // forcing this wrapper's column open to its own full width, the hook
+      // then measured that and concluded it already fitted. Allowing the
+      // wrapper to shrink below its content is what lets it report the space
+      // actually available.
+      className="w-full min-w-0 overflow-hidden"
+      style={{ height: box * scale }}
+    >
     <div
       ref={containerRef}
       onPointerDown={onPointerDown}
@@ -261,7 +326,7 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       className="relative mx-auto h-[380px] w-[380px] cursor-grab touch-none select-none active:cursor-grabbing md:h-[480px] md:w-[480px]"
-      style={{ perspective: '1200px' }}
+      style={{ perspective: '1200px', scale, transformOrigin: 'top center' }}
     >
       {/* Shaded backdrop sphere, a pure CSS radial gradient with no image assets, so
           the icon cloud reads as a globe rather than a scattered pile of icons. */}
@@ -340,6 +405,7 @@ export function SkillsGlobeCSS({ items, activeCategory = null }: SkillsGlobeCSSP
           }}
         />
       ))}
+    </div>
     </div>
   )
 }

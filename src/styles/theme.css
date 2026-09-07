@@ -17,7 +17,13 @@
 
   --color-fg: #f4f3ef;
   --color-fg-muted: #a3a1ab;
-  --color-fg-subtle: #6f6d78;
+  /* 4.59:1 against --color-surface, the lightest of the three backgrounds
+     this sits on, and higher against the other two. The old #6f6d78 managed
+     only 3.89:1 on the page colour, under the 4.5:1 WCAG AA floor for
+     body-size text, and this token carries every eyebrow and label on the
+     site. Solved against the worst case rather than the page colour alone,
+     since a value that passes on --color-bg can still fail on a card. */
+  --color-fg-subtle: #828089;
 
   --color-accent: #ff5a3c;
   --color-accent-fg: #0a0a0c;
@@ -43,11 +49,16 @@
 
   --color-fg: #17161a;
   --color-fg-muted: #55525c;
-  --color-fg-subtle: #8a8790;
+  /* 4.55:1 on --color-bg, and higher again on the white surfaces. The
+     old #8a8790 measured 3.24:1. */
+  --color-fg-subtle: #716f76;
 
-  --color-accent: #d94a2f;
+  /* 4.58:1 on --color-bg, up from #d94a2f's 3.88:1. Accent is used for
+     body-size links as well as fills, and at the old value those links
+     failed AA. A 9% darkening, which the fills read as unchanged. */
+  --color-accent: #c5432b;
   --color-accent-fg: #f7f5f0;
-  --color-accent-soft: #d94a2f5c;
+  --color-accent-soft: #c5432b5c;
 
-  --color-focus-ring: #d94a2f;
+  --color-focus-ring: #c5432b;
 }

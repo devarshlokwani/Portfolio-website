@@ -86,7 +86,13 @@ export function MessageForm() {
         <Label htmlFor="name" hint="(optional)">
           Name
         </Label>
-        <input id="name" name="name" placeholder="Your name" className={FIELD} />
+        <input
+          id="name"
+          name="name"
+          autoComplete="name"
+          placeholder="Your name"
+          className={FIELD}
+        />
 
         <div className="mt-5">
           <Label htmlFor="email">
@@ -96,6 +102,7 @@ export function MessageForm() {
             id="email"
             type="email"
             name="email"
+            autoComplete="email"
             required
             placeholder="your@email.com"
             className={FIELD}
@@ -122,6 +129,18 @@ export function MessageForm() {
             className={`${FIELD} resize-none`}
           />
         </div>
+
+        {/* Said at the point of collection rather than only in the policy: the
+            person deciding whether to send this is standing here, not on the
+            privacy page. */}
+        <p className="mt-5 text-xs leading-relaxed text-fg-muted">
+          Your message is delivered through Formspree and goes straight to my inbox. It is used
+          only to reply to you, never added to a mailing list or shared.{' '}
+          <a href="/privacy" className="underline underline-offset-4 hover:text-fg">
+            Privacy policy
+          </a>
+          .
+        </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
           <p role="status" className="font-mono text-xs text-fg-subtle">

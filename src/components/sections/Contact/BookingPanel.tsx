@@ -39,7 +39,7 @@ const CAL_VARS = {
     'cal-text': '#f4f3ef',
     'cal-text-emphasis': '#f4f3ef',
     'cal-text-subtle': '#a3a1ab',
-    'cal-text-muted': '#6f6d78',
+    'cal-text-muted': '#828089',
     'cal-brand': '#ff5a3c',
     'cal-brand-text': '#0a0a0c',
     'cal-brand-emphasis': '#ff5a3c',
@@ -55,10 +55,10 @@ const CAL_VARS = {
     'cal-text': '#17161a',
     'cal-text-emphasis': '#17161a',
     'cal-text-subtle': '#55525c',
-    'cal-text-muted': '#8a8790',
-    'cal-brand': '#d94a2f',
+    'cal-text-muted': '#716f76',
+    'cal-brand': '#c5432b',
     'cal-brand-text': '#ffffff',
-    'cal-brand-emphasis': '#d94a2f',
+    'cal-brand-emphasis': '#c5432b',
   },
 }
 
@@ -154,9 +154,68 @@ function DurationPicker({
 /** What the loader reserves before any calendar has ever been measured. */
 const MIN_EMBED_HEIGHT = 560
 
+/**
+ * Stands in for the calendar until the reader asks for it.
+ *
+ * Says plainly what loading it involves rather than burying it in the privacy
+ * policy, because the person deciding is standing right here. The direct link
+ * is the way out for anyone who would rather not load a third-party frame at
+ * all: it opens Cal in its own tab, where their relationship is with Cal
+ * instead of being brokered silently by this page.
+ */
+function ConsentGate({ onLoad, minHeight }: { onLoad: () => void; minHeight: number }) {
+  return (
+    <div
+      style={{ minHeight }}
+      className="flex flex-col items-center justify-center gap-5 rounded-2xl border border-border bg-surface px-6 py-16 text-center"
+    >
+      <p className="max-w-md text-sm leading-relaxed text-fg-muted">
+        The booking calendar is loaded from Cal.com. Opening it lets Cal.com set its own
+        cookies and see your IP address, so it stays off until you ask for it.
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={onLoad}
+          data-cursor-hover
+          className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg transition-[transform,translate,rotate,scale] hover:-translate-y-0.5"
+        >
+          Load the calendar
+        </button>
+        <a
+          href={`https://cal.com/${CAL_USER}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-cursor-hover
+          className="rounded-full border border-border px-6 py-3 text-sm font-medium text-fg transition-colors hover:border-fg-subtle"
+        >
+          Open on Cal.com
+        </a>
+      </div>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-fg-subtle">
+        <a href="/privacy" className="underline underline-offset-4">
+          Privacy policy
+        </a>
+      </p>
+    </div>
+  )
+}
+
 export function BookingPanel() {
   const { theme } = useTheme()
   const [slug, setSlug] = useState(DURATIONS[0].slug)
+  /**
+   * Whether the reader has asked for the calendar.
+   *
+   * Cal's embed is a cross-origin frame that sets its own cookies and reports
+   * to its own error-tracking service the moment it boots. Mounting it with
+   * the page made that happen to every visitor who merely opened this route,
+   * before they had done anything and without anywhere to say no. Held behind
+   * a click, none of it happens unless the calendar is actually wanted, which
+   * is both the honest default and what keeps this page free of third-party
+   * cookies.
+   */
+  const [loadCal, setLoadCal] = useState(false)
   const [ready, setReady] = useState(false)
   // The theme whose palette Cal has already been handed. The embed below is
   // held back until this matches, because Cal reads its UI config once when
@@ -192,6 +251,7 @@ export function BookingPanel() {
   // Registered once. Re-running this per theme would stack a fresh pair of
   // listeners on every toggle, since Cal has no way to remove one.
   useEffect(() => {
+    if (!loadCal) return undefined
     let cancelled = false
 
     getCalApi({ namespace: theme })
@@ -210,12 +270,13 @@ export function BookingPanel() {
     return () => {
       cancelled = true
     }
-  }, [theme])
+  }, [theme, loadCal])
 
   // Theme is applied before each mount rather than pushed into a live embed:
   // Cal reads it when the frame boots and does not repaint an already-running
   // calendar, so the embed is keyed on it below and rebuilds instead.
   useEffect(() => {
+    if (!loadCal) return undefined
     let cancelled = false
 
     // `configured` is deliberately not cleared here. It holds the theme it
@@ -261,7 +322,7 @@ export function BookingPanel() {
       // there is nothing to clear because `ready` starts false.
       setReady(false)
     }
-  }, [theme])
+  }, [theme, loadCal])
 
   // Each slug is a separate Cal link and reloads from scratch, so the wait
   // comes back every time the picker changes, not just on first paint.
@@ -296,30 +357,34 @@ export function BookingPanel() {
           the calendar alone. The loader is stacked in the same grid cell
           rather than positioned absolutely, so it reserves height while the
           embed has none to report yet. */}
-      <div className="grid" style={{ minHeight: ready ? undefined : heldHeight }}>
-        <div
-          ref={embedRef}
-          className={`col-start-1 row-start-1 transition-opacity duration-500 ${
-            ready ? 'opacity-100' : 'pointer-events-none opacity-0'
-          }`}
-        >
-          {configured === theme && (
-            <Cal
-              key={`${slug}-${theme}`}
-              namespace={theme}
-              calLink={`${CAL_USER}/${slug}`}
-              config={{ layout: 'month_view', theme }}
-              style={{ width: '100%' }}
-            />
+      {!loadCal ? (
+        <ConsentGate onLoad={() => setLoadCal(true)} minHeight={MIN_EMBED_HEIGHT} />
+      ) : (
+        <div className="grid" style={{ minHeight: ready ? undefined : heldHeight }}>
+          <div
+            ref={embedRef}
+            className={`col-start-1 row-start-1 transition-opacity duration-500 ${
+              ready ? 'opacity-100' : 'pointer-events-none opacity-0'
+            }`}
+          >
+            {configured === theme && (
+              <Cal
+                key={`${slug}-${theme}`}
+                namespace={theme}
+                calLink={`${CAL_USER}/${slug}`}
+                config={{ layout: 'month_view', theme }}
+                style={{ width: '100%' }}
+              />
+            )}
+          </div>
+
+          {!ready && (
+            <div className="col-start-1 row-start-1 flex items-center justify-center">
+              <CogLoader label="Loading calendar" />
+            </div>
           )}
         </div>
-
-        {!ready && (
-          <div className="col-start-1 row-start-1 flex items-center justify-center">
-            <CogLoader label="Loading calendar" />
-          </div>
-        )}
-      </div>
+      )}
     </div>
   )
 }

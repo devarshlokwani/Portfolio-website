@@ -5,7 +5,7 @@ a single-page React app with hand-tuned motion throughout: a scroll-driven fligh
 path across a hand-inked panorama, a custom cursor that hands control back to the
 browser when it should, and a route transition that wipes between pages.
 
-Live at the deployment URL in the repository's About panel.
+**Live at [devarshlokwani.com](https://devarshlokwani.com).**
 Setup and deployment: **[SETUP.md](SETUP.md)**.
 
 ## Stack
@@ -32,7 +32,8 @@ Setup and deployment: **[SETUP.md](SETUP.md)**.
 | `/privacy`, `/terms` | Legal pages |
 
 Anything else redirects to `/`. `vercel.json` rewrites all paths to `index.html` so
-deep links resolve on a static host.
+deep links resolve on a static host, and `www` and the project's original
+`*.vercel.app` name both redirect to the apex domain.
 
 ## Layout
 

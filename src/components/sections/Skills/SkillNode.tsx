@@ -46,7 +46,8 @@ export const SkillNode = forwardRef<HTMLDivElement, SkillNodeProps>(function Ski
               : undefined,
         }}
       >
-        {Icon && <Icon className="h-5 w-5 md:h-6 md:w-6" />}
+        {/* The label below names the skill, so the glyph is decoration. */}
+        {Icon && <Icon aria-hidden="true" className="h-5 w-5 md:h-6 md:w-6" />}
       </div>
       <span
         className="whitespace-nowrap font-mono text-[10px] transition-opacity duration-500"
