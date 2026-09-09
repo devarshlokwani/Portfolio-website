@@ -2,7 +2,16 @@
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
+    <!-- Google shows a generic globe in search results when it cannot find a
+         favicon it will use, and it probes /favicon.ico directly as well as
+         reading these tags. An SVG on its own was leaving it with nothing to
+         fall back to. All of these are the same artwork, rendered from
+         favicon.svg, so there is one drawing to maintain. -->
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
