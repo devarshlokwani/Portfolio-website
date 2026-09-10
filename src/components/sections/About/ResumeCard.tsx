@@ -5,8 +5,20 @@ import { BorderGlow } from '@/components/ui/BorderGlow'
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
 import { GearBadge } from '@/components/ui/GearBadge'
 import { ACCENT_GRADIENT } from '@/components/ui/gradients'
-import resumeUrl from '@/assets/resume/Devarsh_Lokwani_Resume.pdf'
 import { EMAIL } from '@/lib/contact'
+
+/**
+ * Served from `public/` rather than imported through the bundler.
+ *
+ * An imported asset gets a content hash in its filename, and Vercel then
+ * sends `Content-Disposition: filename="Devarsh_Lokwani_Resume-Dzwbos1j.pdf"`
+ * built from that name. A filename in that header beats the anchor's own
+ * `download` attribute, so the file kept landing in people's downloads
+ * folder with the hash on it no matter what this component asked for.
+ * Un-hashed, the header carries the real name and the URL is also stable
+ * enough to hand out on its own.
+ */
+const RESUME_URL = '/Devarsh-Lokwani-Resume.pdf'
 
 /** What the file is called once it lands in someone's downloads folder. */
 const FILE_NAME = 'Devarsh-Lokwani-Resume.pdf'
@@ -174,11 +186,11 @@ export function ResumeCard({
 
           <BorderGlow className="shrink-0 self-start hover:!border-transparent md:self-auto">
             <CtaLaunchLink
-              href={resumeUrl}
+              href={RESUME_URL}
               label="Download Resume"
               icon={LuDownload}
               tone="fg"
-              onNavigate={() => follow(resumeUrl, FILE_NAME)}
+              onNavigate={() => follow(RESUME_URL, FILE_NAME)}
               className="rounded-full px-6 py-3 text-sm font-medium text-fg"
             />
           </BorderGlow>
