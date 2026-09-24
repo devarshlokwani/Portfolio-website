@@ -1,11 +1,42 @@
 [
   {
+    "slug": "memora",
+    "title": "Memora",
+    "tagline": "AI study decks built from your own notes",
+    "description": "Hand over a PDF, slide deck or set of notes and get back a study course. Memora extracts the structure, orders the topics the way they should be learned, and writes every card from the source text it came out of. Flashcards, multiple choice, fill-in-the-blank, matching and jargon drills, scheduled by spaced repetition. Two-pass generation: the first pass finds structure and citations, the second writes cards per topic from only the relevant chunks.",
+    "stack": [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "Supabase",
+      "PostgreSQL",
+      "Claude",
+      "GSAP"
+    ],
+    "links": {
+      "live": "https://memora-learn.vercel.app/",
+      "github": "https://github.com/devarshlokwani/Memora"
+    },
+    "featured": true,
+    "device": "browser"
+  },
+  {
     "slug": "foundr",
     "title": "Foundr",
     "tagline": "Full-stack finance tracker for solo founders",
     "description": "A live, deployed finance-tracking web app that turns manual records into clear metrics: burn rate, runway, ROI, and margins. Decoupled architecture: a static TypeScript/Lit landing frontend on Vercel and an independent Node.js/Express waitlist API on Render, backed by MongoDB Atlas.",
-    "stack": ["TypeScript", "Node.js", "Express", "MongoDB", "Lit", "Vite"],
-    "links": { "live": "https://foundr-xi.vercel.app/", "github": "https://github.com/devarshlokwani/foundr" },
+    "stack": [
+      "TypeScript",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Lit",
+      "Vite"
+    ],
+    "links": {
+      "live": "https://foundr-xi.vercel.app/",
+      "github": "https://github.com/devarshlokwani/foundr"
+    },
     "featured": true,
     "device": "browser"
   },
@@ -14,8 +45,14 @@
     "title": "Sigma DogCare",
     "tagline": "UX research + React Native dog-care app",
     "description": "User research and stakeholder interviews defined requirements for a dual-interface mobile app. Built a functional React Native prototype covering authentication, booking management, real-time tracking, and payment flows.",
-    "stack": ["React Native", "Figma", "UX Research"],
-    "links": { "github": "#" },
+    "stack": [
+      "React Native",
+      "Figma",
+      "UX Research"
+    ],
+    "links": {
+      "github": "#"
+    },
     "featured": false,
     "device": "mobile"
   },
@@ -24,8 +61,14 @@
     "title": "Pokédex",
     "tagline": "Relational database system",
     "description": "Architected a multi-table relational database and wrote complex SQL queries managing inter-table relationships and aggregate reporting, replicated across MySQL Workbench and MongoDB.",
-    "stack": ["MySQL", "MongoDB", "SQL"],
-    "links": { "github": "#" },
+    "stack": [
+      "MySQL",
+      "MongoDB",
+      "SQL"
+    ],
+    "links": {
+      "github": "#"
+    },
     "featured": false,
     "device": "desktop"
   },
@@ -34,8 +77,15 @@
     "title": "Large-Scale Data Analysis",
     "tagline": "KNN classification & regression in Python",
     "description": "Analysed real-world datasets in Jupyter Notebooks using KNN classification and regression, using Pandas, NumPy, and Matplotlib for wrangling, statistical analysis, and visualisation.",
-    "stack": ["Python", "Pandas", "NumPy", "Jupyter"],
-    "links": { "github": "#" },
+    "stack": [
+      "Python",
+      "Pandas",
+      "NumPy",
+      "Jupyter"
+    ],
+    "links": {
+      "github": "#"
+    },
     "featured": false,
     "device": "desktop"
   },
@@ -44,7 +94,11 @@
     "title": "Veritree",
     "tagline": "AI business analysis & stakeholder modelling",
     "description": "Full Business Model Canvas analysis of an AI-powered enterprise, including stakeholder mapping and adoption analysis using the UTAUT framework and EU AI Act risk classification.",
-    "stack": ["Business Analysis", "UTAUT", "AI Governance"],
+    "stack": [
+      "Business Analysis",
+      "UTAUT",
+      "AI Governance"
+    ],
     "links": {},
     "featured": false,
     "device": "desktop"

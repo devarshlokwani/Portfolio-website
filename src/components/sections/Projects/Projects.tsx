@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react'
 import { LuGithub } from 'react-icons/lu'
 
 import { Section } from '@/components/ui/Section'
 import { FoundrScreens } from '@/components/sections/Projects/FoundrScreens'
+import { MemoraScreens } from '@/components/sections/Projects/MemoraScreens'
 import { ProjectRow } from '@/components/sections/Projects/ProjectRow'
 import { BorderGlow } from '@/components/ui/BorderGlow'
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
@@ -16,12 +18,22 @@ interface ProjectData {
   links: { live?: string; github?: string }
 }
 
-// Only Foundr has real screenshots ready to show right now, the rest come
-// back once their own assets are ready, reusing this same row/showcase shell.
-const VISIBLE_SLUGS = ['foundr']
+// Shown in this order. The rest of projects.json comes back once each one
+// has its own assets ready, reusing this same row and showcase shell.
+const VISIBLE_SLUGS = ['memora', 'foundr']
+
+/** Each project's showcase, since every one's real assets differ. */
+const SCREENS: Record<string, ReactNode> = {
+  memora: <MemoraScreens />,
+  foundr: <FoundrScreens />,
+}
 
 export function Projects() {
-  const projects = (projectsData as ProjectData[]).filter((p) => VISIBLE_SLUGS.includes(p.slug))
+  // Ordered by VISIBLE_SLUGS rather than by the order they sit in the JSON,
+  // so the running numbers follow the list above.
+  const projects = VISIBLE_SLUGS.map(
+    (slug) => (projectsData as ProjectData[]).find((p) => p.slug === slug)!,
+  )
 
   return (
     <Section id="projects" label="03 / Projects">
@@ -48,7 +60,7 @@ export function Projects() {
           <ProjectRow
             key={project.slug}
             project={{ index: i + 1, ...project }}
-            screens={project.slug === 'foundr' ? <FoundrScreens /> : null}
+            screens={SCREENS[project.slug] ?? null}
           />
         ))}
       </div>
