@@ -42,7 +42,7 @@ export function WallEntryForm() {
     }
 
     if (!firebaseEnabled || !db) {
-      setError('The wall is not connected yet. Check back soon.')
+      setError('The wall is not connected yet. Check back shortly.')
       return
     }
 

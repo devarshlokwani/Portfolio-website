@@ -1,9 +1,18 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { collection, limit, onSnapshot, orderBy, query, type Timestamp } from 'firebase/firestore'
 
 import type { WallEntry } from '@/components/sections/SignTheWall/types'
 import { db, firebaseEnabled } from '@/lib/firebase'
 import { Flip } from '@/lib/gsap'
+
+/** The empty and unconfigured states, sized like the wall they stand in for. */
+function EmptyWall({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-h-[240px] items-center justify-center rounded-lg border border-dashed border-border p-8">
+      <p className="max-w-xs text-center font-mono text-sm text-fg-subtle">{children}</p>
+    </div>
+  )
+}
 
 /** Small deterministic hash so each card gets a stable, graffiti-wall-style tilt. */
 function tiltFor(id: string): number {
@@ -51,16 +60,15 @@ export function WallEntryList() {
     flipStateRef.current = null
   }, [entries])
 
+  // Both of these fill the column rather than leaving one line of text in a
+  // space sized to hold a wall of cards, which read as something that had
+  // failed to load rather than as a wall with nothing on it yet.
   if (!firebaseEnabled) {
-    return (
-      <p className="font-mono text-sm text-fg-subtle">
-        The wall isn't connected yet. Add Firebase credentials to see live signatures here.
-      </p>
-    )
+    return <EmptyWall>The wall is not connected yet. Check back shortly.</EmptyWall>
   }
 
   if (entries.length === 0) {
-    return <p className="font-mono text-sm text-fg-subtle">Be the first to sign the wall.</p>
+    return <EmptyWall>Nothing up here yet. Yours would be the first.</EmptyWall>
   }
 
   return (

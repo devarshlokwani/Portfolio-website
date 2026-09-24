@@ -14,6 +14,7 @@ import { CertificatesPage } from '@/pages/CertificatesPage'
 import { ContactPage } from '@/pages/ContactPage'
 import { ExperiencePage } from '@/pages/ExperiencePage'
 import { PrivacyPolicy } from '@/pages/PrivacyPolicy'
+import { WallPage } from '@/pages/WallPage'
 import { TermsAndConditions } from '@/pages/TermsAndConditions'
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route path="/experience" element={<ExperiencePage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/certificates" element={<CertificatesPage />} />
+          <Route path="/wall" element={<WallPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           {/* any unknown path (typos, old bookmarks, etc.) lands on Home instead of rendering blank */}

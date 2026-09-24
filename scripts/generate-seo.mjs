@@ -25,6 +25,7 @@ const ROUTES = [
   { path: '/experience', priority: '0.9' },
   { path: '/certificates', priority: '0.8' },
   { path: '/contact', priority: '0.8' },
+  { path: '/wall', priority: '0.6' },
   { path: '/privacy', priority: '0.3' },
   { path: '/terms', priority: '0.3' },
 ]

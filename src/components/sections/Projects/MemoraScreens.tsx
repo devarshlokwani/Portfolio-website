@@ -1,4 +1,5 @@
 import memoraMac from '@/assets/memora-mac.webp'
+import memoraMark from '@/assets/memora-mark.webp'
 import memoraPhone1 from '@/assets/memora-phone-1.webp'
 import memoraPhone2 from '@/assets/memora-phone-2.webp'
 
@@ -47,6 +48,14 @@ export function MemoraScreens() {
       rel="noopener noreferrer"
       aria-label="Open the live Memora site"
       data-cursor-hover
+      // The cursor becomes the "VIEW MORE" badge wearing Memora's brain,
+      // replacing the arrow entirely while the pointer is over the canvas.
+      // Foundr's showcase has its own named variant because its mark is a
+      // styled letter rather than an image; this one goes through the
+      // generic image variant the certificate wall already uses, so it needs
+      // no new CSS of its own.
+      data-cursor-icon="mark"
+      data-cursor-mark={memoraMark}
       className="relative flex aspect-[10/9] w-full items-center justify-center self-start overflow-hidden rounded-2xl border border-border"
       style={{
         backgroundColor: CANVAS_CRIMSON,

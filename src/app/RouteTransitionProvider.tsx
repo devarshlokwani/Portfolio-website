@@ -22,6 +22,7 @@ const ROUTE_DIRECTIONS: Record<string, TransitionDirection> = {
   '/experience': 'work',
   '/contact': 'contact',
   '/certificates': 'certificates',
+  '/wall': 'wall',
   '/privacy': 'privacy',
   '/terms': 'terms',
 }

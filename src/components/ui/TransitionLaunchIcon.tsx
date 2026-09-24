@@ -6,6 +6,7 @@ import {
   TbMail,
   TbRosetteDiscountCheck,
   TbShieldLock,
+  TbSignature,
 } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 
@@ -17,6 +18,7 @@ export type TransitionDirection =
   | 'certificates'
   | 'privacy'
   | 'terms'
+  | 'wall'
   | 'home'
 
 /**
@@ -27,6 +29,9 @@ export type TransitionDirection =
  * and an email address, and a phone icon would promise a channel that isn't
  * actually on offer. It also matches the mail icon the hero's "Get in Touch"
  * button already uses.
+ *
+ * The wall gets a signature rather than a pen, since signing is the thing
+ * the page asks of you and a bare pencil would read as editing.
  */
 const ICONS: Record<TransitionDirection, IconType> = {
   work: TbBriefcase2,
@@ -34,6 +39,7 @@ const ICONS: Record<TransitionDirection, IconType> = {
   certificates: TbRosetteDiscountCheck,
   privacy: TbShieldLock,
   terms: TbGavel,
+  wall: TbSignature,
   home: TbHome2,
 }
 
@@ -184,6 +190,7 @@ export const TransitionLaunchIcon = forwardRef<TransitionLaunchIconHandle>(funct
     certificates: useBurst(),
     privacy: useBurst(),
     terms: useBurst(),
+    wall: useBurst(),
     home: useBurst(),
   }
   const directions = Object.keys(ICONS) as TransitionDirection[]

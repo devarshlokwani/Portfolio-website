@@ -20,6 +20,7 @@ const LINKS: LinkConfig[] = [
   { kind: 'route', to: '/contact', label: 'Contact' },
   { kind: 'route', to: '/experience', label: 'Work' },
   { kind: 'route', to: '/certificates', label: 'Certs' },
+  { kind: 'route', to: '/wall', label: 'Wall' },
 ]
 
 /**
