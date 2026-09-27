@@ -481,7 +481,9 @@ export function CustomCursor() {
             glyph standing in for all of them. */}
         <div className="cursor-icon-badge cursor-icon-badge--mark">
           <BadgeRing id={`${ringTextPathId}-mark`} />
-          <img ref={markRef} className="cursor-icon-badge__logo" alt="" />
+          <span className="cursor-icon-badge__logo">
+            <img ref={markRef} className="cursor-icon-badge__logo-img" alt="" />
+          </span>
         </div>
       </div>
     </div>

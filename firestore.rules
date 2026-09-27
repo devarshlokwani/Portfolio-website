@@ -3,20 +3,48 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /wallEntries/{entryId} {
+
+      function validName(n) {
+        return n is string && n.size() > 0 && n.size() <= 40;
+      }
+
+      function validMessage(m) {
+        return m is string && m.size() > 0 && m.size() <= 200;
+      }
+
+      function validProvider(p) {
+        return p is string && p in ['google.com', 'github.com'];
+      }
+
+      // The wall is meant to be read by anyone, signed in or not.
       allow read: if true;
 
-      allow create: if request.resource.data.keys().hasOnly(['name', 'message', 'createdAt', 'clientId'])
-                    && request.resource.data.name is string
-                    && request.resource.data.name.size() > 0
-                    && request.resource.data.name.size() <= 40
-                    && request.resource.data.message is string
-                    && request.resource.data.message.size() > 0
-                    && request.resource.data.message.size() <= 200
-                    && request.resource.data.clientId is string
-                    && request.resource.data.clientId.size() <= 64
+      // One signature per account, enforced by making the account's own uid
+      // the document id. A second signature has nowhere to go: it would have
+      // to be written over the first. This is the rule that makes it true,
+      // rather than the interface merely asking nicely.
+      allow create: if request.auth != null
+                    && entryId == request.auth.uid
+                    && request.resource.data.keys().hasOnly(['uid', 'name', 'message', 'provider', 'createdAt'])
+                    && request.resource.data.uid == request.auth.uid
+                    && validName(request.resource.data.name)
+                    && validMessage(request.resource.data.message)
+                    && validProvider(request.resource.data.provider)
                     && request.resource.data.createdAt == request.time;
 
-      allow update, delete: if false;
+      // Editing your own signature later. Scoped to the fields a signer owns
+      // so that anything set from the console, `pinned` in particular, is not
+      // quietly dropped when they come back and reword their message.
+      allow update: if request.auth != null
+                    && entryId == request.auth.uid
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['name', 'message', 'createdAt'])
+                    && validName(request.resource.data.name)
+                    && validMessage(request.resource.data.message)
+                    && request.resource.data.createdAt == request.time;
+
+      // Your own entry is yours to take down again.
+      allow delete: if request.auth != null && entryId == request.auth.uid;
     }
   }
 }

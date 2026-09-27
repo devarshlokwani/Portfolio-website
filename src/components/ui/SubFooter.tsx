@@ -381,7 +381,15 @@ function ClosingPortrait() {
  */
 export function SubFooter() {
   const location = useLocation()
-  const cards = CARDS.filter((c) => c.path !== location.pathname).slice(0, 3)
+  // Never offer a card back to the page you are already on.
+  const available = CARDS.filter((c) => c.path !== location.pathname)
+  // Four still standing means this route is not one of the three
+  // destinations, so nothing was filtered and one has to give. It used to be
+  // whichever fell fourth, which was Foundr, so the product card and its
+  // artwork simply vanished on `/certificates`, `/wall` and the legal pages.
+  // Home is the one to drop instead: the corner mark offers it from every
+  // page already.
+  const cards = available.length > 3 ? available.filter((c) => c.id !== 'home') : available
 
   return (
     // The preceding section already carries its own generous bottom padding,

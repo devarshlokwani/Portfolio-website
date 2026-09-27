@@ -239,29 +239,44 @@ body {
 
 /* The logo variant's centre: a pale disc rather than a brand colour, since
    the logos dropped into it are black ink on transparency and there is one
-   per issuer. Padded so a wide wordmark still has air around it inside the
-   ring. */
-/* The logo variant's centre: a pale disc rather than a brand colour, since
-   the logos dropped into it are black ink on transparency and there is one
    per issuer. Circular, and the same size as the Foundr badge's mark, so
    the two read as the same object wearing different faces.
 
    A wordmark much wider than it is tall has to shrink to fit a circle. The
    answer is a square mark for that issuer in `logos/marks/`, not a wider
    badge: widening it pushed the artwork over the ring and turned a circle
-   into a capsule. */
+   into a capsule.
+
+   The disc is a wrapper rather than the image itself. With the circle on
+   the image, `object-fit: contain` sized a square mark to the full 44px
+   content box, whose corners sit 31.1px from the centre while the rounding
+   clips at 30, so roughly a pixel was shaved off each corner of anything
+   square. Putting the circle on a parent leaves the artwork unclipped at
+   the same size. */
 .cursor-icon-badge__logo {
   position: absolute;
   top: 50%;
   left: 50%;
+  display: flex;
   height: 60px;
   width: 60px;
-  padding: 8px;
+  align-items: center;
+  justify-content: center;
   border-radius: 9999px;
   background: #f4f3ef;
-  object-fit: contain;
   transform: translate(-50%, -50%);
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.35);
+}
+
+/* 42 rather than 44 so the square the artwork is laid out in fits inside
+   the disc whole: half its diagonal is 29.7px against the disc's 30px
+   radius. Memora's brain has empty corners and would have looked fine
+   either way, but the marks folder takes any square logo, and one with ink
+   in its corners would have hung over the edge onto the ring. */
+.cursor-icon-badge__logo-img {
+  height: 42px;
+  width: 42px;
+  object-fit: contain;
 }
 
 /* Theme toggle circular reveal: the toggle drives a clip-path grow on the
