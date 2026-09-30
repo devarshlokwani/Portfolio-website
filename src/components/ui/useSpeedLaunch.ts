@@ -55,14 +55,24 @@ export const SPEED_LAUNCH: Record<SpeedLaunchSize, SpeedLaunchScale> = {
     peak: 1.5,
   },
   slim: {
+    // Longer than the button's fan, not shorter, which looks like a mistake
+    // until you measure the labels. A button here reads "Quick View" in about
+    // 70px and trails a 30px fan behind it. "Verify on Credly" is 186px of
+    // spaced uppercase, so the same 30px trail sat under two and a half times
+    // the text and read as a few stray dashes. These are set against the
+    // label they belong to rather than against the other size.
     lines: [
-      { y: -5, length: 13, thickness: 1.5, delay: 0.015, opacity: 0.75 },
-      { y: 0, length: 19, thickness: 1.5, delay: 0, opacity: 0.9 },
-      { y: 5, length: 13, thickness: 1.5, delay: 0.015, opacity: 0.75 },
+      { y: -5, length: 32, thickness: 1.5, delay: 0.015, opacity: 0.75 },
+      { y: 0, length: 44, thickness: 1.5, delay: 0, opacity: 0.9 },
+      { y: 5, length: 32, thickness: 1.5, delay: 0.015, opacity: 0.75 },
     ],
+    // Thin lines and a small mark are what "slim" means here: the weight of
+    // the flourish, not its reach.
     iconClass: 'h-3.5 w-3.5',
-    travel: 9,
-    exit: 20,
+    // Carried up with the fan so the mark still covers ground proportionate
+    // to the trail behind it, rather than idling in front of a long one.
+    travel: 12,
+    exit: 26,
     peak: 1.35,
   },
 }

@@ -30,6 +30,19 @@ const LIVE_URL = 'https://memora-learn.vercel.app/'
  * `overflow-hidden`. On hover they lift clear of that crop line and scale up
  * with a bouncy overshoot.
  *
+ *
+ * The canvas is a letterbox rather than the near-square it used to be, so the
+ * frame can run the full width of the card. Its height is not free to shrink
+ * though: the devices sit in a collage, the laptop in front overlapping a
+ * phone either side, and on hover they each grow by a tenth and lift clear of
+ * the crop line. The ratio here is the shallowest one that still leaves the
+ * tallest of them, a phone at its hovered size, fully inside the frame. Going
+ * shallower crops their tops the moment the pointer arrives.
+ *
+ * Widths are percentages of the canvas again rather than heights, because
+ * that is what holds the overlap: the laptop has to be wider than the gap
+ * between the phones or the three stop reading as one arrangement.
+ *
  * Each device has its frame baked into the asset at its own real pixel size,
  * so every container is sized to that exact aspect ratio and nothing crops
  * into the hardware, only the deliberate bottom bleed does. Memora's laptop
@@ -56,7 +69,7 @@ export function MemoraScreens() {
       // no new CSS of its own.
       data-cursor-icon="mark"
       data-cursor-mark={memoraMark}
-      className="relative flex aspect-[10/9] w-full items-center justify-center self-start overflow-hidden rounded-2xl border border-border"
+      className="relative flex aspect-[2/1] w-full items-center justify-center self-start overflow-hidden rounded-2xl border border-border"
       style={{
         backgroundColor: CANVAS_CRIMSON,
         backgroundImage: `radial-gradient(${DOT_COLOR} 1px, transparent 1px)`,
@@ -66,7 +79,7 @@ export function MemoraScreens() {
       <div className="group relative h-full w-full">
         {/* the study formats screen: behind, left */}
         <div
-          className="absolute bottom-0 left-[2%] aspect-[380/792] w-[38%] translate-y-[12%] transition-[transform,translate,rotate,scale] duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[-4deg]"
+          className="absolute bottom-0 left-[8%] aspect-[380/792] w-[20%] translate-y-[12%] transition-[transform,translate,rotate,scale] duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[-4deg]"
           style={{ transitionTimingFunction: BOUNCE_EASE }}
         >
           <img
@@ -77,7 +90,7 @@ export function MemoraScreens() {
         </div>
         {/* the waitlist screen: behind, right */}
         <div
-          className="absolute bottom-0 right-[2%] aspect-[380/764] w-[38%] translate-y-[12%] transition-[transform,translate,rotate,scale] delay-75 duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[4deg]"
+          className="absolute bottom-0 right-[8%] aspect-[380/764] w-[20%] translate-y-[12%] transition-[transform,translate,rotate,scale] delay-75 duration-500 group-hover:-translate-y-6 group-hover:scale-110 group-hover:rotate-[4deg]"
           style={{ transitionTimingFunction: BOUNCE_EASE }}
         >
           <img
@@ -88,7 +101,7 @@ export function MemoraScreens() {
         </div>
         {/* the landing page: in front, centred */}
         <div
-          className="absolute bottom-0 left-1/2 aspect-[760/577] w-[80%] -translate-x-1/2 translate-y-[8%] transition-[transform,translate,rotate,scale] delay-150 duration-500 group-hover:-translate-x-1/2 group-hover:-translate-y-4 group-hover:scale-110"
+          className="absolute bottom-0 left-1/2 aspect-[760/577] w-[55%] -translate-x-1/2 translate-y-[8%] transition-[transform,translate,rotate,scale] delay-150 duration-500 group-hover:-translate-x-1/2 group-hover:-translate-y-4 group-hover:scale-110"
           style={{ transitionTimingFunction: BOUNCE_EASE }}
         >
           <img

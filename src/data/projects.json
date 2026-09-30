@@ -3,7 +3,7 @@
     "slug": "memora",
     "title": "Memora",
     "tagline": "AI study decks built from your own notes",
-    "description": "Hand over a PDF, slide deck or set of notes and get back a study course. Memora extracts the structure, orders the topics the way they should be learned, and writes every card from the source text it came out of. Flashcards, multiple choice, fill-in-the-blank, matching and jargon drills, scheduled by spaced repetition. Two-pass generation: the first pass finds structure and citations, the second writes cards per topic from only the relevant chunks.",
+    "description": "Turns a PDF or a set of notes into a study course: topics ordered the way they should be learned, every card written from the source it came from. Flashcards, multiple choice, fill in the blanks, matching and jargon drills, scheduled by spaced repetition. Two passes, one to find the structure and its citations, one to write the cards.",
     "stack": [
       "Next.js",
       "TypeScript",
@@ -24,7 +24,7 @@
     "slug": "foundr",
     "title": "Foundr",
     "tagline": "Full-stack finance tracker for solo founders",
-    "description": "A live, deployed finance-tracking web app that turns manual records into clear metrics: burn rate, runway, ROI, and margins. Decoupled architecture: a static TypeScript/Lit landing frontend on Vercel and an independent Node.js/Express waitlist API on Render, backed by MongoDB Atlas.",
+    "description": "Turns manual records into the numbers a solo founder actually watches: burn rate, runway, ROI and margins. A static TypeScript and Lit landing page on Vercel, an independent Node and Express waitlist API on Render, and MongoDB Atlas behind it, so the page stays fast and the API can change without touching it.",
     "stack": [
       "TypeScript",
       "Node.js",
