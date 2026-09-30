@@ -1,6 +1,7 @@
 import { LuArrowUpRight, LuBadgeCheck } from 'react-icons/lu'
 
 import badgeArt from '@/assets/aws-ai-practitioner-badge.webp'
+import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
 
 const BADGE = {
   title: 'AWS Certified AI Practitioner',
@@ -57,17 +58,28 @@ export function CredlyBadge() {
             <span>Expires {BADGE.expires}</span>
           </div>
 
-          <a
+          {/* The same launch flourish the CTAs use, at its slim scale: this is
+              a line of type inside a card, not a filled button, and the full
+              size fan would run past the text it belongs to. The arrow is what
+              flies, since it is already the mark for leaving the page, and
+              `external` holds the new tab open until the flourish has played.
+              py-1 gives the label room to roll up into without the clip
+              cutting its ascenders. */}
+          <CtaLaunchLink
             href={BADGE.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor-hover
-            className="mt-5 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.15em] text-fg transition-colors hover:text-accent"
-          >
-            <LuBadgeCheck className="h-4 w-4" aria-hidden="true" />
-            Verify on Credly
-            <LuArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </a>
+            external
+            size="slim"
+            tone="fg"
+            icon={LuArrowUpRight}
+            className="mt-4 inline-flex items-center py-1 font-mono text-xs uppercase tracking-[0.15em] text-fg transition-colors hover:text-accent"
+            label={
+              <span className="inline-flex items-center gap-1.5">
+                <LuBadgeCheck className="h-4 w-4" aria-hidden="true" />
+                Verify on Credly
+                <LuArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </span>
+            }
+          />
         </div>
       </div>
     </div>
