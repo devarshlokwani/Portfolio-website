@@ -3,6 +3,7 @@ import { deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firest
 import { LuGithub, LuLogOut, LuPenLine, LuTrash2 } from 'react-icons/lu'
 import { FcGoogle } from 'react-icons/fc'
 
+import { useRouteTransition } from '@/app/routeTransition'
 import { WallAvatar } from '@/components/sections/SignTheWall/WallAvatar'
 import { CornerCog } from '@/components/ui/CornerCog'
 import { CtaLaunchButton } from '@/components/ui/CtaLaunchButton'
@@ -26,6 +27,7 @@ type Status = 'idle' | 'submitting' | 'success' | 'error'
  */
 export function WallEntryForm() {
   const { user, pending, busy, error: authError, signIn, signOut } = useWallAuth()
+  const { goTo } = useRouteTransition()
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -200,8 +202,19 @@ export function WallEntryForm() {
           ) : (
             <>
               By signing you agree to the{' '}
-              <a href="/terms" className="underline underline-offset-4 hover:text-fg">
-                terms
+              {/* Kept as a real href so it can be opened in a new tab and
+                  read by a crawler, but navigated through the router so it
+                  wipes across like every other internal link instead of
+                  reloading the site out from under a half-written note. */}
+              <a
+                href="/terms"
+                onClick={(e) => {
+                  e.preventDefault()
+                  goTo('/terms')
+                }}
+                className="underline underline-offset-4 hover:text-fg"
+              >
+                terms of service
               </a>
               .
             </>

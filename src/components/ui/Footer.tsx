@@ -37,7 +37,10 @@ const PAGE_LINKS: FooterLink[] = [
   { label: 'Sign the Wall', href: '/wall' },
 ]
 
-const APP_LINKS: FooterLink[] = [{ label: 'Foundr', href: 'https://foundr-xi.vercel.app/', external: true }]
+const APP_LINKS: FooterLink[] = [
+  { label: 'Foundr', href: 'https://foundr-xi.vercel.app/', external: true },
+  { label: 'Memora', href: 'https://memora-learn.vercel.app/', external: true },
+]
 
 const LEGAL_LINKS: FooterLink[] = [
   { label: 'Privacy Policy', href: '/privacy' },

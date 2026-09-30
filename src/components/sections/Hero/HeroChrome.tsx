@@ -3,6 +3,7 @@ import { TbBriefcase2, TbMapPin, TbStack2 } from 'react-icons/tb'
 
 import { useRouteTransition } from '@/app/routeTransition'
 import { FoundrLink } from '@/components/sections/Hero/FoundrLink'
+import { MemoraLink } from '@/components/sections/Hero/MemoraLink'
 import { SocialIcons } from '@/components/sections/Hero/SocialIcons'
 import { BorderGlow } from '@/components/ui/BorderGlow'
 import { CtaLaunchLink } from '@/components/ui/CtaLaunchLink'
@@ -33,7 +34,7 @@ interface HeroChromeProps {
 }
 
 /**
- * Everything in the hero except the name, FoundrLink, tagline, socials,
+ * Everything in the hero except the name: the product pills, tagline, socials,
  * the "ship, and actually work." meta block with its buttons, and the
  * bottom info bar. Shared verbatim between Home's Hero and the Work page's
  * own hero so the whole thing reads as one continuous surface across the
@@ -80,8 +81,11 @@ export function HeroChrome({ name, nameRef, metaRef, animateIn = false, actions 
       id="hero"
       className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-6 pt-32 text-center md:px-10 md:pt-36"
     >
-      <div>
+      {/* Wraps rather than shrinks: at the narrowest widths the two pills
+          stack instead of squeezing their labels onto two lines each. */}
+      <div className="flex flex-wrap items-center justify-center gap-3">
         <FoundrLink />
+        <MemoraLink />
       </div>
 
       <p className="mt-6 font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">

@@ -363,8 +363,70 @@ body {
   }
 }
 
+/* The same chase as .foundr-pill, run in the theme's own foreground rather
+   than in a brand colour. Memora's pill sits beside Foundr's, and a second
+   coloured ring had the two reading as one set of controls rather than as
+   two separate products. White on the dark page and black on the light one
+   keeps them apart without putting a third colour in the hero.
+
+   The four stops are the chase itself, not a palette: dim at the tail,
+   brightest in the middle, falling away again, which is what gives the
+   light a head and a trail rather than a uniform ring. */
+@property --memora-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.memora-pill {
+  position: relative;
+  --memora-chase-tail: #3f3f46;
+  --memora-chase-head: #ffffff;
+  --memora-chase-peak: #fafafa;
+  --memora-chase-fade: #a1a1aa;
+}
+
+:root[data-theme='light'] .memora-pill {
+  --memora-chase-tail: #d4d4d8;
+  --memora-chase-head: #000000;
+  --memora-chase-peak: #18181b;
+  --memora-chase-fade: #71717a;
+}
+
+.memora-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--memora-angle),
+    transparent 0%,
+    transparent 30%,
+    var(--memora-chase-tail) 38%,
+    var(--memora-chase-head) 52%,
+    var(--memora-chase-peak) 70%,
+    var(--memora-chase-fade) 88%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: memora-border-spin 3.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes memora-border-spin {
+  to {
+    --memora-angle: 360deg;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .foundr-pill::before {
+  .foundr-pill::before,
+  .memora-pill::before {
     animation: none;
   }
 }

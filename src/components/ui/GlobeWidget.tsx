@@ -171,16 +171,58 @@ export function GlobeWidget({ className = '' }: { className?: string }) {
     canvas.height = CANVAS_H * dpr
     ctx.scale(dpr, dpr)
 
-    const styles = getComputedStyle(document.documentElement)
-    const fg = styles.getPropertyValue('--color-fg').trim()
-    const accent = styles.getPropertyValue('--color-accent').trim()
+    /**
+     * The theme's own colours, re-read rather than captured once.
+     *
+     * A canvas keeps whatever it last painted. Read once at mount, the land
+     * stayed in the foreground colour of the theme it was drawn under, which
+     * is near enough the exact colour the *other* theme's card is: switching
+     * either way left the globe painted in the new background's own colour
+     * and reading as gone.
+     *
+     * Cached in a ref rather than read inside `draw`, which runs on every
+     * frame of the spin and every scroll tick. Resolving a custom property
+     * forces a style recalculation, and that is not something to do sixty
+     * times a second for a value that changes when someone hits the toggle.
+     */
+    let fg = ''
+    let accent = ''
+    /**
+     * The sphere's own body, tinted for the theme rather than always white.
+     *
+     * A white lift over the dark card reads as a lit sphere. Over the light
+     * card, which is white itself, it is nothing at all, so the light theme
+     * had land floating with no globe under it.
+     *
+     * The two alphas are deliberately not the same number. Equal alpha is
+     * not equal presence: dark ink on white carries much further than a
+     * white lift on near-black, so the light theme's is pulled back to land
+     * at the weight the dark one already had.
+     */
+    let body = ''
+    let bodyMid = 0
+    let bodyEdge = 0
+    const readColors = () => {
+      const styles = getComputedStyle(document.documentElement)
+      fg = styles.getPropertyValue('--color-fg').trim()
+      accent = styles.getPropertyValue('--color-accent').trim()
+      const light = document.documentElement.getAttribute('data-theme') === 'light'
+      // the light theme's ink, not a flat black, so the shading keeps the
+      // same faintly cool cast the rest of the page has
+      body = light ? '23, 22, 26' : '255, 255, 255'
+      // Tuned by measurement, not by eye: these land the limb the same
+      // ~14 points of luminance away from the card it sits on as the dark
+      // theme's already were.
+      bodyMid = light ? 0.028 : 0.03
+      bodyEdge = light ? 0.082 : 0.09
+    }
 
     const draw = () => {
       const { lat: lat0, lon: lon0 } = camRef.current
       ctx.clearRect(0, 0, CANVAS_W, CANVAS_H)
 
       // a faint lift toward the limb, so the sphere has a body behind the
-      // land rather than dots floating in the dark
+      // land rather than dots floating on the card
       const glow = ctx.createRadialGradient(
         GLOBE_CX,
         GLOBE_CY,
@@ -189,9 +231,9 @@ export function GlobeWidget({ className = '' }: { className?: string }) {
         GLOBE_CY,
         GLOBE_R,
       )
-      glow.addColorStop(0, 'rgba(255,255,255,0)')
-      glow.addColorStop(0.82, 'rgba(255,255,255,0.03)')
-      glow.addColorStop(1, 'rgba(255,255,255,0.09)')
+      glow.addColorStop(0, `rgba(${body}, 0)`)
+      glow.addColorStop(0.82, `rgba(${body}, ${bodyMid})`)
+      glow.addColorStop(1, `rgba(${body}, ${bodyEdge})`)
       ctx.fillStyle = glow
       ctx.beginPath()
       ctx.arc(GLOBE_CX, GLOBE_CY, GLOBE_R, 0, Math.PI * 2)
@@ -240,8 +282,28 @@ export function GlobeWidget({ className = '' }: { className?: string }) {
     }
 
     drawRef.current = draw
+    readColors()
     draw()
-    return undefined
+
+    /*
+     * Watching the attribute rather than taking the theme as a dependency.
+     * The provider sets `data-theme` from an effect of its own, and a child's
+     * effects run before its parent's, so on the render where the theme
+     * changes this effect would still read the old value. The toggle also
+     * wipes the change across in a view transition, which moves it later
+     * again. The attribute landing is the one signal that is always after
+     * the fact.
+     */
+    const onThemeChange = () => {
+      readColors()
+      draw()
+    }
+    const observer = new MutationObserver(onThemeChange)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    })
+    return () => observer.disconnect()
   }, [activeId, active.lat, active.lon])
 
   // --- the spin to the selected place -----------------------------------
