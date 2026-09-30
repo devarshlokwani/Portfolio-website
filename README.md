@@ -29,6 +29,7 @@ Setup and deployment: **[SETUP.md](SETUP.md)**.
 | `/experience` | The work history, as a plane flying a route across a drawn landscape, one landing per job |
 | `/certificates` | Every certificate, as a wall of scans or a searchable list |
 | `/contact` | Cal.com booking and a message form |
+| `/wall` | Sign the Wall, a public guestbook with Google/GitHub sign-in |
 | `/privacy`, `/terms` | Legal pages |
 
 Anything else redirects to `/`. `vercel.json` rewrites all paths to `index.html` so
@@ -93,6 +94,8 @@ build rather than shipping.
 ## Sign the Wall
 
 `src/components/sections/SignTheWall/` is a public guestbook backed by Firestore,
-with rules in `firestore.rules` and App Check via reCAPTCHA v3. It is written but
-not yet wired into any page, so nothing in it reaches the bundle and its environment
-variables can stay empty. See [SETUP.md](SETUP.md#sign-the-wall-not-yet-live).
+live at `/wall`. Anyone can read it; writing needs a Google or GitHub sign-in, which
+is what makes one signature per person enforceable in `firestore.rules` rather than
+merely asked for. App Check via reCAPTCHA v3 sits behind that. Without the Firebase
+environment variables it renders its signed-out state and opens no connection. See
+[SETUP.md](SETUP.md#sign-the-wall).

@@ -1,11 +1,22 @@
+import type { ReactNode } from 'react'
 import type { IconType } from 'react-icons'
 import { LuFileText } from 'react-icons/lu'
 
-import { LINES, type SpeedLaunchRefs } from '@/components/ui/useSpeedLaunch'
+import {
+  SPEED_LAUNCH,
+  type SpeedLaunchRefs,
+  type SpeedLaunchSize,
+} from '@/components/ui/useSpeedLaunch'
 
 interface SpeedLaunchVisualProps extends SpeedLaunchRefs {
-  label: string
+  /**
+   * A node rather than a string, so a link can keep its own leading and
+   * trailing marks and have the whole lockup roll out together.
+   */
+  label: ReactNode
   icon?: IconType
+  /** must match the size passed to `useSpeedLaunch`, or the fan and the icon disagree */
+  size?: SpeedLaunchSize
   /**
    * Icon/line color: "accent" (text-accent-fg, the default) is for CTAs
    * with a solid accent-colored fill, where accent-fg is what actually
@@ -22,6 +33,7 @@ export function SpeedLaunchVisual({
   label,
   icon: Icon = LuFileText,
   tone = 'accent',
+  size = 'default',
   labelRef,
   burstRef,
   groupRef,
@@ -30,6 +42,7 @@ export function SpeedLaunchVisual({
 }: SpeedLaunchVisualProps) {
   const textTone = tone === 'accent' ? 'text-accent-fg' : 'text-fg'
   const bgTone = tone === 'accent' ? 'bg-accent-fg' : 'bg-fg'
+  const scale = SPEED_LAUNCH[size]
   return (
     <>
       <span ref={labelRef} className="relative z-10 block">
@@ -42,7 +55,7 @@ export function SpeedLaunchVisual({
       >
         <span ref={groupRef} className="relative flex items-center justify-center">
           <span className="absolute right-full top-1/2 mr-1">
-            {LINES.map((cfg, i) => (
+            {scale.lines.map((cfg, i) => (
               <span
                 key={i}
                 ref={(el) => {
@@ -59,7 +72,7 @@ export function SpeedLaunchVisual({
             ))}
           </span>
           <span ref={iconRef} className="flex items-center justify-center">
-            <Icon className={`h-4 w-4 ${textTone}`} />
+            <Icon className={`${scale.iconClass} ${textTone}`} />
           </span>
         </span>
       </span>

@@ -178,21 +178,37 @@ Link previews are cached hard. After changing the OG image, force a refresh thro
 LinkedIn's Post Inspector or Facebook's Sharing Debugger rather than assuming it did
 not work.
 
-## Sign the Wall (not yet live)
+## Sign the Wall
 
-A public Firestore-backed guestbook, complete but not rendered by any page. To turn
-it on:
+A public Firestore-backed guestbook, live at `/wall`. Public to read, signed in to
+write. To connect it:
 
 1. Create a Firebase project and fill in the six `VITE_FIREBASE_*` variables.
-2. Deploy `firestore.rules`. They already restrict `wallEntries` to create-only,
-   with length caps on every field and a server-set `createdAt`.
-3. Register the domain under **App Check → reCAPTCHA v3** and set
-   `VITE_RECAPTCHA_SITE_KEY`. The collection is public-write with no auth; App Check
-   is what stands between it and a bot.
-4. Render `<SignTheWall />` from a page.
+2. Under **Authentication -> Sign-in method**, enable **Google** and **GitHub**, and
+   add the production domain under **Authentication -> Settings -> Authorised
+   domains**. GitHub also needs an OAuth app of its own, with Firebase's callback URL
+   as the authorisation callback.
+3. Deploy `firestore.rules`. They scope `wallEntries` so a document's id must be the
+   signer's own uid, which is what makes one signature per account true in the
+   database rather than merely asked for in the interface. Updates are limited to the
+   fields a signer owns, so a `pinned` flag set from the console survives them
+   rewording their message.
+4. Register the domain under **App Check -> reCAPTCHA v3** and set
+   `VITE_RECAPTCHA_SITE_KEY`, then turn on enforcement for Firestore. Signing in is
+   what gates writing; App Check is what stops a script with a stolen token writing
+   to the collection directly.
 
-Until step 4, none of the Firebase code reaches the bundle — it is tree-shaken out
-entirely, so leaving it dormant costs nothing.
+Leaving the variables blank is safe: `firebaseEnabled` is false without them, the
+wall renders its signed-out state, and no Firebase connection is opened.
+
+To feature a signature, set `pinned: true` on its document from the console. Nothing
+in the interface can set it, and the rules will not let a signer change it.
+
+**Privacy note.** The routes are not code-split, so `src/lib/firebase.ts` is
+evaluated on first load of any page. Its App Check call is at module scope, which
+means that once `VITE_RECAPTCHA_SITE_KEY` is set, Google reCAPTCHA loads on every
+page of the site rather than only on `/wall`. The Privacy Policy says so. If that
+should only happen on the wall, the initialisation needs deferring behind the route.
 
 ## Notes
 

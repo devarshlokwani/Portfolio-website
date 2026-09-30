@@ -3,16 +3,69 @@ import { useRef, type RefObject } from 'react'
 import { gsap } from '@/lib/gsap'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
-// A symmetric converging fan: longest line through the center, shorter
-// ones above and below: straight/horizontal lines, each just at a
-// different height, growing out from the icon toward the left. Each has
-// its own small burst delay so they don't all snap in as one flat sweep,
-// with the center line (closest to the icon's own path) leading.
-export const LINES = [
-  { y: -7, length: 22, thickness: 2, delay: 0.015, opacity: 0.75 },
-  { y: 0, length: 30, thickness: 2, delay: 0, opacity: 0.9 },
-  { y: 7, length: 22, thickness: 2, delay: 0.015, opacity: 0.75 },
-]
+export interface SpeedLine {
+  y: number
+  length: number
+  thickness: number
+  delay: number
+  opacity: number
+}
+
+export type SpeedLaunchSize = 'default' | 'slim'
+
+interface SpeedLaunchScale {
+  /**
+   * A symmetric converging fan: longest line through the centre, shorter
+   * ones above and below: straight/horizontal lines, each just at a
+   * different height, growing out from the icon toward the left. Each has
+   * its own small burst delay so they don't all snap in as one flat sweep,
+   * with the centre line (closest to the icon's own path) leading.
+   */
+  lines: SpeedLine[]
+  /** the flying icon's size */
+  iconClass: string
+  /** how far the group travels on the take-off beat */
+  travel: number
+  /** and how much further as it leaves */
+  exit: number
+  /** how big the icon gets at full speed */
+  peak: number
+}
+
+/**
+ * The same flourish at two scales.
+ *
+ * "default" is drawn for a filled CTA button, which has padding to spare in
+ * every direction. "slim" is for a plain text link, where that geometry
+ * would overrun the line of type the link sits on and read as a button
+ * trying to escape a sentence. Everything shrinks together rather than the
+ * icon alone: a full-length fan behind a smaller mark reads as a mistake,
+ * not as a smaller version of the same thing.
+ */
+export const SPEED_LAUNCH: Record<SpeedLaunchSize, SpeedLaunchScale> = {
+  default: {
+    lines: [
+      { y: -7, length: 22, thickness: 2, delay: 0.015, opacity: 0.75 },
+      { y: 0, length: 30, thickness: 2, delay: 0, opacity: 0.9 },
+      { y: 7, length: 22, thickness: 2, delay: 0.015, opacity: 0.75 },
+    ],
+    iconClass: 'h-4 w-4',
+    travel: 14,
+    exit: 30,
+    peak: 1.5,
+  },
+  slim: {
+    lines: [
+      { y: -5, length: 13, thickness: 1.5, delay: 0.015, opacity: 0.75 },
+      { y: 0, length: 19, thickness: 1.5, delay: 0, opacity: 0.9 },
+      { y: 5, length: 13, thickness: 1.5, delay: 0.015, opacity: 0.75 },
+    ],
+    iconClass: 'h-3.5 w-3.5',
+    travel: 9,
+    exit: 20,
+    peak: 1.35,
+  },
+}
 
 export interface SpeedLaunchRefs {
   labelRef: RefObject<HTMLSpanElement | null>
@@ -34,7 +87,10 @@ export interface SpeedLaunchRefs {
  * `onLaunch` fires the real action a beat later, and the label rolls back
  * in so the control is ready to use again.
  */
-export function useSpeedLaunch(): SpeedLaunchRefs & { play: (onLaunch: () => void) => void } {
+export function useSpeedLaunch(
+  size: SpeedLaunchSize = 'default',
+): SpeedLaunchRefs & { play: (onLaunch: () => void) => void } {
+  const scale = SPEED_LAUNCH[size]
   const labelRef = useRef<HTMLSpanElement>(null)
   const burstRef = useRef<HTMLSpanElement>(null)
   const groupRef = useRef<HTMLSpanElement>(null)
@@ -87,8 +143,8 @@ export function useSpeedLaunch(): SpeedLaunchRefs & { play: (onLaunch: () => voi
     // travels, not masked by a simultaneous fade. A small vertical shake
     // rides along the same path (never rotation/curving, just a jitter on
     // the y-axis) to sell the vibration of gathering speed.
-    tl.to(iconEl, { scale: 1.5, duration: 0.26, ease: 'power1.out' }, 0.32)
-    tl.to(group, { x: 14, duration: 0.26, ease: 'power2.out' }, 0.32)
+    tl.to(iconEl, { scale: scale.peak, duration: 0.26, ease: 'power1.out' }, 0.32)
+    tl.to(group, { x: scale.travel, duration: 0.26, ease: 'power2.out' }, 0.32)
     tl.to(group, { y: -3, duration: 0.05, ease: 'sine.inOut' }, 0.32)
     tl.to(group, { y: 2, duration: 0.05, ease: 'sine.inOut' }, 0.37)
     tl.to(group, { y: -2, duration: 0.05, ease: 'sine.inOut' }, 0.42)
@@ -100,7 +156,7 @@ export function useSpeedLaunch(): SpeedLaunchRefs & { play: (onLaunch: () => voi
     // reads as gathering speed, not an instant full-length snap, and each
     // starts at its own slightly offset moment for an irregular ripple
     // rather than a single uniform sweep
-    LINES.forEach((cfg, i) => {
+    scale.lines.forEach((cfg, i) => {
       const el = lineEls[i]
       if (!el) return
       tl.fromTo(
@@ -116,7 +172,7 @@ export function useSpeedLaunch(): SpeedLaunchRefs & { play: (onLaunch: () => voi
     // already at its biggest by now, so this is just a fade, not a shrink;
     // it stays large all the way out rather than receding
     tl.to(iconEl, { opacity: 0, duration: 0.16, ease: 'power2.in' }, 0.66)
-    tl.to(group, { x: 30, duration: 0.16, ease: 'power2.in' }, 0.66)
+    tl.to(group, { x: scale.exit, duration: 0.16, ease: 'power2.in' }, 0.66)
     tl.to(lineEls, { scaleX: 1.6, opacity: 0, duration: 0.16, ease: 'power2.in' }, 0.66)
     tl.call(() => onLaunch(), [], 0.76)
 

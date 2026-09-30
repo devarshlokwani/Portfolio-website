@@ -1,11 +1,12 @@
+import type { ReactNode } from 'react'
 import type { IconType } from 'react-icons'
 
 import { SpeedLaunchVisual } from '@/components/ui/speedLaunch'
-import { useSpeedLaunch } from '@/components/ui/useSpeedLaunch'
+import { useSpeedLaunch, type SpeedLaunchSize } from '@/components/ui/useSpeedLaunch'
 
 interface CtaLaunchLinkProps {
   href: string
-  label: string
+  label: ReactNode
   className: string
   icon?: IconType
   /** target="_blank" + window.open, for links that leave the page open (e.g. a project's live site) */
@@ -14,6 +15,8 @@ interface CtaLaunchLinkProps {
   onNavigate?: () => void
   /** see SpeedLaunchVisual: "accent" (default) for a solid accent-fill CTA, "fg" for a bordered/transparent one */
   tone?: 'accent' | 'fg'
+  /** "slim" scales the flourish down for a plain text link rather than a button */
+  size?: SpeedLaunchSize
 }
 
 /**
@@ -32,8 +35,9 @@ export function CtaLaunchLink({
   external = false,
   onNavigate,
   tone,
+  size,
 }: CtaLaunchLinkProps) {
-  const { play, ...refs } = useSpeedLaunch()
+  const { play, ...refs } = useSpeedLaunch(size)
 
   const fire = () => {
     if (external) {
@@ -68,7 +72,7 @@ export function CtaLaunchLink({
       onClick={handleClick}
       className={`relative isolate overflow-hidden ${className}`}
     >
-      <SpeedLaunchVisual label={label} icon={icon} tone={tone} {...refs} />
+      <SpeedLaunchVisual label={label} icon={icon} tone={tone} size={size} {...refs} />
     </a>
   )
 }

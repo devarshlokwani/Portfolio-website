@@ -9,7 +9,12 @@ interface ScrambleTextProps {
   /** skip straight to onDone with no animation (repeat-visit fast path) */
   skip?: boolean
   className?: string
-  /** per-word class overrides, index-aligned with `words`, swapped in as each word starts scrambling in, replacing (not adding to) the base className for that word. An empty/missing entry falls back to the base className. */
+  /**
+   * Per-word class overrides, index-aligned with `words`, swapped in as each
+   * word starts scrambling in. An entry replaces the base className outright
+   * for that word, so it has to be a complete class list and not just the
+   * parts that differ. A missing or empty entry falls back to the base.
+   */
   wordClassNames?: (string | undefined)[]
 }
 
@@ -40,11 +45,15 @@ export function ScrambleText({
         scrambleText: { text: word, chars: SCRAMBLE_CHARS, speed: 0.4, revealDelay: 0.15 },
         ease: 'none',
         onStart: () => {
-          // Reset to the base className each word, then layer this word's
-          // override on top: avoids overrides accumulating across words.
-          el.className = className
-          const override = wordClassNames?.[i]
-          if (override) el.classList.add(...override.split(' ').filter(Boolean))
+          // The override replaces the base outright rather than layering on
+          // top of it. Adding both left the two sets fighting, and which won
+          // came down to the order Tailwind happens to emit its utilities in
+          // rather than to intent: the base's `uppercase`, `font-semibold`
+          // and `tracking-tight` were all quietly beating the override's
+          // `normal-case`, `font-normal` and `tracking-normal`, so the script
+          // face rendered in tight semibold caps. An override is therefore a
+          // whole class list, not a patch on one.
+          el.className = wordClassNames?.[i] || className
         },
       })
       if (i < words.length - 1) {
@@ -63,7 +72,10 @@ export function ScrambleText({
   if (skip) return null
 
   return (
-    <span ref={textRef} className={className}>
+    // The first word's own classes, not the base, so the opening frame is
+    // already in the face it animates in rather than flipping on the first
+    // tick.
+    <span ref={textRef} className={wordClassNames?.[0] || className}>
       {words[0]}
     </span>
   )

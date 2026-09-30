@@ -24,7 +24,7 @@ export function IntroLoader() {
   }
 
   return (
-    <div ref={overlayRef} className="fixed inset-0 z-[100]" aria-hidden={wordsDone}>
+    <div ref={overlayRef} className="fixed inset-0 z-[100] overflow-hidden" aria-hidden={wordsDone}>
       <div ref={panelTopRef} className="absolute inset-x-0 top-0 h-1/2 bg-bg" />
       <div ref={panelBottomRef} className="absolute inset-x-0 bottom-0 h-1/2 bg-bg" />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -32,7 +32,11 @@ export function IntroLoader() {
           words={INTRO_WORDS}
           onDone={handleWordsDone}
           skip={skipped}
-          className="font-display text-[12vw] font-semibold uppercase leading-none tracking-tight text-fg md:text-[6vw]"
+          /* nowrap is the actual fix for the reflow: whatever the scrambler
+             puts up, it can never break onto a second line and jump the
+             centred block. The sizes above keep it inside the screen; this
+             keeps it on one line even when they do not. */
+          className="whitespace-nowrap font-display text-[12vw] font-semibold uppercase leading-none tracking-tight text-fg md:text-[6vw]"
           wordClassNames={wordClassNames}
         />
       </div>

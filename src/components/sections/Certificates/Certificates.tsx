@@ -1,5 +1,6 @@
 import { CertificateList } from '@/components/sections/Certificates/CertificateList'
 import { CertificateWall } from '@/components/sections/Certificates/CertificateWall'
+import { CredlyBadge } from '@/components/sections/Certificates/CredlyBadge'
 import { CERTIFICATES } from '@/components/sections/Certificates/certificateData'
 import { Section } from '@/components/ui/Section'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -41,6 +42,10 @@ export function Certificates({ view }: { view: CertificateView }) {
       />
 
       {view === 'wall' ? <CertificateWall /> : <CertificateList />}
+
+      {/* Below both views rather than inside either: it is the same credential
+          whichever way the list above is being read. */}
+      <CredlyBadge />
     </Section>
   )
 }
