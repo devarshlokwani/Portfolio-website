@@ -101,8 +101,12 @@ export function WallEntryForm() {
     try {
       // The uid is the document id, so this replaces rather than appends.
       // Merged rather than overwritten, because anything set on the document
-      // from the console, `pinned` above all, would otherwise be dropped the
+      // by the admin, `pinned` above all, would otherwise be dropped the
       // moment its author came back and reworded their message.
+      //
+      // `approved` goes back to false on every write, including an edit: the
+      // words that were reviewed are not the words that would now be shown.
+      // The rules enforce this too, so a crafted request cannot skip it.
       await setDoc(
         doc(db, 'wallEntries', user.uid),
         {
@@ -110,7 +114,9 @@ export function WallEntryForm() {
           name: name.slice(0, 40),
           message: trimmed.slice(0, MESSAGE_MAX),
           provider: user.providerData[0]?.providerId ?? 'google.com',
+          photoURL: user.photoURL ?? null,
           createdAt: serverTimestamp(),
+          approved: false,
         },
         { merge: true },
       )
@@ -264,7 +270,7 @@ export function WallEntryForm() {
           {error ? (
             <span className="text-accent">{error}</span>
           ) : status === 'success' ? (
-            'Up on the wall. Thank you.'
+            'Signed. It goes up once it has been read.'
           ) : (
             `${message.length}/${MESSAGE_MAX}`
           )}

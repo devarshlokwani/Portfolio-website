@@ -6,7 +6,7 @@ export function TermsAndConditions() {
   const { goTo } = useRouteTransition()
 
   return (
-    <LegalLayout title="Terms & Conditions" lastUpdated="30 September 2026">
+    <LegalLayout title="Terms & Conditions" lastUpdated="13 October 2026">
       <section>
         <h2>Acceptance</h2>
         <p>
@@ -101,10 +101,10 @@ export function TermsAndConditions() {
           <li>Infringe someone else's copyright or other rights</li>
         </ul>
         <p>
-          A basic word filter and automated abuse prevention are in place, but neither is a
-          substitute for the rules above. Entries that don't belong may be edited or removed at
-          Devarsh's discretion, without notice, and repeated breaches may mean no further
-          signatures from that account.
+          Every signature is read before it goes up. Nothing you write appears on the wall until
+          it has been approved, and anything that breaks the rules above simply never appears.
+          A signature already on the wall may be taken down at Devarsh's discretion, without
+          notice, and repeated breaches may mean no further signatures from that account.
         </p>
       </section>
 
@@ -113,7 +113,8 @@ export function TermsAndConditions() {
         <p>
           One signature per account. Coming back and signing again replaces what you wrote rather
           than adding a second entry, and re-dates it, which also moves it back to the top of the
-          wall.
+          wall. An edited signature goes back for review, so it leaves the wall until it has been
+          read again.
         </p>
         <p>
           Your signature is yours to change or take down whenever you like, from the wall itself
@@ -136,8 +137,8 @@ export function TermsAndConditions() {
         </p>
         <p>
           Post only what you have the right to post, and treat anything you write there as
-          public, because it is. Signatures are other people's words, not Devarsh's, and are not
-          reviewed before they appear.
+          public, because once approved it is. Signatures are other people's words, not
+          Devarsh's. Approving one means it was judged fit to show, not that he agrees with it.
         </p>
       </section>
 

@@ -1,12 +1,18 @@
+import { useState } from 'react'
+
 /**
- * A visitor's initials on a colour picked from their own id.
+ * A signer's profile picture, falling back to their initials.
  *
- * Deliberately not the avatar Google or GitHub hands back with the account.
- * Those live on their CDNs, so showing them would put a third-party request
- * on this page for every signature on the wall, and hand each visitor's IP
- * to Google or GitHub simply for reading it. The privacy policy states that
- * images here are served from this domain and that reading a page announces
- * your visit to nobody, and that would stop being true.
+ * The picture is the one their provider hands back, served from Google's or
+ * GitHub's CDN. That is a third-party request per signature on the wall, and
+ * it hands those two a visitor's IP address for reading the page: the
+ * privacy policy says so plainly rather than the site pretending otherwise.
+ * It is the trade for a wall of faces instead of a wall of monograms.
+ *
+ * Initials remain the fallback, and not only for accounts with no picture.
+ * Provider avatar URLs expire, get revoked, and fail to load behind strict
+ * blockers, so a broken image is a normal state rather than an edge case,
+ * and reaching it should look deliberate.
  *
  * The colour is derived rather than random so the same person keeps the same
  * one on every visit and across reloads.
@@ -41,13 +47,32 @@ function initialsOf(name: string): string {
 export function WallAvatar({
   name,
   seed,
+  photoURL = null,
   className = 'h-10 w-10 text-sm',
 }: {
   name: string
   /** Stable per person. The account id where there is one, else the name. */
   seed: string
+  /** The provider's picture, if the account had one. */
+  photoURL?: string | null
   className?: string
 }) {
+  const [failed, setFailed] = useState(false)
+
+  if (photoURL && !failed) {
+    return (
+      <img
+        src={photoURL}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
+        className={`inline-block shrink-0 rounded-full object-cover ${className}`}
+      />
+    )
+  }
+
   return (
     <span
       aria-hidden="true"

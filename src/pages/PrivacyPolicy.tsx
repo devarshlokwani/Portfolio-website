@@ -3,7 +3,7 @@ import { EMAIL, EMAIL_HREF } from '@/lib/contact'
 
 export function PrivacyPolicy() {
   return (
-    <LegalLayout title="Privacy Policy" lastUpdated="30 September 2026">
+    <LegalLayout title="Privacy Policy" lastUpdated="13 October 2026">
       <section>
         <h2>Overview</h2>
         <p>
@@ -39,26 +39,39 @@ export function PrivacyPolicy() {
           Signing in creates an account record held by Firebase Authentication. That record holds
           the identifiers your chosen provider returns, which normally include your email address,
           your display name, a link to your profile picture, and an opaque user ID. The site
-          itself reads only your display name from it. Your email address is never displayed on
-          the wall, never stored in the guestbook, and never used to contact you. Your profile
-          picture is not loaded either: the coloured initials next to a signature are drawn by
-          this site from your name, on a colour worked out from your user ID so it stays the
-          same each visit. That keeps every image on the wall served from this domain rather
-          than from Google's or GitHub's.
+          itself reads your display name and the address of your profile picture. Your email
+          address is never displayed on the wall, never stored in the guestbook, and never used
+          to contact you.
         </p>
         <p>
           <strong className="text-fg">What a signature stores.</strong> When you sign, one record
           is written to Firestore, a Google database, holding your display name, your message,
-          which provider you signed in with, the time you signed, and your Firebase user ID. That
-          record is public: anyone who visits the wall can read all of it, including which of the
-          two providers you used, which is shown as a small mark on your signature. Nothing else
-          about you is written, and nothing is inferred from it.
+          the address of your profile picture, which provider you signed in with, the time you
+          signed, and your Firebase user ID. Once it is approved that record is public: anyone
+          who visits the wall can read all of it, including which of the two providers you used,
+          which is shown as a small mark on your signature. Nothing else about you is written,
+          and nothing is inferred from it.
         </p>
         <p>
           Your user ID is also the record's name, which is how one signature per person is
           enforced by the database itself rather than merely asked for. It is an identifier for
           this project only, meaningless anywhere else, and not linked to anything outside the
           wall.
+        </p>
+        <p>
+          <strong className="text-fg">Before it appears.</strong> A signature is not public the
+          moment you write it. It is held back until Devarsh has read it, and only then does it
+          go up on the wall. Until that happens only you and he can see it. Editing a signature
+          that was already approved sends it back to be read again, because the words that were
+          reviewed are no longer the words that would be shown.
+        </p>
+        <p>
+          <strong className="text-fg">Profile pictures.</strong> Signatures show the picture from
+          the account that signed, loaded directly from Google's or GitHub's servers. That is a
+          request to them from your browser for each signature on the wall, which tells them your
+          IP address and that you loaded this page. It is the one place on this site where
+          reading a page involves a third party without you choosing to. Accounts with no picture
+          fall back to initials drawn here, and so does any picture that fails to load.
         </p>
         <p>
           <strong className="text-fg">Abuse prevention.</strong> The guestbook is protected by
@@ -86,8 +99,9 @@ export function PrivacyPolicy() {
         </p>
         <p>
           Nothing else is collected. There is no payment processing, no newsletter, and no form
-          on this site asks for anything beyond what's described above. Fonts and images are
-          served from this site's own domain rather than a third-party CDN.
+          on this site asks for anything beyond what's described above. Fonts, and every image
+          other than the guestbook's profile pictures, are served from this site's own domain
+          rather than a third-party CDN.
         </p>
       </section>
 

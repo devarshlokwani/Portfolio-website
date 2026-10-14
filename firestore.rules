@@ -16,35 +16,80 @@ service cloud.firestore {
         return p is string && p in ['google.com', 'github.com'];
       }
 
-      // The wall is meant to be read by anyone, signed in or not.
-      allow read: if true;
+      // Null where the provider had no picture. Capped because it is written
+      // by the client and shown as an image source.
+      function validPhoto(u) {
+        return u == null || (u is string && u.size() <= 500);
+      }
+
+      // The one account that moderates. Checked by email rather than by uid
+      // so it survives the account being recreated, and `email_verified`
+      // because an unverified address proves nothing about who holds it.
+      function isAdmin() {
+        return request.auth != null
+               && request.auth.token.email_verified == true
+               && request.auth.token.email == 'devarshlokwani480@gmail.com';
+      }
+
+      function isOwner() {
+        return request.auth != null && entryId == request.auth.uid;
+      }
+
+      // `approved` read through get() with a default: a document written
+      // before moderation existed has no such field, and reaching for a
+      // missing key is an error that denies the read outright.
+      function isApproved() {
+        return resource.data.get('approved', false) == true;
+      }
+
+      // A signature is public once it has been reviewed. Its author can
+      // always see their own, so a pending one reads as waiting rather than
+      // lost, and the admin sees everything in order to review it.
+      allow get: if isApproved() || isOwner() || isAdmin();
+
+      // Listing is evaluated per document, so a query that would return one
+      // the reader cannot see fails as a whole. The public list therefore has
+      // to ask for approved entries only; the admin's list is unconstrained.
+      allow list: if isApproved() || isAdmin();
 
       // One signature per account, enforced by making the account's own uid
       // the document id. A second signature has nowhere to go: it would have
       // to be written over the first. This is the rule that makes it true,
       // rather than the interface merely asking nicely.
-      allow create: if request.auth != null
-                    && entryId == request.auth.uid
-                    && request.resource.data.keys().hasOnly(['uid', 'name', 'message', 'provider', 'createdAt'])
+      allow create: if isOwner()
+                    && request.resource.data.keys().hasOnly(
+                         ['uid', 'name', 'message', 'provider', 'photoURL', 'createdAt', 'approved'])
                     && request.resource.data.uid == request.auth.uid
                     && validName(request.resource.data.name)
                     && validMessage(request.resource.data.message)
                     && validProvider(request.resource.data.provider)
-                    && request.resource.data.createdAt == request.time;
+                    && validPhoto(request.resource.data.photoURL)
+                    && request.resource.data.createdAt == request.time
+                    // Nobody puts themselves on the wall. A new signature
+                    // starts unapproved and waits to be reviewed.
+                    && request.resource.data.approved == false;
 
-      // Editing your own signature later. Scoped to the fields a signer owns
-      // so that anything set from the console, `pinned` in particular, is not
-      // quietly dropped when they come back and reword their message.
-      allow update: if request.auth != null
-                    && entryId == request.auth.uid
+      // Editing your own signature. Scoped to the fields a signer owns, so
+      // `pinned` is not quietly dropped when they reword their message, and
+      // forced back to unapproved, because what was reviewed is no longer
+      // what would be shown.
+      allow update: if isOwner()
                     && request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['name', 'message', 'createdAt'])
+                         .hasOnly(['name', 'message', 'photoURL', 'createdAt', 'approved'])
                     && validName(request.resource.data.name)
                     && validMessage(request.resource.data.message)
-                    && request.resource.data.createdAt == request.time;
+                    && validPhoto(request.resource.data.photoURL)
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.approved == false;
 
-      // Your own entry is yours to take down again.
-      allow delete: if request.auth != null && entryId == request.auth.uid;
+      // The admin decides what is shown and what is featured, and nothing
+      // else: they cannot rewrite what somebody signed.
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['approved', 'pinned']);
+
+      // Your own entry is yours to take down. The admin can take down anyone's.
+      allow delete: if isOwner() || isAdmin();
     }
   }
 }
