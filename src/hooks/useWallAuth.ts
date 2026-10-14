@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   getRedirectResult,
   onAuthStateChanged,
+  signInWithPopup,
   signInWithRedirect,
   signOut as firebaseSignOut,
   type AuthProvider,
@@ -19,14 +20,20 @@ const PROVIDERS: Record<WallProvider, AuthProvider> = {
 
 /** Turns a Firebase auth error code into something worth reading. */
 function messageFor(code: string): string | null {
+  // Closing the window is the visitor changing their mind, not a fault, and
+  // an error for it would be telling them off for it.
+  if (
+    code === 'auth/popup-closed-by-user' ||
+    code === 'auth/cancelled-popup-request' ||
+    code === 'auth/user-cancelled'
+  ) {
+    return null
+  }
   if (code === 'auth/account-exists-with-different-credential') {
     return 'That email is already signed in with the other provider. Try that one.'
   }
-  // The visitor backing out of the provider's page is a decision, not a
-  // fault, and an error for it would be telling them off for changing their
-  // mind.
-  if (code === 'auth/user-cancelled' || code === 'auth/cancelled-popup-request') {
-    return null
+  if (code === 'auth/popup-blocked') {
+    return 'Your browser blocked the sign-in window. Allow popups and try again.'
   }
   return 'Could not sign you in. Try again in a moment.'
 }
@@ -38,17 +45,22 @@ function messageFor(code: string): string | null {
  * account is what makes one signature per person enforceable in the security
  * rules rather than merely asked for in the interface.
  *
- * Signing in redirects the page rather than opening a second window. A popup
- * puts the provider in a bare browser frame with its own address bar, which
- * reads as something that arrived from outside the site, and it is the thing
- * browsers and extensions block most readily. Redirecting hands the whole
- * page over and brings it back, so the only chrome on screen is the one the
- * visitor already trusts.
+ * Sign-in hands over the whole page where it can, and opens a window where
+ * it cannot. Which one is possible comes down to a single thing: whether the
+ * auth handler is served from this same origin.
  *
- * The cost is that the result arrives on the next page load rather than from
- * the call, which is what `getRedirectResult` is reading below: it is the
- * only place a failed sign-in can still be reported, since by then the call
- * that started it is long gone.
+ * Redirecting is the better experience, the provider filling the tab rather
+ * than arriving in a bare frame with its own address bar. But mid-redirect
+ * Firebase leaves its state on the `authDomain`, and if that is a different
+ * origin to the page, the state is third-party storage. Browsers that block
+ * it, Edge and Safari among them, send the visitor back signed out with
+ * nothing to show for the trip and no error to explain it. Production
+ * proxies `/__/auth/*` through this domain precisely so the two match.
+ *
+ * Nothing here needs to know which environment it is in. It compares the
+ * configured `authDomain` against the page's own host and picks the flow
+ * that can actually complete, so a deployment where the proxy is missing
+ * degrades to a popup instead of failing silently.
  *
  * `pending` starts true and only clears once Firebase has reported the first
  * auth state. Without it the sign-in panel flashes up for the moment before a
@@ -69,8 +81,9 @@ export function useWallAuth() {
     })
   }, [])
 
-  // Picks up a sign-in that completed while the page was away. Resolves to
-  // null on an ordinary load, so this costs nothing when nobody signed in.
+  // Picks up a sign-in that finished while the page was away, which is the
+  // only place a failed redirect can still be reported: the call that began
+  // it is long gone by then. Resolves to null on an ordinary load.
   useEffect(() => {
     if (!auth) return
     getRedirectResult(auth).catch((e: unknown) => {
@@ -80,17 +93,13 @@ export function useWallAuth() {
   }, [])
 
   /**
-   * Lets the buttons go again when the visitor comes back without signing in.
+   * Lets the buttons go again when the page comes back from the cache.
    *
-   * Handing the page to the provider means the `busy` that disabled the
-   * buttons is never cleared by the call that set it: the navigation happens
-   * first. Pressing back then restores this page from the browser's
-   * back/forward cache with that state frozen exactly as it was, buttons
-   * still disabled, and no amount of clicking brings them round.
-   *
-   * `pageshow` is what distinguishes a restore from a fresh load, and fires
-   * for both, so clearing here covers the case without needing to know which
-   * happened. On a fresh load it is setting false over false.
+   * Pressing back onto a page the browser kept in its back/forward cache
+   * restores its state exactly as it was, which includes a `busy` that was
+   * set on the way out and never cleared. `pageshow` fires on that restore
+   * as well as on a fresh load, so clearing here covers it either way: on a
+   * fresh load it is setting false over false.
    */
   useEffect(() => {
     const reset = () => setBusy(false)
@@ -105,13 +114,24 @@ export function useWallAuth() {
     }
     setError(null)
     setBusy(true)
+
+    // Same host means the handler is ours to serve, so the redirect's state
+    // is first-party and survives. Anything else, localhost included, has to
+    // use a window.
+    const sameOrigin = auth.config.authDomain === window.location.hostname
+
     try {
-      // Navigates away. Nothing after this runs on a successful sign-in, so
-      // `busy` is only ever cleared when the redirect itself failed to start.
-      await signInWithRedirect(auth, PROVIDERS[provider])
+      if (sameOrigin) {
+        // Navigates away. Nothing after this runs on success, and the result
+        // is picked up by getRedirectResult on the way back in.
+        await signInWithRedirect(auth, PROVIDERS[provider])
+        return
+      }
+      await signInWithPopup(auth, PROVIDERS[provider])
     } catch (e) {
       const code = (e as { code?: string })?.code ?? ''
       setError(messageFor(code))
+    } finally {
       setBusy(false)
     }
   }, [])
