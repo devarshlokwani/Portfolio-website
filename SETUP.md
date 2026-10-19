@@ -188,11 +188,12 @@ write. To connect it:
    add the production domain under **Authentication -> Settings -> Authorised
    domains**. GitHub also needs an OAuth app of its own, with Firebase's callback URL
    as the authorisation callback.
-3. Deploy `firestore.rules`. They scope `wallEntries` so a document's id must be the
-   signer's own uid, which is what makes one signature per account true in the
-   database rather than merely asked for in the interface. Updates are limited to the
-   fields a signer owns, so a `pinned` flag set from the console survives them
-   rewording their message.
+3. Deploy `firestore.rules` and `firestore.indexes.json`. The rules scope
+   `wallEntries` so a document's id must be the signer's own uid, which is what makes
+   one signature per account true in the database rather than merely asked for in the
+   interface. Updates are limited to the fields a signer owns, so a `pinned` flag
+   survives them rewording their message. The index is the one the public list needs,
+   on `approved` and `createdAt` together.
 4. Register the domain under **App Check -> reCAPTCHA v3** and set
    `VITE_RECAPTCHA_SITE_KEY`, then turn on enforcement for Firestore. Signing in is
    what gates writing; App Check is what stops a script with a stolen token writing
@@ -201,8 +202,39 @@ write. To connect it:
 Leaving the variables blank is safe: `firebaseEnabled` is false without them, the
 wall renders its signed-out state, and no Firebase connection is opened.
 
-To feature a signature, set `pinned: true` on its document from the console. Nothing
-in the interface can set it, and the rules will not let a signer change it.
+### Moderation
+
+Nothing goes up unreviewed. A new or edited signature is written with
+`approved: false` and is visible only to its author and to the admin account named in
+`src/lib/admin.ts`, which the rules check by verified email. Signed in as that
+account, each signature on `/wall` carries its own controls: **Approve** puts it up,
+**Hide** takes it back down, **Pin** features it, **Delete** removes it outright. A
+count of what is waiting sits above the list.
+
+`src/lib/admin.ts` only decides whether to draw those controls. The rules are what
+actually stop anyone else using them, so changing the address there without changing
+it in `firestore.rules` changes nothing about who can moderate.
+
+### The approval email
+
+Approving a signature sends its author a short note saying it is up. Optional: leave
+the three `VITE_EMAILJS_*` variables blank and approving simply sends nothing.
+
+Firebase is on the Spark plan, which has no Cloud Functions, so there is no server of
+ours to send from. `src/lib/notify.ts` posts to EmailJS from the admin's own browser
+instead. To turn it on, create an EmailJS service and template, take the public key
+from **Account -> General**, and restrict it to this domain under **Account ->
+Security**, because it ships in the bundle like every other `VITE_` value. The
+template is addressed to `{{to_email}}` and can use `{{to_name}}`, `{{site_url}}` and
+`{{wall_url}}`.
+
+The address itself is never written to the signature, because the wall is public and
+a rule cannot hide one field of a document it allows to be read. It goes in
+`wallContacts/{uid}`, which has no list rule at all: it can be opened one document at
+a time by its owner and by the admin, and cannot be enumerated as a mailing list by
+anybody. It is deleted whenever the signature is. The admin may set `notifiedAt` on
+it and nothing else, so the collection cannot be turned into a way to send mail to an
+arbitrary address.
 
 **Privacy note.** The routes are not code-split, so `src/lib/firebase.ts` is
 evaluated on first load of any page. Its App Check call is at module scope, which

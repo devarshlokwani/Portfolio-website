@@ -4,9 +4,12 @@ import { WallEntryForm } from '@/components/sections/SignTheWall/WallEntryForm'
 import { WallEntryList } from '@/components/sections/SignTheWall/WallEntryList'
 
 /** A centred label with a rule running out to either side. */
-function Divider({ children }: { children: string }) {
+function Divider({ id, children }: { id?: string; children: string }) {
   return (
-    <div className="mt-24 flex items-center gap-5 md:mt-28">
+    // Scrolled to by the hero's "Read Notes", so it carries the id rather
+    // than the section: landing on the section puts the form on screen and
+    // the notes below the fold, which is the opposite of what was asked for.
+    <div id={id} className="scroll-mt-28 mt-24 flex items-center gap-5 md:mt-28">
       <span className="h-px flex-1 bg-border" />
       <span className="shrink-0 font-mono text-xs uppercase tracking-[0.3em] text-fg-subtle">
         {children}
@@ -38,8 +41,8 @@ export function SignTheWall() {
         <SignatureDraw className="mx-auto mt-2 h-20 w-full max-w-[19rem] md:h-24 md:max-w-[23rem]" />
         <p className="mt-6 text-sm leading-relaxed text-fg-muted">
           Had a look around? Leave a note. What worked, what did not, what you would build
-          differently, or just that you were here. Everything posted stays on the wall for the
-          next person to read.
+          differently, or just that you were here. Every note is read before it goes up, so
+          yours will appear once Devarsh has seen it.
         </p>
       </div>
 
@@ -47,7 +50,7 @@ export function SignTheWall() {
         <WallEntryForm />
       </div>
 
-      <Divider>Recent signatures</Divider>
+      <Divider id="signatures">Recent signatures</Divider>
 
       <div className="mt-10">
         <WallEntryList />

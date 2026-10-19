@@ -4,6 +4,7 @@ import { LuGithub, LuLogOut, LuPenLine, LuTrash2 } from 'react-icons/lu'
 import { FcGoogle } from 'react-icons/fc'
 
 import { useRouteTransition } from '@/app/routeTransition'
+import { EmojiPicker } from '@/components/sections/SignTheWall/EmojiPicker'
 import { WallAvatar } from '@/components/sections/SignTheWall/WallAvatar'
 import { CornerCog } from '@/components/ui/CornerCog'
 import { CtaLaunchButton } from '@/components/ui/CtaLaunchButton'
@@ -31,6 +32,7 @@ export function WallEntryForm() {
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
+  const messageRef = useRef<HTMLTextAreaElement>(null)
 
   /**
    * Both of these carry the account they belong to.
@@ -120,6 +122,27 @@ export function WallEntryForm() {
         },
         { merge: true },
       )
+      // The address, kept apart from the signature so that approving it can
+      // say so by email without putting anyone's email on a public wall.
+      // Best effort on purpose: the signature is the thing being saved, and
+      // a failure here, or an account that came with no address at all,
+      // costs that person a courtesy note rather than their entry.
+      //
+      // `notifiedAt` is reset alongside `approved`, because an edited
+      // signature is reviewed again and going up again is worth hearing
+      // about again.
+      if (user.email) {
+        try {
+          await setDoc(doc(db, 'wallContacts', user.uid), {
+            uid: user.uid,
+            email: user.email,
+            notifiedAt: null,
+          })
+        } catch {
+          // Nothing to tell the signer. They did not ask for the email.
+        }
+      }
+
       setLoaded({ uid: user.uid, existing: true })
       setStatus('success')
     } catch {
@@ -128,12 +151,42 @@ export function WallEntryForm() {
     }
   }
 
+  /**
+   * Drops an emoji in at the caret rather than on the end.
+   *
+   * Someone part-way through a sentence expects it where they are, and the
+   * caret is put back after it so they can keep typing without reaching for
+   * the mouse again. Falls back to appending when the field was never
+   * focused and there is no caret to speak of.
+   */
+  const insertEmoji = (emoji: string) => {
+    const field = messageRef.current
+    const current = message
+    const start = field?.selectionStart ?? current.length
+    const end = field?.selectionEnd ?? current.length
+    const next = (current.slice(0, start) + emoji + current.slice(end)).slice(0, MESSAGE_MAX)
+    setDraft({ uid, text: next })
+
+    // After React has written the new value, or the caret lands at whatever
+    // position the old string had.
+    requestAnimationFrame(() => {
+      if (!field) return
+      const caret = Math.min(start + emoji.length, next.length)
+      field.focus()
+      field.setSelectionRange(caret, caret)
+    })
+  }
+
   const onRemove = async () => {
     if (!db || !user) return
     setError(null)
     setStatus('submitting')
     try {
       await deleteDoc(doc(db, 'wallEntries', user.uid))
+      // Taking the signature down takes the address with it. Keeping it
+      // would be holding a contact detail for something that no longer
+      // exists, which is the thing the privacy policy says does not happen.
+      await deleteDoc(doc(db, 'wallContacts', user.uid)).catch(() => {})
       setDraft({ uid: user.uid, text: '' })
       setLoaded({ uid: user.uid, existing: false })
       setStatus('idle')
@@ -256,6 +309,7 @@ export function WallEntryForm() {
       </div>
 
       <textarea
+        ref={messageRef}
         value={message}
         onChange={(e) => setDraft({ uid, text: e.target.value })}
         maxLength={MESSAGE_MAX}
@@ -266,6 +320,8 @@ export function WallEntryForm() {
       />
 
       <div className="flex items-center justify-between gap-4">
+        <EmojiPicker disabled={loading} onPick={insertEmoji} />
+
         <p role="status" className="font-mono text-xs text-fg-subtle">
           {error ? (
             <span className="text-accent">{error}</span>

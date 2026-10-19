@@ -3,10 +3,12 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   limit,
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
   updateDoc,
   where,
   type Timestamp,
@@ -20,6 +22,7 @@ import { useWallAuth } from '@/hooks/useWallAuth'
 import { isAdminEmail } from '@/lib/admin'
 import { db, firebaseEnabled } from '@/lib/firebase'
 import { Flip } from '@/lib/gsap'
+import { sendApprovalNotice } from '@/lib/notify'
 
 /** The empty and unconfigured states, sized like the wall they stand in for. */
 function EmptyWall({ children }: { children: ReactNode }) {
@@ -168,11 +171,49 @@ export function WallEntryList() {
     }
   }
 
+  /**
+   * Approving, and telling the person it happened.
+   *
+   * The signature goes up first and the email is an afterthought in the
+   * literal sense: if it fails, the entry is still approved and nothing is
+   * marked, so the next approval has another go. The reverse order would
+   * risk mailing somebody about a signature that never went up.
+   *
+   * The address is read one document at a time from the private collection,
+   * which is the only way it can be read. An entry whose author signed in
+   * with a GitHub account that exposes no address simply has no contact
+   * record, and goes up quietly.
+   */
+  const approve = async (entry: WallEntry) => {
+    if (!db) return
+    setBusyId(entry.id)
+    try {
+      await updateDoc(doc(db, 'wallEntries', entry.id), { approved: true })
+
+      const contactRef = doc(db, 'wallContacts', entry.id)
+      const contact = await getDoc(contactRef).catch(() => null)
+      const email = contact?.exists() ? (contact.data().email as string | undefined) : undefined
+      // Already told them about this version of the signature. Editing it
+      // clears the mark, so a reworded entry going back up does send again.
+      const alreadySent = contact?.exists() && contact.data().notifiedAt != null
+
+      if (email && !alreadySent) {
+        const sent = await sendApprovalNotice({ email, name: entry.name })
+        if (sent) await updateDoc(contactRef, { notifiedAt: serverTimestamp() })
+      }
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   const remove = async (id: string) => {
     if (!db) return
     setBusyId(id)
     try {
       await deleteDoc(doc(db, 'wallEntries', id))
+      // The address outlives the signature nowhere, including when it is the
+      // admin doing the removing rather than its author.
+      await deleteDoc(doc(db, 'wallContacts', id)).catch(() => {})
     } finally {
       setBusyId(null)
     }
@@ -203,7 +244,7 @@ export function WallEntryList() {
         {entries.map((entry) => (
           <article
             key={entry.id}
-            className={`relative overflow-hidden rounded-2xl border bg-surface p-5 transition-colors ${
+            className={`relative overflow-hidden rounded-2xl border bg-surface px-5 py-6 transition-colors ${
               !entry.approved
                 ? 'border-dashed border-accent/50'
                 : entry.pinned
@@ -211,11 +252,12 @@ export function WallEntryList() {
                   : 'border-border'
             }`}
           >
-            {/* Oversized and half off the corner, so it reads as watermark
-                rather than as punctuation competing with the message. */}
+            {/* Sat inside the corner rather than bleeding out of it. Hung off
+                the edge it read as a graphic that had slipped rather than a
+                watermark, and crowded the name it sat beside. */}
             <LuQuote
               aria-hidden="true"
-              className="pointer-events-none absolute -right-2 -top-1 h-16 w-16 text-fg opacity-[0.07]"
+              className="pointer-events-none absolute right-5 top-5 h-12 w-12 text-fg opacity-[0.06]"
             />
 
             <header className="flex items-center gap-3">
@@ -240,9 +282,15 @@ export function WallEntryList() {
 
             {/* The name again, in the signature face the footer uses for
                 Devarsh's own. A guestbook entry is a signature, and drawing it
-                as one is the whole conceit of the page. */}
-            <p className="mt-4 font-signature text-2xl leading-none text-fg-subtle/70">
-              {entry.name}
+                as one is the whole conceit of the page.
+                
+                The stroke in front is how a signature is actually written on
+                a page, the pen laid down before the name starts. Drawn as a
+                rule rather than typed as a dash so it keeps the weight and
+                the optical alignment of the hand it sits against. */}
+            <p className="mt-5 flex items-center gap-2.5 text-fg-subtle/70">
+              <span aria-hidden="true" className="h-px w-6 shrink-0 bg-current opacity-60" />
+              <span className="font-signature text-2xl leading-none">{entry.name}</span>
             </p>
 
             {entry.pinned && entry.approved && (
@@ -283,7 +331,7 @@ export function WallEntryList() {
                       Waiting
                     </span>
                     <ReviewButton
-                      onClick={() => setFlag(entry.id, { approved: true })}
+                      onClick={() => approve(entry)}
                       busy={busyId === entry.id}
                       tone="accent"
                       label="Approve this signature for the wall"

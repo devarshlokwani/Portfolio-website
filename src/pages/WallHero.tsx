@@ -41,10 +41,10 @@ export function WallHero() {
   const transitions = useGlyphReload(TITLE, { enabled: revealed && !reducedMotion })
   const text = revealed ? TITLE : reveal
 
-  // Both land on the same section, which is the only one on this route, so
-  // like the other route heroes these scroll rather than navigate. The pair
-  // is kept because the chrome expects two and a lone button reads as an
-  // afterthought in a space built for a row.
+  // Both scroll rather than navigate, like the other route heroes, but to
+  // different places: signing starts at the form, reading starts at the
+  // wall. Sending both to the top of the section meant "Read Notes" put the
+  // form on screen and the notes below the fold.
   const actions = (
     <>
       <CtaLaunchLink
@@ -56,11 +56,13 @@ export function WallHero() {
       />
       <BorderGlow className="hover:!border-transparent">
         <CtaLaunchLink
-          href="#wall"
+          href="#signatures"
           label="Read Notes"
           icon={LuMessagesSquare}
           tone="fg"
-          onNavigate={() => document.querySelector('#wall')?.scrollIntoView({ behavior: 'smooth' })}
+          onNavigate={() =>
+            document.querySelector('#signatures')?.scrollIntoView({ behavior: 'smooth' })
+          }
           className="rounded-full px-6 py-3 text-sm font-medium text-fg"
         />
       </BorderGlow>

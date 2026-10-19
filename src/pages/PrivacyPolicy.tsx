@@ -3,7 +3,7 @@ import { EMAIL, EMAIL_HREF } from '@/lib/contact'
 
 export function PrivacyPolicy() {
   return (
-    <LegalLayout title="Privacy Policy" lastUpdated="13 October 2026">
+    <LegalLayout title="Privacy Policy" lastUpdated="19 October 2026">
       <section>
         <h2>Overview</h2>
         <p>
@@ -40,8 +40,18 @@ export function PrivacyPolicy() {
           the identifiers your chosen provider returns, which normally include your email address,
           your display name, a link to your profile picture, and an opaque user ID. The site
           itself reads your display name and the address of your profile picture. Your email
-          address is never displayed on the wall, never stored in the guestbook, and never used
-          to contact you.
+          address is never displayed on the wall and never shown to anyone who visits it.
+        </p>
+        <p>
+          <strong className="text-fg">Your email address, and the one message sent to it.</strong>{' '}
+          Your address is kept in a separate record from your signature, readable only by you and
+          by Devarsh. It is used for exactly one thing: when your signature is approved and goes
+          up on the wall, a short note is sent to say so and to thank you. That is the only email
+          this site will ever send you. There is no list to be added to and nothing to
+          unsubscribe from. The note is sent through EmailJS, a third-party sending service,
+          which handles it on the way. If your account is one that gives no email address, as a
+          GitHub account can be, nothing is stored and nothing is sent. Removing your signature,
+          by you or by Devarsh, deletes the address with it.
         </p>
         <p>
           <strong className="text-fg">What a signature stores.</strong> When you sign, one record
@@ -111,8 +121,8 @@ export function PrivacyPolicy() {
           Guestbook signatures and sign-in records are held by Google on its own infrastructure,
           which means they may be stored and processed outside Australia. The contact form is
           handled by Formspree and booking details by Cal.com, both on their own infrastructure.
-          Each of those services is governed by its own privacy policy and its own security
-          arrangements.
+          The approval note sent when a signature goes up passes through EmailJS. Each of those
+          services is governed by its own privacy policy and its own security arrangements.
         </p>
       </section>
 
@@ -169,6 +179,10 @@ export function PrivacyPolicy() {
           <li>
             Guestbook signatures stay on the wall until you remove yours or it is removed for
             breaking the rules in the Terms.
+          </li>
+          <li>
+            The email address held against your signature is deleted when the signature is, and
+            is kept only so the approval note can be sent.
           </li>
           <li>
             Your Firebase sign-in record lasts until the account is deleted. Removing your

@@ -91,5 +91,57 @@ service cloud.firestore {
       // Your own entry is yours to take down. The admin can take down anyone's.
       allow delete: if isOwner() || isAdmin();
     }
+
+    /**
+     * Where a signer's email address lives, which is deliberately not on the
+     * signature.
+     *
+     * The wall is public, and a rule cannot hide one field of a document it
+     * allows to be read: anything written beside the message is readable by
+     * everyone who can read the message. So the address sits in its own
+     * collection that nobody but its owner and the admin can open, and the
+     * only thing it is ever used for is telling someone their signature went
+     * up.
+     *
+     * Keyed by uid like the signature, so the two line up without either
+     * pointing at the other.
+     */
+    match /wallContacts/{contactId} {
+
+      function isAdmin() {
+        return request.auth != null
+               && request.auth.token.email_verified == true
+               && request.auth.token.email == 'devarshlokwani480@gmail.com';
+      }
+
+      function isOwner() {
+        return request.auth != null && contactId == request.auth.uid;
+      }
+
+      // Read one at a time only. There is no list rule at all, so the
+      // collection cannot be enumerated even by the admin: the address is
+      // reachable when there is a signature in front of you to send it
+      // about, and not as a mailing list to pull down.
+      allow get: if isOwner() || isAdmin();
+
+      // Written by the signer, holding their own verified address and
+      // nothing else. `notifiedAt` starts null and is the admin's to set.
+      allow create, update: if isOwner()
+                    && request.resource.data.keys().hasOnly(['uid', 'email', 'notifiedAt'])
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.email == request.auth.token.email
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() <= 320;
+
+      // The admin marks that the email went, and may touch nothing else.
+      // They cannot rewrite the address, which is what keeps this from
+      // being a way to send mail to an arbitrary person.
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['notifiedAt']);
+
+      // Removing your signature should not leave your address behind.
+      allow delete: if isOwner() || isAdmin();
+    }
   }
 }
