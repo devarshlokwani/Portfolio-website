@@ -88,6 +88,7 @@ export function useWallAuth() {
     if (!auth) return
     getRedirectResult(auth).catch((e: unknown) => {
       const code = (e as { code?: string })?.code ?? ''
+      console.error('[wall] returning from sign-in failed:', code || e)
       setError(messageFor(code))
     })
   }, [])
@@ -130,6 +131,10 @@ export function useWallAuth() {
       await signInWithPopup(auth, PROVIDERS[provider])
     } catch (e) {
       const code = (e as { code?: string })?.code ?? ''
+      // The friendly sentence below is for the visitor. The code is for
+      // whoever has to work out why, and without it a configuration fault
+      // and a declined consent screen look identical from the outside.
+      console.error('[wall] sign-in failed:', code || e)
       setError(messageFor(code))
     } finally {
       setBusy(false)

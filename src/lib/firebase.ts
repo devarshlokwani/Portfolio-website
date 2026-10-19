@@ -3,16 +3,38 @@ import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getAuth, GithubAuthProvider, GoogleAuthProvider } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
+/**
+ * Trims the value a host actually stored.
+ *
+ * These arrive from a dashboard where a pasted value can carry a trailing
+ * newline or a leading space that nothing in the interface shows you. One
+ * newline on the end of `authDomain` is enough to break sign-in in a way
+ * that looks like anything but whitespace: the domain stops matching the
+ * page's host, so the same-origin check silently picks the wrong flow, and
+ * the URL Firebase builds from it is not a real host, so the error that
+ * surfaces says nothing about where it came from.
+ */
+const env = (value: string | undefined) => value?.trim() || undefined
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: env(import.meta.env.VITE_FIREBASE_API_KEY),
+  authDomain: env(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN),
+  projectId: env(import.meta.env.VITE_FIREBASE_PROJECT_ID),
+  storageBucket: env(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET),
+  messagingSenderId: env(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID),
+  appId: env(import.meta.env.VITE_FIREBASE_APP_ID),
 }
 
-export const firebaseEnabled = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId)
+/**
+ * Every value sign-in needs, not just the two that prove a project exists.
+ *
+ * `authDomain` was missing from this check once, so a build without it sailed
+ * past as connected and failed later at the click, where the cause was four
+ * steps removed from the symptom.
+ */
+export const firebaseEnabled = Boolean(
+  firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.authDomain,
+)
 
 export const app = firebaseEnabled ? initializeApp(firebaseConfig) : null
 
@@ -20,9 +42,11 @@ export const app = firebaseEnabled ? initializeApp(firebaseConfig) : null
 // it stops a script holding a stolen token from writing directly to the
 // collection. Requires a site key from the Firebase console
 // (App Check -> reCAPTCHA v3) and the site registered there.
-if (app && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+const recaptchaSiteKey = env(import.meta.env.VITE_RECAPTCHA_SITE_KEY)
+
+if (app && recaptchaSiteKey) {
   initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    provider: new ReCaptchaV3Provider(recaptchaSiteKey),
     isTokenAutoRefreshEnabled: true,
   })
 }
