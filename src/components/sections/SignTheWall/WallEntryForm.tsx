@@ -237,7 +237,7 @@ export function WallEntryForm() {
     <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-4 py-3">
         <span className="flex min-w-0 items-center gap-3">
-          <WallAvatar name={name} seed={user.uid} />
+          <WallAvatar name={name} seed={user.uid} photoURL={user.photoURL} />
           <span className="min-w-0">
             <span className="block truncate text-sm font-medium text-fg">{name}</span>
             <span className="block font-mono text-xs text-fg-subtle">Signing as</span>
